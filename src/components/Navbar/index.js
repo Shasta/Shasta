@@ -13,6 +13,12 @@ class Index extends Component {
           <Menu.Item name='Shasta' active={activeItem === 'Shasta'} onClick={this.handleItemClick} />
           <Menu.Menu position='right'>
             <Menu.Item>
+              <span>1000 SNT == 2.1 ETH</span>
+            </Menu.Item>
+            <Menu.Item>
+              <span>Hardware connected</span>
+            </Menu.Item>
+            <Menu.Item>
               <Image src='https://pbs.twimg.com/profile_images/962407427755986944/OyX-elqB_400x400.jpg' avatar />
               <span>Alex Sicart</span>
             </Menu.Item>
@@ -33,10 +39,23 @@ class Index extends Component {
                 active={activeItem === 'links'}
                 onClick={this.handleItemClick}
               />
+              <Menu.Item
+                name='Identity'
+                active={activeItem === 'links'}
+                onClick={this.handleItemClick}
+              />
+              <Menu.Item
+                name='Settings'
+                active={activeItem === 'links'}
+                onClick={this.handleItemClick}
+              />
             </Menu>
           </Grid.Column>
 
           <Grid.Column stretched width={12}>
+            <Menu.Item>
+              <h2><b>Market</b></h2>
+            </Menu.Item>
             <Segment>
               <Card.Group>
                 <Card>
@@ -50,23 +69,23 @@ class Index extends Component {
                 <Card>
                   <Card.Content>
                     <Card.Header content='Catalonia' />
-                    <Card.Meta content='200 SNT' />
+                    <Card.Meta content='200 SNT / kWh' />
                     <Card.Description content='HolaLuz' />
                   </Card.Content>
                 </Card>
 
                 <Card>
                   <Card.Content
-                    header='Elliot Baker'
-                    meta='Friend'
-                    description='Elliot is a music producer living in Chicago.'
+                    header='Zurich'
+                    meta='500 SNT / kWh'
+                    description='HolaLuz'
                   />
                 </Card>
 
                 <Card
-                  header='Jenny Hess'
-                  meta='Friend'
-                  description='Jenny is a student studying Media Management at the New School'
+                  header='Torquay'
+                  meta='400 SNT / kWh'
+                  description='HolaLuz'
                 />
               </Card.Group>
             </Segment>
