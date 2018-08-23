@@ -21,6 +21,10 @@ class Index extends Component {
               <Icon name='user' />
               Network
             </Menu.Item>
+            <Menu.Item as='a'>
+              <Icon name='camera' />
+              Market
+            </Menu.Item>
           </Sidebar>
       </div>
     );
