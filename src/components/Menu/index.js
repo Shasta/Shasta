@@ -6,10 +6,7 @@ class Index extends Component {
     return (
       // Menu with Bulma-React.
       <div>
-        <Menu size='small'>
-          <Menu.Item>
-            <span>Shasta</span>
-          </Menu.Item>
+        <Menu size='massive'>
           <Menu.Menu position='right'>
             <Menu.Item>
               <p>username</p>
