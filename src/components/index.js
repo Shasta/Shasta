@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 
-import './App.css';
+import Menu from './Menu/index';
+
 
 class App extends React.Component {
   render() {
     return (
       <div>
-
+        <Menu></Menu>
       </div>
     );
   }
