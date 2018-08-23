@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import Menu from './Menu/index';
 import Sidebar from './Sidebar/index';
-
+import Market from './Market/index';
 
 class App extends React.Component {
   render() {
