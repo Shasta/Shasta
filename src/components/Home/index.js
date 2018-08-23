@@ -15,9 +15,13 @@ class Index extends Component {
           <Feed.Event
             icon='pencil'
             date='Today'
+            summary="You spended 50$ today."
+            />
+          <Feed.Event
+            icon='pencil'
+            date='Today'
             summary="You earned 350$ today."
             />
-
           <Feed.Event>
             <Feed.Label icon='pencil' />
             <Feed.Content date='Today' summary="Alain wants you to supply him with energy." />

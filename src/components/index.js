@@ -20,14 +20,12 @@ class App extends React.Component {
               <h2>Shasta</h2>
             </Menu.Item>
             <Menu.Item as='a'>
+              <Icon name='user' />
               <Link to="/">Home</Link>
             </Menu.Item>
             <Menu.Item as='a'>
-              <Link to="/market">Market</Link>
-            </Menu.Item>
-            <Menu.Item as='a'>
               <Icon name='user' />
-              Network
+              <Link to="/market">Market</Link>
             </Menu.Item>
           </Sidebar>
           <div>
