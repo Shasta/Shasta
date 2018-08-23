@@ -9,6 +9,9 @@ class Index extends Component {
         <Menu size='massive'>
           <Menu.Menu position='right'>
             <Menu.Item>
+              <h4>Wallet: 589$</h4>
+            </Menu.Item>
+            <Menu.Item>
               <p>username</p>
             </Menu.Item>
           </Menu.Menu>

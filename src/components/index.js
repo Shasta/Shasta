@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Menu from './Menu/index';
 import Sidebar from './Sidebar/index';
+import Home from './Home/index';
 
 
 class App extends React.Component {
@@ -10,6 +11,7 @@ class App extends React.Component {
       <div>
         <Menu></Menu>
         <Sidebar></Sidebar>
+        <Home></Home>
       </div>
     );
   }

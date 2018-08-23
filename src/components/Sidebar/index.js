@@ -7,15 +7,19 @@ class Index extends Component {
       <div>
           <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
             <Menu.Item as='a'>
-              <h1>Shasta</h1>
+              <h2>Shasta</h2>
             </Menu.Item>
             <Menu.Item as='a'>
-              <Icon name='gamepad' />
-              Games
+              <Icon name='home' />
+              Home
             </Menu.Item>
             <Menu.Item as='a'>
-              <Icon name='camera' />
-              Channels
+              <Icon name='user' />
+              Market
+            </Menu.Item>
+            <Menu.Item as='a'>
+              <Icon name='user' />
+              Network
             </Menu.Item>
           </Sidebar>
       </div>
