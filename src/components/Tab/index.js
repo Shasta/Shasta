@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Menu, Button } from 'semantic-ui-react'
-var faker = require('faker');
 
 class Index extends Component {
   render() {
@@ -10,7 +9,10 @@ class Index extends Component {
         <Menu size='massive'>
           <Menu.Menu position='right'>
             <Menu.Item>
-              <p>{faker.name.findName()}</p>
+              <h4>Wallet: 589$</h4>
+            </Menu.Item>
+            <Menu.Item>
+              <p>username</p>
             </Menu.Item>
           </Menu.Menu>
         </Menu>

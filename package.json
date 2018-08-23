@@ -49,12 +49,22 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "@vx/axis": "0.0.171",
+    "@vx/glyph": "0.0.170",
+    "@vx/gradient": "0.0.165",
+    "@vx/group": "0.0.170",
+    "@vx/mock-data": "0.0.165",
+    "@vx/scale": "0.0.165",
+    "@vx/shape": "0.0.171",
+    "d3-array": "^1.2.1",
     "dotenv": "^2.0.0",
     "faker": "^4.1.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "react-router-dom": "^4.3.1",
     "semantic-ui-css": "^2.3.3",
-    "semantic-ui-react": "^0.82.3"
+    "semantic-ui-react": "^0.82.3",
+    "vx": "0.0.1"
   },
   "scripts": {
     "start": "node scripts/start.js",
