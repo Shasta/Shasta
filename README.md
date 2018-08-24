@@ -1,0 +1,2 @@
+# Shasta
+Shasta Core Project
