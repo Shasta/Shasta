@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@vx/axis": "0.0.171",
+    "@vx/geo": "0.0.170",
     "@vx/glyph": "0.0.170",
     "@vx/gradient": "0.0.165",
     "@vx/group": "0.0.170",
@@ -64,6 +65,7 @@
     "react-router-dom": "^4.3.1",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.3",
+    "topojson-client": "^3.0.0",
     "vx": "0.0.1"
   },
   "scripts": {

@@ -27,7 +27,6 @@ class Index extends Component {
             <Feed.Content date='Today' summary="Alain wants you to supply him with energy." />
           </Feed.Event>
         </Feed>
-        <Divider />
       </div>
     );
   }

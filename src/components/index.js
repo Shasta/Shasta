@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Tab from './Tab/index';
 import Home from './Home/index';
 import Market from './Market/index';
+import Map from './Map/index';
 
 
 class App extends React.Component {
@@ -27,10 +28,15 @@ class App extends React.Component {
               <Icon name='user' />
               <Link to="/market">Market</Link>
             </Menu.Item>
+            <Menu.Item as='a'>
+              <Icon name='user' />
+              <Link to="/map">Map</Link>
+            </Menu.Item>
           </Sidebar>
           <div>
             <Route exact path="/" component={Home} />
             <Route path="/market" component={Market} />
+            <Route path="/map" component={Map} />
           </div>
         </div>
       </Router>

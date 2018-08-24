@@ -51,10 +51,10 @@ class Index extends Component {
         <Menu size='massive'>
           <Menu.Menu position='right'>
             <Menu.Item>
-              <h4>Wallet: {this.state.balance} ETH</h4>
+              <h4>{this.state.balance} ETH</h4>
             </Menu.Item>
             <Menu.Item>
-              <p>{this.state.user}</p>
+              <a href=''><p>{this.state.user}</p></a>
             </Menu.Item>
           </Menu.Menu>
         </Menu>

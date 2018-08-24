@@ -8,8 +8,18 @@ class Index extends Component {
       <div style={{marginLeft: 400, marginTop:20}}>
         <h1> Buy energy: </h1>
         <Button basic color='blue'>
-          Sign a contract to start receiving energy
+          Start a Contract
         </Button>
+        <h2>Open Contracts</h2>
+        <Card.Group>
+          <Card>
+            <Card.Content>
+              <Card.Header>Contract with HolaLuz</Card.Header>
+              <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
+              <Card.Description></Card.Description>
+            </Card.Content>
+          </Card>
+        </Card.Group>
         <Divider style={{marginTop:200}}/>
         <h1>Shasta Providers</h1>
         <Card.Group>
