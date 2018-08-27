@@ -11,7 +11,7 @@ class App extends React.Component {
     this.state = {
       web3: null,
       user: '',
-      balance: ''
+      balance: '',
     }
   }
 
