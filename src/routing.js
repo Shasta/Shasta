@@ -9,11 +9,21 @@ import Home from './components/Home/index';
 import Market from './components/Market/index';
 import Map from './components/Map/index';
 
+import logo from './static/shasta-logo.png';
+
 
 class App extends React.Component {
   constructor(props) {
     super(props)
   }
+
+
+      heyWeb3 = () => {
+        console.log('web3', this.props.web3)
+        console.log(this.props.web3.eth);
+        console.log(this.props.balance);
+
+      }
 
   render() {
     const {
@@ -29,7 +39,7 @@ class App extends React.Component {
             <Tab web3={web3} user={user} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
               <Menu.Item as='a'>
-                <h2>Shasta</h2>
+                <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
               <Menu.Item as='a'>
                 <Icon name='user' />

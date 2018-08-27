@@ -3,7 +3,16 @@ import { Image, Card, Button, Divider } from 'semantic-ui-react'
 var faker = require('faker');
 
 class Index extends Component {
+  constructor(props) {
+    super(props)
+  }
+
   render() {
+    const {
+      balance,
+      user
+    } = this.props;
+
     return (
       <div style={{marginLeft: 400, marginTop:20}}>
         <h1> Buy energy: </h1>
