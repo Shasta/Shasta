@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Card, Button, Divider } from 'semantic-ui-react'
+import { Image, Card, Button, Divider, Grid } from 'semantic-ui-react'
 var faker = require('faker');
 
 class Index extends Component {
@@ -15,22 +15,37 @@ class Index extends Component {
 
     return (
       <div style={{marginLeft: 400, marginTop:20}}>
-        <h1> Buy energy: </h1>
-        <Button basic color='blue'>
-          Start a Contract
-        </Button>
+        <Grid>
+          <Grid.Row columns={3}>
+            <Grid.Column></Grid.Column>
+            <Grid.Column></Grid.Column>
+            <Grid.Column>
+              <Button>Start a Contract</Button>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
         <h2>Open Contracts</h2>
         <Card.Group>
           <Card>
             <Card.Content>
-              <Card.Header>Contract with HolaLuz</Card.Header>
+              <Card.Header>xxxxxxx</Card.Header>
+              <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
+              <Card.Description></Card.Description>
+            </Card.Content>
+            <Card.Content>
+              <Card.Header>xxxxxxx</Card.Header>
+              <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
+              <Card.Description></Card.Description>
+            </Card.Content>
+            <Card.Content>
+              <Card.Header>xxxxxxx</Card.Header>
               <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
               <Card.Description></Card.Description>
             </Card.Content>
           </Card>
         </Card.Group>
-        <Divider style={{marginTop:200}}/>
-        <h1>Shasta Providers</h1>
+        <Divider style={{marginTop:100}}/>
+        <h1>Providers</h1>
         <Card.Group>
           <Card>
             <Card.Content>
