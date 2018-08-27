@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
 
 import Router from "./routing.js";
-
+import CreateUser from "./components/CreateUser/index";
 import getWeb3 from './getWeb3.js'
+import { default as contract } from 'truffle-contract'
+import user_artifacts from '../build/contracts/User.json'
+var User = contract(user_artifacts);
 
 class App extends React.Component {
+
   constructor(props) {
     super(props)
 
     this.state = {
       web3: null,
       user: '',
-      balance: ''
+      balance: '',
+      username: ''
     }
   }
 
@@ -24,6 +29,9 @@ class App extends React.Component {
       this.setState({
         web3: results.web3
       })
+
+      // set the provider for the User abstraction
+      User.setProvider(results.web3.currentProvider);
 
       // Instantiate contract once web3 provided.
       this.instantiateContract()
@@ -42,25 +50,43 @@ class App extends React.Component {
           balance: this.state.web3.fromWei(balance.toString(), 'ether')
         })
       })
+      // set the provider for the User abstraction 
+      User.setProvider(this.state.web3.currentProvider);
     })
+  }
+
+  //Make checks as eth testnet or if account has user
+  checkAuthentication() {
+
+
 
   }
+
   render() {
     const {
       web3,
       user,
-      balance
+      balance,
+      username
     } = this.state
-    return (
-      <div>
-        <Router
-          web3={web3}
-          user={user}
-          balance={balance}
-          >
-        </Router>
-      </div>
-    );
+
+    if (this.state.username) {
+      return (
+        <div>
+          <Router
+            web3={web3}
+            user={user}
+            balance={balance}
+            username={username}
+            >
+          </Router>
+        </div>
+      );
+    } else {
+      return (
+        <div><CreateUser web3={web3} user={User} account={user}></CreateUser></div>
+      );
+    }
   }
 }
 

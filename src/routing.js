@@ -17,13 +17,12 @@ class App extends React.Component {
     super(props)
   }
 
+  heyWeb3 = () => {
+    console.log('web3', this.props.web3)
+    console.log(this.props.web3.eth);
+    console.log(this.props.balance);
 
-      heyWeb3 = () => {
-        console.log('web3', this.props.web3)
-        console.log(this.props.web3.eth);
-        console.log(this.props.balance);
-
-      }
+  }
 
   render() {
     const {
