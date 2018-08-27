@@ -14,21 +14,27 @@ class App extends React.Component {
   constructor(props) {
     super(props)
   }
+
+
       heyWeb3 = () => {
         console.log('web3', this.props.web3)
         console.log(this.props.web3.eth);
+        console.log(this.props.balance);
+
       }
 
   render() {
     const {
-      web3
+      web3,
+      user,
+      balance
     } = this.props;
 
     return (
       <div>
         <Router>
           <div>
-            <Tab web3={web3}></Tab>
+            <Tab web3={web3} user={user} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
               <Menu.Item as='a'>
                 <h2>Shasta</h2>
@@ -44,10 +50,6 @@ class App extends React.Component {
               <Menu.Item as='a'>
                 <Icon name='user' />
                 <Link to="/map">Map</Link>
-              </Menu.Item>
-              <Menu.Item as='a'>
-                <Icon name='user' />
-                <button onClick={this.heyWeb3}>Web3</button>
               </Menu.Item>
             </Sidebar>
             <div>

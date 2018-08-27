@@ -9,7 +9,9 @@ class App extends React.Component {
     super(props)
 
     this.state = {
-      web3: null
+      web3: null,
+      user: '',
+      balance: ''
     }
   }
 
@@ -30,14 +32,31 @@ class App extends React.Component {
       console.log('Error finding web3.')
     })
   }
+
+  instantiateContract() {
+    // Get accounts.
+    this.state.web3.eth.getAccounts((error, accounts) => {
+      this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
+        this.setState({
+          user: accounts[0],
+          balance: this.state.web3.fromWei(balance.toString(), 'ether')
+        })
+      })
+    })
+
+  }
   render() {
     const {
-      web3
+      web3,
+      user,
+      balance
     } = this.state
     return (
       <div>
         <Router
           web3={web3}
+          user={user}
+          balance={balance}
           >
         </Router>
       </div>
