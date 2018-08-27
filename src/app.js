@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import Router from "./routing.js";
 
-import getWeb3 from './getWeb3'
+import getWeb3 from './getWeb3.js'
 
 class App extends React.Component {
   constructor(props) {
@@ -12,7 +12,7 @@ class App extends React.Component {
       web3: null
     }
   }
-  
+
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
