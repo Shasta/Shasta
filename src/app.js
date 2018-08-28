@@ -37,7 +37,7 @@ class App extends React.Component {
   }
 
   instantiateContract() {
-    // Get accounts.
+    // Get accounts and start IPFS
     this.state.web3.eth.getAccounts((error, accounts) => {
       this.state.node.on('ready', () => {
         console.log('IPFS ready to use!');

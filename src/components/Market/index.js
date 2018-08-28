@@ -32,8 +32,11 @@ class Index extends Component {
               visible={visible}
               width='very wide'
               >
+              <Menu.Item as='a'>
+                <h2>Name: </h2>
+                <h2>Residence: </h2>
+              </Menu.Item>
             </Sidebar>
-            
         </div>
         <div style={{marginLeft: 400, marginTop:20}}>
           <Grid>
