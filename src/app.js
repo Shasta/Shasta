@@ -52,7 +52,7 @@ class App extends React.Component {
         })
 
         //Authenticate the address from metamask
-        this.checkAuthentication(accounts[0]);
+        this.checkAuthentication(accounts[0], this.state);
       })
       // set the provider for the User abstraction 
       User.setProvider(this.state.web3.currentProvider);
@@ -61,15 +61,16 @@ class App extends React.Component {
   }
 
   //Make checks as eth testnet or if account has user
-  checkAuthentication(account) {
+  checkAuthentication(account, state) {
     //Check if address has user
     User.deployed().then(function(contractInstance) {
       contractInstance.getUserByAddress.call(account, {from: account}).then(function(result) {
       
-        console.log('success', result);
+        console.log('success', result[1]);
+        state.username = result[1]
 
-     }).catch(function(e) {
-      console.log('error with call', e);
+      }).catch(function(e) {
+      console.log(e);
       });
       
      });
@@ -82,7 +83,7 @@ class App extends React.Component {
       balance,
       username
     } = this.state
-
+    console.log("username: " + this.state.username);
     if (this.state.username) {
       return (
         <div>
