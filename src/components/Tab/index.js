@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Menu, Button } from 'semantic-ui-react'
-import getWeb3 from './utils/getWeb3'
 
 class Index extends Component {
   constructor(props) {
@@ -8,14 +7,12 @@ class Index extends Component {
 
   }
 
-
   render() {
     const {
       user,
       balance
     } = this.props;
     return (
-      // Menu with Bulma-React.
       <div>
         <Menu size='massive'>
           <Menu.Menu position='right'>
