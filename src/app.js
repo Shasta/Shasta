@@ -58,7 +58,8 @@ class App extends React.Component {
   //Make checks as eth testnet or if account has user
   checkAuthentication() {
 
-
+    //Get users count
+    
 
   }
 
@@ -84,7 +85,7 @@ class App extends React.Component {
       );
     } else {
       return (
-        <div><CreateUser web3={web3} user={User} account={user}></CreateUser></div>
+        <div><CreateUser web3={web3} user={User} account={user} balance={balance}></CreateUser></div>
       );
     }
   }
