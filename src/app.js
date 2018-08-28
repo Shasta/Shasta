@@ -4,6 +4,8 @@ import Router from "./routing.js";
 
 import getWeb3 from './getWeb3.js'
 
+import Ipfs from 'ipfs'
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -12,19 +14,20 @@ class App extends React.Component {
       web3: null,
       user: '',
       balance: '',
+      node: new Ipfs({
+        repo: String(Math.random() + Date.now())
+      }),
     }
   }
 
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
-
     getWeb3
     .then(results => {
       this.setState({
         web3: results.web3
       })
-
       // Instantiate contract once web3 provided.
       this.instantiateContract()
     })
@@ -36,6 +39,9 @@ class App extends React.Component {
   instantiateContract() {
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
+      this.state.node.on('ready', () => {
+        console.log('IPFS ready to use!');
+      })
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
           user: accounts[0],
@@ -43,8 +49,8 @@ class App extends React.Component {
         })
       })
     })
-
   }
+
   render() {
     const {
       web3,
