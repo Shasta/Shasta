@@ -35,6 +35,7 @@ class App extends React.Component {
 
       // Instantiate contract once web3 provided.
       this.instantiateContract()
+
     })
     .catch(() => {
       console.log('Error finding web3.')
@@ -49,18 +50,29 @@ class App extends React.Component {
           user: accounts[0],
           balance: this.state.web3.fromWei(balance.toString(), 'ether')
         })
+
+        //Authenticate the address from metamask
+        this.checkAuthentication(accounts[0]);
       })
       // set the provider for the User abstraction 
       User.setProvider(this.state.web3.currentProvider);
+
     })
   }
 
   //Make checks as eth testnet or if account has user
-  checkAuthentication() {
+  checkAuthentication(account) {
+    //Check if address has user
+    User.deployed().then(function(contractInstance) {
+      contractInstance.getUserByAddress.call(account, {from: account}).then(function(result) {
+      
+        console.log('success', result);
 
-    //Get users count
-    
-
+     }).catch(function(e) {
+      console.log('error with call', e);
+      });
+      
+     });
   }
 
   render() {

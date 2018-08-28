@@ -21,7 +21,7 @@ contract User {
 
   function hasUser(address userAddress) public view returns(bool hasIndeed) 
   {
-    return (addressToIndex[userAddress] > 0 || userAddress == addresses[0]);
+    return (addressToIndex[userAddress] > 0);
   }
 
   function usernameTaken(bytes16 username) public view returns(bool takenIndeed) 

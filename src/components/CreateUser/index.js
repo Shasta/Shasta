@@ -23,24 +23,22 @@ class Index extends Component {
         var User = this.props.user;
         var username = this.state.username;
         var account = this.props.account;
-        console.log("contract", User)
         var ipfsHash = 'not-available';
 
         
         User.deployed().then(function(contractInstance) {
             contractInstance.createUser(username, ipfsHash, {gas: 200000, from: account}).then(function(success) {
             if(success) {
-            console.log('created user on ethereum!');
+            console.log('created user ' + username + 'on ethereum!');
 
             } else {
-            console.log('error creating user on ethereum');
+            console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
             }
            }).catch(function(e) {
             console.log('error creating user:', username, ':', e);
             });
             
            });
-
     }
 
     updateInput(event){
