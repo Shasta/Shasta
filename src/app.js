@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 
 import Router from "./routing.js";
-
+import CreateUser from "./components/CreateUser/index";
 import getWeb3 from './getWeb3.js'
+import { default as contract } from 'truffle-contract'
+import user_artifacts from '../build/contracts/User.json'
+var User = contract(user_artifacts);
 
 import Ipfs from 'ipfs'
 
 class App extends React.Component {
+
   constructor(props) {
     super(props)
 
@@ -17,6 +21,7 @@ class App extends React.Component {
       node: new Ipfs({
         repo: String(Math.random() + Date.now())
       }),
+      username: ''
     }
   }
 
@@ -28,8 +33,13 @@ class App extends React.Component {
       this.setState({
         web3: results.web3
       })
+
+      // set the provider for the User abstraction
+      User.setProvider(results.web3.currentProvider);
+
       // Instantiate contract once web3 provided.
       this.instantiateContract()
+
     })
     .catch(() => {
       console.log('Error finding web3.')
@@ -47,26 +57,63 @@ class App extends React.Component {
           user: accounts[0],
           balance: this.state.web3.fromWei(balance.toString(), 'ether')
         })
+
+        //Authenticate the address from metamask
+        this.checkAuthentication(accounts[0], this);
       })
+      // set the provider for the User abstraction 
+      User.setProvider(this.state.web3.currentProvider);
+
     })
+  }
+
+  //Make checks as eth testnet or if account has user
+  checkAuthentication(account, state) {
+    //Check if address has user
+    console.log("Validating with: ", account);
+    User.deployed().then(function(contractInstance) {
+      contractInstance.getUsernameByAddress.call(account, {from: account}).then(function(result) {
+      
+        console.log("result", result);
+        
+        state.setState({
+          username: result[1]
+        })
+
+        console.log("state",state.state);
+
+      }).catch(function(e) {
+      console.log(e);
+      });
+      
+     });
   }
 
   render() {
     const {
       web3,
       user,
-      balance
+      balance,
+      username
     } = this.state
-    return (
-      <div>
-        <Router
-          web3={web3}
-          user={user}
-          balance={balance}
-          >
-        </Router>
-      </div>
-    );
+    console.log("username: " + this.state.username);
+    if (this.state.username) {
+      return (
+        <div>
+          <Router
+            web3={web3}
+            user={user}
+            balance={balance}
+            username={username}
+            >
+          </Router>
+        </div>
+      );
+    } else {
+      return (
+        <div><CreateUser web3={web3} user={User} account={user} balance={balance}></CreateUser></div>
+      );
+    }
   }
 }
 
