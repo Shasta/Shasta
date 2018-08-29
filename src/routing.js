@@ -10,6 +10,7 @@ import Market from './components/Market/index';
 import Map from './components/Map/index';
 
 import logo from './static/shasta-logo.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 class App extends React.Component {
@@ -21,7 +22,8 @@ class App extends React.Component {
     const {
       web3,
       user,
-      balance
+      balance,
+      username
     } = this.props;
 
     return (
@@ -34,7 +36,7 @@ class App extends React.Component {
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
               <Menu.Item as='a'>
-                <Icon name='home' />
+                <FontAwesomeIcon style={{marginRight:'10px'}} icon="home" />
                 <Link to="/">Home</Link>
               </Menu.Item>
               <Menu.Item as='a'>
@@ -45,7 +47,7 @@ class App extends React.Component {
               </Menu.Item>
             </Sidebar>
             <div>
-              <Route exact path="/" component={Home} />
+              <Route exact path="/" render={(props) => <Home username={this.props.username} />} />
               <Route path="/market" component={Market} />
               <Route path="/map" component={Map} />
             </div>

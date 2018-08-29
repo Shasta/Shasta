@@ -76,7 +76,7 @@ class Index extends Component {
           </Sidebar>
         </div>
         <div style={{marginLeft: 400, marginTop:20}}>
-          <Loader active inline='centered' />          <Grid>
+          <Grid>
             <Grid.Row columns={3}>
               <Grid.Column></Grid.Column>
               <Grid.Column></Grid.Column>
