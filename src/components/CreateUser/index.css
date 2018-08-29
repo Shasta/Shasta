@@ -1,0 +1,12 @@
+body, html {
+    height: 100%;
+    background-color: #3D293F;
+}
+
+.home {
+    height: 100vh;
+    background-color: #3D293F;
+    background-size: cover;
+    background-position: center;
+    color: white;
+}

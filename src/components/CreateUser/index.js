@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, Grid, Image, Input} from 'semantic-ui-react'
 
+import './index.css';
 import shasta from './shasta.png'
 
 
@@ -50,8 +51,8 @@ class Index extends Component {
 
   render() {
     return (
-      <div>
-        <Grid>
+      <div className='home'>
+        <Grid centered>
           <Grid.Row columns={2}>
             <Grid.Column>
               <Image src={shasta} />
@@ -64,14 +65,14 @@ class Index extends Component {
                 <Grid.Column style={{marginTop: '20px'}}>
                   <Form>
                     <Form.Field style={{marginRight: '450px'}}>
-                      <label>Username</label>
+                      <p>Organization</p>
                       <Input placeholder='Username' onChange={this.updateInput}/>
                     </Form.Field>
                     <Button type='submit' onClick={this.createUser}>Create a new organization</Button>
                   </Form>
                 </Grid.Column>
                 <Grid.Column style={{marginTop: '100px'}}>
-                  <h2>{this.props.status}</h2>
+                  <h2>Status: {this.props.status}</h2>
                 </Grid.Column>
                 <Grid.Column></Grid.Column>
               </Grid.Row>
