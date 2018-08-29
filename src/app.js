@@ -68,25 +68,29 @@ class App extends React.Component {
   }
 
   //Make checks as eth testnet or if account has user
-  checkAuthentication(account, state) {
+  checkAuthentication(account, context) {
     //Check if address has user
     console.log("Validating with: ", account);
     User.deployed().then(function(contractInstance) {
       contractInstance.getUsernameByAddress.call(account, {from: account}).then(function(result) {
       
-        console.log("result", result);
-        
-        state.setState({
-          username: result[1]
+        context.setState({
+          username: context.hex2a(result)
         })
-
-        console.log("state",state.state);
 
       }).catch(function(e) {
       console.log(e);
       });
       
      });
+  }
+  
+  hex2a(hexx) {
+    var hex = hexx.toString();//force conversion
+    var str = '';
+    for (var i = 2; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
   }
 
   render() {
@@ -96,7 +100,7 @@ class App extends React.Component {
       balance,
       username
     } = this.state
-    console.log("username: " + this.state.username);
+
     if (this.state.username) {
       return (
         <div>

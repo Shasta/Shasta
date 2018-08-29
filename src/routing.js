@@ -22,7 +22,8 @@ class App extends React.Component {
     const {
       web3,
       user,
-      balance
+      balance,
+      username
     } = this.props;
 
     return (
@@ -51,7 +52,7 @@ class App extends React.Component {
               </Link>
             </Sidebar>
             <div>
-              <Route exact path="/" component={Home} />
+              <Route exact path="/" render={(props) => <Home username={this.props.username} />} />
               <Route path="/market" component={Market} />
               <Route path="/map" component={Map} />
             </div>
