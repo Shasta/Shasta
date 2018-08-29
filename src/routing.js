@@ -17,14 +17,6 @@ class App extends React.Component {
     super(props)
   }
 
-
-      heyWeb3 = () => {
-        console.log('web3', this.props.web3)
-        console.log(this.props.web3.eth);
-        console.log(this.props.balance);
-
-      }
-
   render() {
     const {
       web3,
@@ -42,15 +34,13 @@ class App extends React.Component {
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
               <Menu.Item as='a'>
-                <Icon name='user' />
+                <Icon name='home' />
                 <Link to="/">Home</Link>
               </Menu.Item>
               <Menu.Item as='a'>
-                <Icon name='user' />
                 <Link to="/market">Market</Link>
               </Menu.Item>
               <Menu.Item as='a'>
-                <Icon name='user' />
                 <Link to="/map">Map</Link>
               </Menu.Item>
             </Sidebar>
