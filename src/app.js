@@ -7,6 +7,8 @@ import { default as contract } from 'truffle-contract'
 import user_artifacts from '../build/contracts/User.json'
 var User = contract(user_artifacts);
 
+import Ipfs from 'ipfs'
+
 class App extends React.Component {
 
   constructor(props) {
@@ -16,6 +18,9 @@ class App extends React.Component {
       web3: null,
       user: '',
       balance: '',
+      node: new Ipfs({
+        repo: String(Math.random() + Date.now())
+      }),
       username: ''
     }
   }
@@ -23,7 +28,6 @@ class App extends React.Component {
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
-
     getWeb3
     .then(results => {
       this.setState({
@@ -43,8 +47,11 @@ class App extends React.Component {
   }
 
   instantiateContract() {
-    // Get accounts.
+    // Get accounts and start IPFS
     this.state.web3.eth.getAccounts((error, accounts) => {
+      this.state.node.on('ready', () => {
+        console.log('IPFS ready to use!');
+      })
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
           user: accounts[0],
