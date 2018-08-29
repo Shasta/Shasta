@@ -21,7 +21,7 @@ class App extends React.Component {
       address: '',
       balance: '',
       username: '',
-      ipfsHash: ''
+      ipfsHash: '',
       status: 'Not Connected!'
     }
   }
