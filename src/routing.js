@@ -34,15 +34,13 @@ class App extends React.Component {
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
               <Menu.Item as='a'>
-                <i class="small home icon"></i>
+                <Icon name='home' />
                 <Link to="/">Home</Link>
               </Menu.Item>
               <Menu.Item as='a'>
-                <i name='user' />
                 <Link to="/market">Market</Link>
               </Menu.Item>
               <Menu.Item as='a'>
-                <i name='user' />
                 <Link to="/map">Map</Link>
               </Menu.Item>
             </Sidebar>
