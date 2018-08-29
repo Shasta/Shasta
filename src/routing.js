@@ -34,16 +34,21 @@ class App extends React.Component {
               <Menu.Item as='a'>
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
-              <Menu.Item as='a'>
-                <FontAwesomeIcon style={{marginRight:'10px'}} icon="home" />
-                <Link to="/">Home</Link>
-              </Menu.Item>
-              <Menu.Item as='a'>
-                <Link to="/market">Market</Link>
-              </Menu.Item>
-              <Menu.Item as='a'>
-                <Link to="/map">Map</Link>
-              </Menu.Item>
+              <Link to="/">
+                <Menu.Item as='a'>
+                  <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
+                </Menu.Item>
+              </Link>
+              <Link to="/market">
+                <Menu.Item as='a'>
+                  <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Market</h4>
+                </Menu.Item>
+              </Link>
+              <Link to="/map">
+                <Menu.Item as='a'>
+                  <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Map</h4>
+                </Menu.Item>
+              </Link>
             </Sidebar>
             <div>
               <Route exact path="/" component={Home} />
