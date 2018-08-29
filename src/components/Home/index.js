@@ -14,7 +14,7 @@ class Index extends Component {
     return (
       // Menu with Bulma-React.
       <div style={{ marginLeft: '375px' }}>
-        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome {this.props.username},</h2>
+        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href='https://rinkeby.etherscan.io/address/{this.props.user}'>{this.props.username}</a>,</h2>
         <h5 style={{ marginLeft: '30px', marginTop: '10px' }}>You have 32 notifications.</h5>
         <D3></D3>
         <Feed style={{ marginLeft: '40px', marginTop: '30px' }}>

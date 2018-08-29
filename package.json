@@ -73,6 +73,7 @@
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.3",
     "topojson-client": "^3.0.0",
+    "truffle-hdwallet-provider": "0.0.6",
     "vx": "0.0.1"
   },
   "scripts": {
