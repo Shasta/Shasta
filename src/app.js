@@ -21,7 +21,8 @@ class App extends React.Component {
       node: new Ipfs({
         repo: String(Math.random() + Date.now())
       }),
-      username: ''
+      username: '',
+      status: 'Not Connected!'
     }
   }
 
@@ -55,13 +56,14 @@ class App extends React.Component {
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
           user: accounts[0],
-          balance: this.state.web3.fromWei(balance.toString(), 'ether')
+          balance: this.state.web3.fromWei(balance.toString(), 'ether'),
+          status: 'Connected!'
         })
 
         //Authenticate the address from metamask
         this.checkAuthentication(accounts[0], this);
       })
-      // set the provider for the User abstraction 
+      // set the provider for the User abstraction
       User.setProvider(this.state.web3.currentProvider);
 
     })
@@ -73,7 +75,7 @@ class App extends React.Component {
     console.log("Validating with: ", account);
     User.deployed().then(function(contractInstance) {
       contractInstance.getUsernameByAddress.call(account, {from: account}).then(function(result) {
-      
+
         context.setState({
           username: context.hex2a(result)
         })
@@ -81,10 +83,10 @@ class App extends React.Component {
       }).catch(function(e) {
       console.log(e);
       });
-      
+
      });
   }
-  
+
   hex2a(hexx) {
     var hex = hexx.toString();//force conversion
     var str = '';
@@ -97,6 +99,7 @@ class App extends React.Component {
     const {
       web3,
       user,
+      status,
       balance,
       username
     } = this.state
@@ -115,7 +118,7 @@ class App extends React.Component {
       );
     } else {
       return (
-        <div><CreateUser web3={web3} user={User} account={user} balance={balance}></CreateUser></div>
+        <div><CreateUser web3={web3} user={User} status={status} account={user} balance={balance}></CreateUser></div>
       );
     }
   }
