@@ -22,6 +22,7 @@ class App extends React.Component {
       balance: '',
       username: '',
       ipfsHash: ''
+      status: 'Not Connected!'
     }
   }
 
@@ -58,8 +59,9 @@ class App extends React.Component {
 
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
-          address: accounts[0],
-          balance: this.state.web3.fromWei(balance.toString(), 'ether')
+          user: accounts[0],
+          balance: this.state.web3.fromWei(balance.toString(), 'ether'),
+          status: 'Connected!'
         })
         //Authenticate the address from metamask
         this.checkAuthentication(accounts[0], this);
@@ -116,6 +118,7 @@ class App extends React.Component {
     const {
       web3,
       address,
+      status,
       balance,
       username
     } = this.state
@@ -134,7 +137,7 @@ class App extends React.Component {
       );
     } else {
       return (
-        <div><CreateUser web3={web3} userContract={userContract} account={address} balance={balance} ipfs={ipfs}></CreateUser></div>
+        <div><CreateUser web3={web3} userContract={userContract} account={address} status={status} balance={balance} ipfs={ipfs}></CreateUser></div>
       );
     }
   }
