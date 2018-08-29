@@ -1,7 +1,7 @@
 const HDWalletProvider = require('truffle-hdwallet-provider')
 const fs = require('fs')
 
-const mnemonic = 'uncle dust alien radar deposit palace exile detect master nuclear uncover three'
+const mnemonic = 'mnemonic'
 
 module.exports = {
   networks: {
