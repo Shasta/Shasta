@@ -12,17 +12,11 @@ class Index extends Component {
       user,
       balance
     } = this.props;
+    
     return (
       <div>
         <Menu size='massive'>
-          <Menu.Menu position='right'>
-            <Menu.Item>
-              <h4>{this.props.balance} ETH</h4>
-            </Menu.Item>
-            <Menu.Item>
-              <a href=''><p>{this.props.user}</p></a>
-            </Menu.Item>
-          </Menu.Menu>
+          <Menu.Menu position='right'></Menu.Menu>
         </Menu>
       </div>
     );

@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
-import { Image, Card, Button, Divider, Grid, Sidebar, Icon, Menu, Segment, Header } from 'semantic-ui-react'
+import { Image, Card, Button, Divider, Grid, Sidebar, Icon, Menu, Segment, Header, Progress, Form, Checkbox, Loader } from 'semantic-ui-react'
+import './index.css';
+
 var faker = require('faker');
 
 class Index extends Component {
   constructor(props) {
     super(props)
 
-    this.state = { visible: false }
+    this.state = {
+      visible: false,
+      percent: 0
+    }
   }
+
+  toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
 
   handleButtonClick = () => this.setState({ visible: !this.state.visible })
 
@@ -22,24 +29,54 @@ class Index extends Component {
     return (
       <div>
         <div>
-            <Sidebar
-              as={Menu}
-              animation='overlay'
-              icon='labeled'
-              onHide={this.handleSidebarHide}
-              vertical
-              direction='right'
-              visible={visible}
-              width='very wide'
-              >
-              <Menu.Item as='a'>
-                <h2>Name: </h2>
-                <h2>Residence: </h2>
-              </Menu.Item>
-            </Sidebar>
+          <Sidebar
+            as={Menu}
+            animation='overlay'
+            icon='labeled'
+            onHide={this.handleSidebarHide}
+            vertical
+            direction='right'
+            visible={visible}
+            width='very wide'
+            >
+            <Menu.Item>
+              <h3 style={{position: 'relative'}}>New Contract</h3>
+            </Menu.Item>
+            <Menu.Item>
+              <Form>
+                <Form.Field>
+                  <label>First Name</label>
+                  <input placeholder='First Name' />
+                </Form.Field>
+                <Form.Field>
+                  <label>Last Name</label>
+                  <input placeholder='Last Name' />
+                </Form.Field>
+                <Form.Field>
+                  <label>Address</label>
+                  <input placeholder='Address' />
+                </Form.Field>
+                <Form.Field>
+                  <label>zip code</label>
+                  <input placeholder='zip code' />
+                </Form.Field>
+                <Menu.Item>
+                  <h4 style={{position: 'relative'}}>60€ / mes</h4>
+                </Menu.Item>
+                <Form.Field>
+                  <Checkbox label='I agree to the Terms and Conditions' />
+                </Form.Field>
+                <Button onClick={this.toggle} type='submit'>Submit</Button>
+              </Form>
+            </Menu.Item>
+            <Menu.Item>
+              <Progress percent={this.state.percent} color='violet' active></Progress>
+            </Menu.Item>
+            <h3>Powered by District0x</h3>
+          </Sidebar>
         </div>
         <div style={{marginLeft: 400, marginTop:20}}>
-          <Grid>
+          <Loader active inline='centered' />          <Grid>
             <Grid.Row columns={3}>
               <Grid.Column></Grid.Column>
               <Grid.Column></Grid.Column>
@@ -48,63 +85,6 @@ class Index extends Component {
               </Grid.Column>
             </Grid.Row>
           </Grid>
-          <h2>Open Contracts</h2>
-          <Card.Group>
-            <Card>
-              <Card.Content>
-                <Card.Header>xxxxxxx</Card.Header>
-                <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
-                <Card.Description></Card.Description>
-              </Card.Content>
-              <Card.Content>
-                <Card.Header>xxxxxxx</Card.Header>
-                <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
-                <Card.Description></Card.Description>
-              </Card.Content>
-              <Card.Content>
-                <Card.Header>xxxxxxx</Card.Header>
-                <Card.Meta style={{width: ''}}>Created by x</Card.Meta>
-                <Card.Description></Card.Description>
-              </Card.Content>
-            </Card>
-          </Card.Group>
-          <Divider style={{marginTop:100}}/>
-          <h1>Providers</h1>
-          <Card.Group>
-            <Card>
-              <Card.Content>
-                <Image floated='right' size='mini' src={faker.image.avatar()} />
-                <Card.Header>{faker.name.findName()}</Card.Header>
-                <Card.Description>
-                  <strong><p>1 $/kWh</p></strong>
-                  <p>Toledo</p>
-                  <p>HolaLuz</p>
-                </Card.Description>
-              </Card.Content>
-            </Card>
-            <Card>
-              <Card.Content>
-                <Image floated='right' size='mini' src={faker.image.avatar()} />
-                <Card.Header>{faker.name.findName()}</Card.Header>
-                <Card.Description>
-                  <strong><p>1.8 $/kWh</p></strong>
-                  <p>Sevilla</p>
-                  <p>Crypto Energy</p>
-                </Card.Description>
-              </Card.Content>
-            </Card>
-            <Card>
-              <Card.Content>
-                <Image floated='right' size='mini' src={faker.image.avatar()} />
-                <Card.Header>{faker.name.findName()}</Card.Header>
-                <Card.Description>
-                  <strong><p>1.3 $/kWh</p></strong>
-                  <p>Barcelona</p>
-                  <p>Som Energia</p>
-                </Card.Description>
-              </Card.Content>
-            </Card>
-          </Card.Group>
         </div>
       </div>
     );
