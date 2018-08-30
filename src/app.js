@@ -18,6 +18,7 @@ class App extends React.Component {
 
     this.state = {
       web3: null,
+      ipfs: null,
       address: '',
       balance: '',
       username: '',
@@ -55,7 +56,11 @@ class App extends React.Component {
       ipfs.id(function (err, res) {
         if (err) throw err
         console.log('Connected to IPFS node!', res.id, res.agentVersion, res.protocolVersion);
+       
       });
+      this.setState({
+        ipfs: ipfs
+      })
 
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
@@ -120,10 +125,12 @@ class App extends React.Component {
       address,
       status,
       balance,
-      username
+      username,
+      ipfs
     } = this.state
     console.log("username: ", this.state.username);
     console.log("address: ", this.state.address);
+
     if (this.state.username) {
       return (
         <div>
@@ -132,13 +139,15 @@ class App extends React.Component {
             address={address}
             balance={balance}
             username={username}
+            ipfs={this.state.ipfs}
+            contract = {userContract}
           >
           </Router>
         </div>
       );
     } else {
       return (
-        <div><CreateUser web3={web3} userContract={userContract} account={address} status={status} balance={balance} ipfs={ipfs}></CreateUser></div>
+        <div><CreateUser web3={web3} userContract={userContract} account={address} status={status} balance={balance}></CreateUser></div>
       );
     }
   }
