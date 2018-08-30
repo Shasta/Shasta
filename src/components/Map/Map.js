@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Menu, Button, Divider, Feed } from 'semantic-ui-react'
 
 import D3 from './d3.js';
 
-class Index extends Component {
+class Map extends Component {
   render() {
     return (
       <div style={{marginLeft: '375px', marginTop: '50px'}}>
@@ -13,4 +12,4 @@ class Index extends Component {
   }
 }
 
-export default Index;
+export default Map;

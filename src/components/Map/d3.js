@@ -1,12 +1,12 @@
 import React from 'react';
-import { GradientTealBlue, RadialGradient } from '@vx/gradient';
+import { RadialGradient } from '@vx/gradient';
 import { Mercator } from '@vx/geo';
 import * as topojson from 'topojson-client';
 import topology from './world-topo.json';
 
 export default ({ width, height, events = false }) => {
-  var width = 950;
-  var height = 500;
+  width = 950;
+  height = 500;
   if (width < 10) return <div />;
 
   const world = topojson.feature(topology, topology.objects.units);

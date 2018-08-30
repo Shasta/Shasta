@@ -1,36 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-import { Header, Icon, Image, Menu, Segment, Sidebar, Button } from 'semantic-ui-react'
+import { Image, Menu, Sidebar } from 'semantic-ui-react'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 
-import Tab from './components/Tab/index';
-import Home from './components/Home/index';
-import Market from './components/Market/index';
-import Map from './components/Map/index';
+import Tab from './components/Tab/Tab';
+import Home from './components/Home/Home';
+import Market from './components/Market/Market';
+import Map from './components/Map/Map';
 
 import logo from './static/shasta-logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-  }
 
   render() {
     const {
       web3,
-      user,
-      balance,
-      username
+      account,
+      balance
     } = this.props;
 
     return (
       <div>
         <Router>
           <div>
-            <Tab web3={web3} user={user} balance={balance}></Tab>
+            <Tab web3={web3} account={account} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
               <Menu.Item as='a'>
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>

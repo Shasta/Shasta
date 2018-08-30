@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import axios from 'axios';
 
 import Router from "./routing.js";
-import CreateUser from "./components/CreateUser/index";
+import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
 import { default as contract } from 'truffle-contract'
 import user_artifacts from '../build/contracts/User.json'
@@ -59,7 +59,7 @@ class App extends React.Component {
 
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
-          user: accounts[0],
+          address: accounts[0],
           balance: this.state.web3.fromWei(balance.toString(), 'ether'),
           status: 'Connected!'
         })
@@ -123,6 +123,7 @@ class App extends React.Component {
       username
     } = this.state
     console.log("username: ", this.state.username);
+    console.log("address: ", this.state.address);
     if (this.state.username) {
       return (
         <div>

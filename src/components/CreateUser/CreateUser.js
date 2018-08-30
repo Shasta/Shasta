@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Form, Grid, Image, Input } from 'semantic-ui-react'
 
-import './index.css';
+import './CreateUser.css';
 import shasta from './shasta.png'
 
 
-class Index extends Component {
+class CreateUser extends Component {
 
   constructor(props) {
     super(props);
@@ -25,7 +25,8 @@ class Index extends Component {
 
     var username = this.state.username;
     var userJson = {
-      username: username
+      username: username,
+      contracts: []
     }
 
     var ipfsHash = '';
@@ -37,7 +38,7 @@ class Index extends Component {
       if (err) throw err;
       ipfsHash = res[0].hash;
       console.log("ipfs hash: ", ipfsHash);
-
+      
       contract.deployed().then(function (contractInstance) {
         contractInstance.createUser(username, ipfsHash, { gas: 400000, from: account }).then(function (success) {
           if (success) {
@@ -55,11 +56,9 @@ class Index extends Component {
 
   }
 
-
   updateInput(event) {
     this.setState({ username: event.target.value })
   }
-
 
   render() {
     return (
@@ -96,4 +95,4 @@ class Index extends Component {
   }
 }
 
-export default Index;
+export default CreateUser;
