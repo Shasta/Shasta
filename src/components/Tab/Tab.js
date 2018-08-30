@@ -4,7 +4,7 @@ import { Menu } from 'semantic-ui-react'
 class Tab extends Component {
 
   render() {
-    
+
     return (
       <div>
         <Menu size='massive'>

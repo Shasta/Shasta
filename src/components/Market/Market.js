@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox } from 'semantic-ui-react'
-import './index.css';
+import './Market.css';
 
 class Market extends Component {
   constructor(props) {
@@ -8,7 +8,11 @@ class Market extends Component {
 
     this.state = {
       visible: false,
-      percent: 0
+      percent: 0,
+      firstName: '',
+      lastName: '',
+      address:'',
+      zipCode: ''
     }
   }
 
@@ -17,6 +21,46 @@ class Market extends Component {
   handleButtonClick = () => this.setState({ visible: !this.state.visible })
 
   handleSidebarHide = () => this.setState({ visible: false })
+
+  updateUser() {
+
+    var userJson = {
+      username: this.props.username,
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      address: this.state.address,
+      zipCode: this.state.zipCode,
+      contracts: []
+    }
+
+    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], function (err, res) {
+
+      if (err) throw err;
+      ipfsHash = res[0].hash;
+      console.log("ipfs hash: ", ipfsHash);
+      
+      contract.deployed().then(function (contractInstance) {
+        contractInstance.updateUser( ipfsHash, { gas: 400000, from: account }).then(function (success) {
+          if (success) {
+            console.log('Updated user ' + username + ' on ethereum!');
+
+          } else {
+            console.log('error updateing user on ethereum.');
+          }
+        }).catch(function (e) {
+          console.log('error creating user:', username, ':', e);
+        });
+
+      });
+    });
+
+  }
+
+  handleChange = (e) => {
+    this.setState({
+        [e.target.name]: e.target.value
+    })
+  }
 
   render() {
 
@@ -41,19 +85,31 @@ class Market extends Component {
               <Form>
                 <Form.Field>
                   <label>First Name</label>
-                  <input placeholder='First Name' />
+                  <input placeholder='First Name'
+                   name='firstName'
+                   value={this.state.firstName} 
+                   onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Last Name</label>
-                  <input placeholder='Last Name' />
+                  <input placeholder='Last Name'
+                  name='lastName'
+                  value={this.state.lastName} 
+                  onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Address</label>
-                  <input placeholder='Address' />
+                  <input placeholder='Address'
+                  name='address'
+                  value={this.state.address} 
+                  onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>zip code</label>
-                  <input placeholder='zip code' />
+                  <input placeholder='zip code'
+                  name='zipCode'
+                  value={this.state.zipCode} 
+                  onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Menu.Item>
                   <h4 style={{position: 'relative'}}>60€ / mes</h4>

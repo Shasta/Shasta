@@ -18,7 +18,7 @@ class App extends React.Component {
   render() {
     const {
       web3,
-      user,
+      account,
       balance
     } = this.props;
 
@@ -26,7 +26,7 @@ class App extends React.Component {
       <div>
         <Router>
           <div>
-            <Tab web3={web3} user={user} balance={balance}></Tab>
+            <Tab web3={web3} account={account} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
               <Menu.Item as='a'>
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>

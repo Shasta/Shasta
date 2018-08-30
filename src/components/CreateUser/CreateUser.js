@@ -25,7 +25,8 @@ class CreateUser extends Component {
 
     var username = this.state.username;
     var userJson = {
-      username: username
+      username: username,
+      contracts: []
     }
 
     var ipfsHash = '';
@@ -37,7 +38,6 @@ class CreateUser extends Component {
       if (err) throw err;
       ipfsHash = res[0].hash;
       console.log("ipfs hash: ", ipfsHash);
-      console.log("account: ", account);
       
       contract.deployed().then(function (contractInstance) {
         contractInstance.createUser(username, ipfsHash, { gas: 400000, from: account }).then(function (success) {
@@ -56,11 +56,9 @@ class CreateUser extends Component {
 
   }
 
-
   updateInput(event) {
     this.setState({ username: event.target.value })
   }
-
 
   render() {
     return (
