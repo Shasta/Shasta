@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import axios from 'axios';
 
@@ -59,7 +59,7 @@ class App extends React.Component {
 
       this.state.web3.eth.getBalance(accounts[0], (error, balance) => {
         this.setState({
-          user: accounts[0],
+          address: accounts[0],
           balance: this.state.web3.fromWei(balance.toString(), 'ether'),
           status: 'Connected!'
         })
@@ -123,6 +123,7 @@ class App extends React.Component {
       username
     } = this.state
     console.log("username: ", this.state.username);
+    console.log("address: ", this.state.address);
     if (this.state.username) {
       return (
         <div>

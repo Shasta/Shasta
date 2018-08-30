@@ -1,17 +1,9 @@
 import React, { Component } from 'react';
-import { Menu, Button } from 'semantic-ui-react'
+import { Menu } from 'semantic-ui-react'
 
 class Index extends Component {
-  constructor(props) {
-    super(props)
-
-  }
 
   render() {
-    const {
-      user,
-      balance
-    } = this.props;
     
     return (
       <div>

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Menu, Button, Divider, Feed } from 'semantic-ui-react'
 
 import D3 from './d3.js';
 

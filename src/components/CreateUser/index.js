@@ -37,7 +37,8 @@ class Index extends Component {
       if (err) throw err;
       ipfsHash = res[0].hash;
       console.log("ipfs hash: ", ipfsHash);
-
+      console.log("account: ", account);
+      
       contract.deployed().then(function (contractInstance) {
         contractInstance.createUser(username, ipfsHash, { gas: 400000, from: account }).then(function (success) {
           if (success) {

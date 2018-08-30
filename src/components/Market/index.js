@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Image, Card, Button, Divider, Grid, Sidebar, Icon, Menu, Segment, Header, Progress, Form, Checkbox, Loader } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox } from 'semantic-ui-react'
 import './index.css';
-
-var faker = require('faker');
 
 class Index extends Component {
   constructor(props) {
@@ -21,10 +19,7 @@ class Index extends Component {
   handleSidebarHide = () => this.setState({ visible: false })
 
   render() {
-    const {
-      balance,
-      user
-    } = this.props;
+
     const { visible } = this.state
     return (
       <div>

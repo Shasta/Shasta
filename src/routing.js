@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-import { Header, Icon, Image, Menu, Segment, Sidebar, Button } from 'semantic-ui-react'
+import { Image, Menu, Sidebar } from 'semantic-ui-react'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 
@@ -14,16 +14,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-  }
 
   render() {
     const {
       web3,
       user,
-      balance,
-      username
+      balance
     } = this.props;
 
     return (
