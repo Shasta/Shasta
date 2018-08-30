@@ -14,6 +14,9 @@ class Market extends Component {
       address:'',
       zipCode: ''
     }
+
+    this.updateUser = this.updateUser.bind(this);
+
   }
 
   toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
@@ -33,22 +36,27 @@ class Market extends Component {
       contracts: []
     }
 
+    console.log("Info to update: ", userJson);
+
+    var contract = this.props.contract;
+    var address = this.props.address;
+    
     this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], function (err, res) {
 
       if (err) throw err;
-      ipfsHash = res[0].hash;
+
+      var ipfsHash = res[0].hash;
       console.log("ipfs hash: ", ipfsHash);
-      
       contract.deployed().then(function (contractInstance) {
-        contractInstance.updateUser( ipfsHash, { gas: 400000, from: account }).then(function (success) {
+        contractInstance.updateUser( ipfsHash, { gas: 400000, from: address }).then(function (success) {
           if (success) {
-            console.log('Updated user ' + username + ' on ethereum!');
+            console.log('Updated user ' + userJson.username + ' on ethereum!');
 
           } else {
             console.log('error updateing user on ethereum.');
           }
         }).catch(function (e) {
-          console.log('error creating user:', username, ':', e);
+          console.log('error creating user:', userJson.username, ':', e);
         });
 
       });
@@ -117,7 +125,7 @@ class Market extends Component {
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
                 </Form.Field>
-                <Button onClick={this.toggle} type='submit'>Submit</Button>
+                <Button onClick={this.updateUser} type='submit'>Submit</Button>
               </Form>
             </Menu.Item>
             <Menu.Item>

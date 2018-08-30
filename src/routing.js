@@ -21,7 +21,7 @@ class App extends React.Component {
       account,
       balance
     } = this.props;
-
+    
     return (
       <div>
         <Router>
@@ -49,7 +49,12 @@ class App extends React.Component {
             </Sidebar>
             <div>
               <Route exact path="/" render={(props) => <Home username={this.props.username} />} />
-              <Route path="/market" component={Market} />
+              <Route path="/market" render={(props) => <Market 
+                  username={this.props.username}
+                  ipfs={this.props.ipfs} 
+                  contract={this.props.contract}
+                  address={this.props.address}
+                  />} />
               <Route path="/map" component={Map} />
             </div>
           </div>
