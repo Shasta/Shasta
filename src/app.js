@@ -147,7 +147,7 @@ class App extends React.Component {
       );
     } else {
       return (
-        <div><CreateUser web3={web3} userContract={userContract} account={address} status={status} balance={balance}></CreateUser></div>
+        <div><CreateUser web3={web3} userContract={userContract} account={address} status={status} balance={balance} ipfs={ipfs}></CreateUser></div>
       );
     }
   }
