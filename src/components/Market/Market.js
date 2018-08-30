@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox } from 'semantic-ui-react'
 import './index.css';
 
-class Index extends Component {
+class Market extends Component {
   constructor(props) {
     super(props)
 
@@ -86,4 +86,4 @@ class Index extends Component {
   }
 }
 
-export default Index
+export default Market

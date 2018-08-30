@@ -4,10 +4,10 @@ import { Image, Menu, Sidebar } from 'semantic-ui-react'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 
-import Tab from './components/Tab/index';
-import Home from './components/Home/index';
-import Market from './components/Market/index';
-import Map from './components/Map/index';
+import Tab from './components/Tab/Tab';
+import Home from './components/Home/Home';
+import Market from './components/Market/Market';
+import Map from './components/Map/Map';
 
 import logo from './static/shasta-logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

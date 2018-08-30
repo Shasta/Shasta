@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react'
 
-class Index extends Component {
+class Tab extends Component {
 
   render() {
     
@@ -15,4 +15,4 @@ class Index extends Component {
   }
 }
 
-export default Index;
+export default Tab;

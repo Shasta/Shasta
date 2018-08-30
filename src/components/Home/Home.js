@@ -3,7 +3,7 @@ import { Feed } from 'semantic-ui-react'
 
 import D3 from './d3.js';
 
-class Index extends Component {
+class Home extends Component {
 
   render() {
 
@@ -34,4 +34,4 @@ class Index extends Component {
   }
 }
 
-export default Index;
+export default Home;

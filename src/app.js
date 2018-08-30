@@ -3,7 +3,7 @@ import React from 'react';
 import axios from 'axios';
 
 import Router from "./routing.js";
-import CreateUser from "./components/CreateUser/index";
+import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
 import { default as contract } from 'truffle-contract'
 import user_artifacts from '../build/contracts/User.json'

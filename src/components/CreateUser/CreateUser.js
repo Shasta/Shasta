@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Form, Grid, Image, Input } from 'semantic-ui-react'
 
-import './index.css';
+import './CreateUser.css';
 import shasta from './shasta.png'
 
 
-class Index extends Component {
+class CreateUser extends Component {
 
   constructor(props) {
     super(props);
@@ -97,4 +97,4 @@ class Index extends Component {
   }
 }
 
-export default Index;
+export default CreateUser;
