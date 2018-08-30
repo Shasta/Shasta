@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown } from 'semantic-ui-react'
 import './Market.css';
 
 class Market extends Component {
@@ -12,7 +12,8 @@ class Market extends Component {
       firstName: '',
       lastName: '',
       address:'',
-      zipCode: ''
+      zipCode: '',
+      dropdownValue: ''
     }
 
     this.updateUser = this.updateUser.bind(this);
@@ -73,6 +74,21 @@ class Market extends Component {
   render() {
 
     const { visible } = this.state
+    const prices = [
+      {
+        text: '20€',
+        value: '20',
+      },
+      {
+        text: '40€',
+        value: '40',
+      },
+      {
+        text: '60€',
+        value: '60',
+      }
+    ]
+
     return (
       <div>
         <div>
@@ -119,9 +135,9 @@ class Market extends Component {
                   value={this.state.zipCode} 
                   onChange={e => this.handleChange(e)} />
                 </Form.Field>
-                <Menu.Item>
-                  <h4 style={{position: 'relative'}}>60€ / mes</h4>
-                </Menu.Item>
+                <div style={{padding:'20'}}>
+                <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChange(e)} />
+                </div>
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
                 </Form.Field>

@@ -23,7 +23,8 @@ class App extends React.Component {
       balance: '',
       username: '',
       ipfsHash: '',
-      status: 'Not Connected!'
+      status: 'Not Connected!',
+      userJson: ''
     }
   }
 
@@ -100,7 +101,8 @@ class App extends React.Component {
 
               context.setState({
                 username: res.data.username,
-                ipfsHash: ipfsHash
+                ipfsHash: ipfsHash,
+                userJson: res.data
               })
             })
         }
@@ -140,7 +142,7 @@ class App extends React.Component {
             balance={balance}
             username={username}
             ipfs={this.state.ipfs}
-            contract = {userContract}
+            contract={userContract}
           >
           </Router>
         </div>

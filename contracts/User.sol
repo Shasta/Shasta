@@ -1,15 +1,24 @@
 pragma solidity ^0.4.19;
 
+import "./SafeMath.sol";
+
 contract User {
     
   mapping(address => uint) private addressToIndex;
   mapping(bytes16 => uint) private usernameToIndex;
+  mapping(address => uint) private addressToBalance;
 
   event NewUser(bytes16 username, address owner);
 
   address[] private addresses;
   bytes16[] private usernames;
   bytes[] private ipfsHashes;
+  address owner;
+  
+  modifier onlyOwner() {
+    require (msg.sender != owner);
+    _;
+  }
 
   constructor() public {
 
@@ -18,6 +27,16 @@ contract User {
     addresses.push(msg.sender);
     usernames.push('self');
     ipfsHashes.push('not-available');
+    owner = msg.sender;
+
+  }
+
+  function withdraw(address from, uint amount) public onlyOwner returns(bool) {
+      
+      require(amount <= addressToBalance[from]);
+      addressToBalance[from] -= amount;
+      owner.transfer(amount);
+      return true;
 
   }
 
@@ -26,6 +45,11 @@ contract User {
     return (addressToIndex[userAddress] > 0);
   }
 
+
+  function getBalance() public view returns (uint){
+    return addressToBalance[msg.sender];
+  }
+  
   function usernameTaken(bytes16 username) public view returns(bool takenIndeed) 
   {
     return (usernameToIndex[username] > 0 || username == 'self');
@@ -39,6 +63,7 @@ contract User {
     addresses.push(msg.sender);
     usernames.push(username);
     ipfsHashes.push(ipfsHash);
+    addressToBalance[msg.sender] = 0;
 
     addressToIndex[msg.sender] = addresses.length - 1;
     usernameToIndex[username] = addresses.length - 1;
@@ -47,11 +72,13 @@ contract User {
     return true;
   }
 
-  function updateUser(bytes ipfsHash) public returns(bool success)
+  function updateUser(bytes ipfsHash) public payable returns(bool success)
   {
     require(hasUser(msg.sender));
     
     ipfsHashes[addressToIndex[msg.sender]] = ipfsHash;
+    addressToBalance[msg.sender] += msg.value;
+    
     return true;
   }  
  
