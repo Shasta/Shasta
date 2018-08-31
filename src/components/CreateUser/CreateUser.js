@@ -38,7 +38,7 @@ class CreateUser extends Component {
       if (err) throw err;
       ipfsHash = res[0].hash;
       console.log("ipfs hash: ", ipfsHash);
-      
+
       contract.deployed().then(function (contractInstance) {
         contractInstance.createUser(username, ipfsHash, { gas: 400000, from: account }).then(function (success) {
           if (success) {
@@ -66,7 +66,7 @@ class CreateUser extends Component {
         <Grid>
           <Grid.Row columns={2}>
             <Grid.Column>
-              <Image src={shasta} />
+              <Image className='logo-image' src={shasta} />
             </Grid.Column>
             <Grid.Column style={{ marginTop: '10%' }}>
               <Grid.Row>
