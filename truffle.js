@@ -3,6 +3,7 @@ const fs = require('fs')
 
 const mnemonic = 'mnemonic'
 
+
 module.exports = {
   networks: {
     development: {
@@ -13,7 +14,9 @@ module.exports = {
       network_id: '*'
     },
     kovan: {
-      provider: new HDWalletProvider(mnemonic, 'https://kovan.infura.io'),
+      provider: function() {
+        return new HDWalletProvider(mnemonic, 'https://kovan.infura.io')
+      },
       network_id: '*',
       gas: 4500000,
       gasPrice: 25000000000
@@ -25,7 +28,9 @@ module.exports = {
       network_id: 3
     },
     mainnet: {
-      provider: new HDWalletProvider(mnemonic, 'https://mainnet.infura.io'),
+      provider: function() {
+        return new HDWalletProvider(mnemonic, 'https://mainnet.infura.io')
+      },
       network_id: '*',
       gas: 4500000,
       gasPrice: 25000000000
