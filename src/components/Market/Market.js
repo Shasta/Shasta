@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon, Message } from 'semantic-ui-react'
 import './Market.css';
 
 
@@ -76,7 +76,7 @@ class Market extends Component {
 
   handleChange = (e) => {
     this.setState({
-        [e.target.name]: e.target.value
+      [e.target.name]: e.target.value
     })
   }
 
@@ -122,34 +122,39 @@ class Market extends Component {
                 <Form.Field>
                   <label>First Name</label>
                   <input placeholder='First Name'
-                   name='firstName'
-                   value={this.state.firstName}
-                   onChange={e => this.handleChange(e)} />
+                    name='firstName'
+                    value={this.state.firstName}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Last Name</label>
                   <input placeholder='Last Name'
-                  name='lastName'
-                  value={this.state.lastName}
-                  onChange={e => this.handleChange(e)} />
+                    name='lastName'
+                    value={this.state.lastName}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Address</label>
                   <input placeholder='Address'
-                  name='address'
-                  value={this.state.address}
-                  onChange={e => this.handleChange(e)} />
+                    name='address'
+                    value={this.state.address}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>zip code</label>
                   <input placeholder='zip code'
-                  name='zipCode'
-                  value={this.state.zipCode}
-                  onChange={e => this.handleChange(e)} />
+                    name='zipCode'
+                    value={this.state.zipCode}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <div style={{padding:'20'}}>
-                <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChange(e)} />
+                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChange(e)} />
                 </div>
+                <Message icon>
+                  <Message.Content>
+                    {this.props.address}
+                  </Message.Content>
+                </Message>
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
                 </Form.Field>
@@ -173,7 +178,21 @@ class Market extends Component {
             </Grid.Row>
           </Grid>
           <Card.Group>
-            <Card fluid style={{maxWidth: '300px'}} color='purple' header={this.props.ipfsAddress} description={this.props.username} />
+            <Card fluid style={{maxWidth: '600px'}} color='purple'>
+              <Card.Content>
+              <Card.Header>
+                {this.props.ipfsAddress}
+              </Card.Header>
+              <Card.Description>
+                {this.props.address}
+              </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              <Button basic color='purple'>
+                More Info
+              </Button>
+            </Card.Content>
+            </Card>
           </Card.Group>
         </div>
       </div>

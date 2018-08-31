@@ -29,9 +29,11 @@ class App extends React.Component {
           <div>
             <Tab web3={web3} account={account} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
+              <Link to="/">
               <Menu.Item as='a'>
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
+            </Link>
               <Link to="/">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
