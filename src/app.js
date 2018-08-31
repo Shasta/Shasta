@@ -22,6 +22,8 @@ class App extends React.Component {
       address: '',
       balance: '',
       username: '',
+      ipfsFirstName: '',
+      ipfsAddress: '',
       ipfsHash: '',
       status: 'Not Connected!',
       userJson: ''
@@ -57,7 +59,7 @@ class App extends React.Component {
       ipfs.id(function (err, res) {
         if (err) throw err
         console.log('Connected to IPFS node!', res.id, res.agentVersion, res.protocolVersion);
-       
+
       });
       this.setState({
         ipfs: ipfs
@@ -72,7 +74,7 @@ class App extends React.Component {
         //Authenticate the address from metamask
         this.checkAuthentication(accounts[0], this);
       })
-      // set the provider for the User abstraction 
+      // set the provider for the User abstraction
       userContract.setProvider(this.state.web3.currentProvider);
 
     })
@@ -82,7 +84,7 @@ class App extends React.Component {
     //Check if address has user
     console.log("Validating with: ", account);
     userContract.deployed().then(function (contractInstance) {
-      contractInstance.getIpfsHashByAddress.call(account, { from: account }).then(function (result) {
+      contractInstance.getIpfsHashByAddress.call(account, { from: account }).then((result) => {
 
         console.log("Stored ipfs hash: ", context.hex2a(result));
 
@@ -93,18 +95,19 @@ class App extends React.Component {
           var url = 'https://ipfs.io/ipfs/' + ipfsHash;
           console.log('getting user info from ', url);
 
-          //Get request
-          axios.get(url)
-            .then(res => {
+          ipfs.cat(ipfsHash, (err, aux) => {
+            console.log(aux, 'first aux');
+            aux = aux.toString('utf8')
+            aux = JSON.parse(aux)
+            console.log(aux, aux.firstName, 'aux parse');
 
-              console.log("ipfs response: ", res);
-
-              context.setState({
-                username: res.data.username,
-                ipfsHash: ipfsHash,
-                userJson: res.data
-              })
+            context.setState({
+              username: aux.username,
+              ipfsFirstName: aux.firstName,
+              ipfsAddress: aux.address,
+              ipfsHash: ipfsHash
             })
+          })
         }
       }).catch(function (e) {
         console.log(e);
@@ -128,7 +131,10 @@ class App extends React.Component {
       status,
       balance,
       username,
-      ipfs
+      ipfs,
+      ipfsHash,
+      ipfsFirstName,
+      ipfsAddress
     } = this.state
     console.log("username: ", this.state.username);
     console.log("address: ", this.state.address);
@@ -143,6 +149,9 @@ class App extends React.Component {
             username={username}
             ipfs={this.state.ipfs}
             contract={userContract}
+            ipfsHash={ipfsHash}
+            ipfsFirstName={ipfsFirstName}
+            ipfsAddress={ipfsAddress}
           >
           </Router>
         </div>

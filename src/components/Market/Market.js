@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon } from 'semantic-ui-react'
 import './Market.css';
+
 
 class Market extends Component {
   constructor(props) {
@@ -13,18 +14,23 @@ class Market extends Component {
       lastName: '',
       address:'',
       zipCode: '',
-      dropdownValue: ''
+      dropdownValue: '',
+      ipfsHash: '',
+      ipfsFirstName: '',
+      ipfsAddress: ''
+
     }
 
     this.updateUser = this.updateUser.bind(this);
-
   }
+
 
   toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
 
   handleButtonClick = () => this.setState({ visible: !this.state.visible })
 
   handleSidebarHide = () => this.setState({ visible: false })
+
 
   updateUser() {
 
@@ -41,20 +47,23 @@ class Market extends Component {
 
     var contract = this.props.contract;
     var address = this.props.address;
-    
-    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], function (err, res) {
+    var ipfs = this.props.ipfs;
+
+    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], (err, res) => {
 
       if (err) throw err;
 
       var ipfsHash = res[0].hash;
+
       console.log("ipfs hash: ", ipfsHash);
+
       contract.deployed().then(function (contractInstance) {
         contractInstance.updateUser( ipfsHash, { gas: 400000, from: address }).then(function (success) {
           if (success) {
             console.log('Updated user ' + userJson.username + ' on ethereum!');
 
           } else {
-            console.log('error updateing user on ethereum.');
+            console.log('error updating user on ethereum.');
           }
         }).catch(function (e) {
           console.log('error creating user:', userJson.username, ':', e);
@@ -72,7 +81,10 @@ class Market extends Component {
   }
 
   render() {
-
+    const {
+      ipfsFirstName,
+      ipfsAddress
+    } = this.props;
     const { visible } = this.state
     const prices = [
       {
@@ -111,28 +123,28 @@ class Market extends Component {
                   <label>First Name</label>
                   <input placeholder='First Name'
                    name='firstName'
-                   value={this.state.firstName} 
+                   value={this.state.firstName}
                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Last Name</label>
                   <input placeholder='Last Name'
                   name='lastName'
-                  value={this.state.lastName} 
+                  value={this.state.lastName}
                   onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Address</label>
                   <input placeholder='Address'
                   name='address'
-                  value={this.state.address} 
+                  value={this.state.address}
                   onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>zip code</label>
                   <input placeholder='zip code'
                   name='zipCode'
-                  value={this.state.zipCode} 
+                  value={this.state.zipCode}
                   onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <div style={{padding:'20'}}>
@@ -160,6 +172,9 @@ class Market extends Component {
               </Grid.Column>
             </Grid.Row>
           </Grid>
+          <Card.Group>
+            <Card fluid style={{maxWidth: '300px'}} color='purple' header={this.props.ipfsAddress} description={this.props.username} />
+          </Card.Group>
         </div>
       </div>
     );

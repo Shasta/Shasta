@@ -19,7 +19,8 @@ class App extends React.Component {
     const {
       web3,
       account,
-      balance
+      balance,
+      ipfsHash
     } = this.props;
 
     return (
@@ -59,6 +60,9 @@ class App extends React.Component {
                   ipfs={this.props.ipfs}
                   contract={this.props.contract}
                   address={this.props.address}
+                  ipfsHash={this.props.ipfsHash}
+                  ipfsFirstName={this.props.ipfsFirstName}
+                  ipfsAddress={this.props.ipfsAddress}
                   />} />
               <Route path="/map" component={Map} />
             </div>
