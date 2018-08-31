@@ -62,6 +62,7 @@ class App extends React.Component {
                   ipfs={this.props.ipfs}
                   contract={this.props.contract}
                   address={this.props.address}
+                  web3={this.props.web3}
                   ipfsHash={this.props.ipfsHash}
                   ipfsFirstName={this.props.ipfsFirstName}
                   ipfsAddress={this.props.ipfsAddress}

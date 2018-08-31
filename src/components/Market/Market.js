@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon, Message } from 'semantic-ui-react'
 import './Market.css';
+import axios from 'axios';
 
 
 class Market extends Component {
@@ -12,7 +13,7 @@ class Market extends Component {
       percent: 0,
       firstName: '',
       lastName: '',
-      address:'',
+      address: '',
       zipCode: '',
       dropdownValue: '',
       ipfsHash: '',
@@ -43,11 +44,19 @@ class Market extends Component {
       contracts: []
     }
 
+    var newContract = {
+      value: this.state.dropdownValue,
+      date: Date.now()
+    }
+
+    //Add the new contract to the profile
+
+    userJson.contracts.push(newContract);
     console.log("Info to update: ", userJson);
 
     var contract = this.props.contract;
     var address = this.props.address;
-    var ipfs = this.props.ipfs;
+    var url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
 
     this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], (err, res) => {
 
@@ -57,29 +66,45 @@ class Market extends Component {
 
       console.log("ipfs hash: ", ipfsHash);
 
-      contract.deployed().then(function (contractInstance) {
-        contractInstance.updateUser( ipfsHash, { gas: 400000, from: address }).then(function (success) {
-          if (success) {
-            console.log('Updated user ' + userJson.username + ' on ethereum!');
+      //Get the exact value in ethers
+      axios.get(url).then(res => {
 
-          } else {
-            console.log('error updating user on ethereum.');
-          }
-        }).catch(function (e) {
-          console.log('error creating user:', userJson.username, ':', e);
+        //Set te conversion from EUR to WEI
+        console.log("ETH", res.data.ETH);
+        console.log("toPay", newContract.value);
+
+        var value = this.props.web3.toWei(res.data.ETH * newContract.value);
+
+        //Call the transaction
+        contract.deployed().then(function (contractInstance) {
+          contractInstance.updateUser.sendTransaction(ipfsHash, { gas: 400000, from: address, value: value }).then(function (success) {
+            if (success) {
+              console.log('Updated user ' + userJson.username + ' on ethereum!');
+
+            } else {
+              console.log('error updateing user on ethereum.');
+            }
+          }).catch(function (e) {
+            console.log('error creating user:', userJson.username, ':', e);
+          });
+
         });
-
       });
     });
 
   }
 
-  handleChange = (e) => {
+  handleChange = (e, value) => {
     this.setState({
       [e.target.name]: e.target.value
     })
   }
 
+  handleChangeDropdown = (e) => {
+    this.setState({
+      dropdownValue: e.target.textContent.slice(0, -1)
+    })
+  }
   render() {
     const {
       ipfsFirstName,
@@ -113,9 +138,9 @@ class Market extends Component {
             direction='right'
             visible={visible}
             width='very wide'
-            >
+          >
             <Menu.Item>
-              <h3 style={{position: 'relative'}}>New Contract</h3>
+              <h3 style={{ position: 'relative' }}>New Contract</h3>
             </Menu.Item>
             <Menu.Item>
               <Form>
@@ -147,8 +172,8 @@ class Market extends Component {
                     value={this.state.zipCode}
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
-                <div style={{padding:'20'}}>
-                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChange(e)} />
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
                 </div>
                 <Message icon>
                   <Message.Content>
@@ -167,7 +192,7 @@ class Market extends Component {
             <h3>Powered by District0x</h3>
           </Sidebar>
         </div>
-        <div style={{marginLeft: 400, marginTop:20}}>
+        <div style={{ marginLeft: 400, marginTop: 20 }}>
           <Grid>
             <Grid.Row columns={3}>
               <Grid.Column></Grid.Column>
