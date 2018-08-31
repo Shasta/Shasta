@@ -19,18 +19,21 @@ class App extends React.Component {
     const {
       web3,
       account,
-      balance
+      balance,
+      ipfsHash
     } = this.props;
-    
+
     return (
       <div>
         <Router>
           <div>
             <Tab web3={web3} account={account} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
+              <Link to="/">
               <Menu.Item as='a'>
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
+            </Link>
               <Link to="/">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
@@ -46,15 +49,23 @@ class App extends React.Component {
                   <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Map</h4>
                 </Menu.Item>
               </Link>
+              <Link to="/settings">
+                <Menu.Item as='a'>
+                  <FontAwesomeIcon icon="cog"></FontAwesomeIcon><h4>Settings</h4>
+                </Menu.Item>
+              </Link>
             </Sidebar>
             <div>
               <Route exact path="/" render={(props) => <Home username={this.props.username} />} />
-              <Route path="/market" render={(props) => <Market 
+              <Route path="/market" render={(props) => <Market
                   username={this.props.username}
-                  ipfs={this.props.ipfs} 
+                  ipfs={this.props.ipfs}
                   contract={this.props.contract}
                   address={this.props.address}
                   web3={this.props.web3}
+                  ipfsHash={this.props.ipfsHash}
+                  ipfsFirstName={this.props.ipfsFirstName}
+                  ipfsAddress={this.props.ipfsAddress}
                   />} />
               <Route path="/map" component={Map} />
             </div>

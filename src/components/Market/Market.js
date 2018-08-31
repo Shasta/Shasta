@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon, Message } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
+
 
 class Market extends Component {
   constructor(props) {
@@ -14,18 +15,23 @@ class Market extends Component {
       lastName: '',
       address: '',
       zipCode: '',
-      dropdownValue: ''
+      dropdownValue: '',
+      ipfsHash: '',
+      ipfsFirstName: '',
+      ipfsAddress: ''
+
     }
 
     this.updateUser = this.updateUser.bind(this);
-
   }
+
 
   toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
 
   handleButtonClick = () => this.setState({ visible: !this.state.visible })
 
   handleSidebarHide = () => this.setState({ visible: false })
+
 
   updateUser() {
 
@@ -52,12 +58,12 @@ class Market extends Component {
     var address = this.props.address;
     var url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
 
-    //Upload json to ipfs and get the hash
     this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], (err, res) => {
 
       if (err) throw err;
 
       var ipfsHash = res[0].hash;
+
       console.log("ipfs hash: ", ipfsHash);
 
       //Get the exact value in ethers
@@ -100,7 +106,10 @@ class Market extends Component {
     })
   }
   render() {
-
+    const {
+      ipfsFirstName,
+      ipfsAddress
+    } = this.props;
     const { visible } = this.state
     const prices = [
       {
@@ -166,6 +175,11 @@ class Market extends Component {
                 <div style={{ padding: '20' }}>
                   <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
                 </div>
+                <Message icon>
+                  <Message.Content>
+                    {this.props.address}
+                  </Message.Content>
+                </Message>
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
                 </Form.Field>
@@ -188,6 +202,23 @@ class Market extends Component {
               </Grid.Column>
             </Grid.Row>
           </Grid>
+          <Card.Group>
+            <Card fluid style={{maxWidth: '600px'}} color='purple'>
+              <Card.Content>
+              <Card.Header>
+                {this.props.ipfsAddress}
+              </Card.Header>
+              <Card.Description>
+                {this.props.address}
+              </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              <Button basic color='purple'>
+                More Info
+              </Button>
+            </Card.Content>
+            </Card>
+          </Card.Group>
         </div>
       </div>
     );
