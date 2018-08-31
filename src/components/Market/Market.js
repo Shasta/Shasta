@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown } from 'semantic-ui-react'
 import './Market.css';
+import axios from 'axios';
 
 class Market extends Component {
   constructor(props) {
@@ -11,7 +12,7 @@ class Market extends Component {
       percent: 0,
       firstName: '',
       lastName: '',
-      address:'',
+      address: '',
       zipCode: '',
       dropdownValue: ''
     }
@@ -37,40 +38,67 @@ class Market extends Component {
       contracts: []
     }
 
+    var newContract = {
+      value: this.state.dropdownValue,
+      date: Date.now()
+    }
+
+    //Add the new contract to the profile
+
+    userJson.contracts.push(newContract);
     console.log("Info to update: ", userJson);
 
     var contract = this.props.contract;
     var address = this.props.address;
-    
-    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], function (err, res) {
+    var url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
+
+    //Upload json to ipfs and get the hash
+    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], (err, res) => {
 
       if (err) throw err;
 
       var ipfsHash = res[0].hash;
       console.log("ipfs hash: ", ipfsHash);
-      contract.deployed().then(function (contractInstance) {
-        contractInstance.updateUser( ipfsHash, { gas: 400000, from: address }).then(function (success) {
-          if (success) {
-            console.log('Updated user ' + userJson.username + ' on ethereum!');
 
-          } else {
-            console.log('error updateing user on ethereum.');
-          }
-        }).catch(function (e) {
-          console.log('error creating user:', userJson.username, ':', e);
+      //Get the exact value in ethers
+      axios.get(url).then(res => {
+
+        //Set te conversion from EUR to WEI
+        console.log("ETH", res.data.ETH);
+        console.log("toPay", newContract.value);
+
+        var value = this.props.web3.toWei(res.data.ETH * newContract.value);
+
+        //Call the transaction
+        contract.deployed().then(function (contractInstance) {
+          contractInstance.updateUser.sendTransaction(ipfsHash, { gas: 400000, from: address, value: value }).then(function (success) {
+            if (success) {
+              console.log('Updated user ' + userJson.username + ' on ethereum!');
+
+            } else {
+              console.log('error updateing user on ethereum.');
+            }
+          }).catch(function (e) {
+            console.log('error creating user:', userJson.username, ':', e);
+          });
+
         });
-
       });
     });
 
   }
 
-  handleChange = (e) => {
+  handleChange = (e, value) => {
     this.setState({
-        [e.target.name]: e.target.value
+      [e.target.name]: e.target.value
     })
   }
 
+  handleChangeDropdown = (e) => {
+    this.setState({
+      dropdownValue: e.target.textContent.slice(0, -1)
+    })
+  }
   render() {
 
     const { visible } = this.state
@@ -101,42 +129,42 @@ class Market extends Component {
             direction='right'
             visible={visible}
             width='very wide'
-            >
+          >
             <Menu.Item>
-              <h3 style={{position: 'relative'}}>New Contract</h3>
+              <h3 style={{ position: 'relative' }}>New Contract</h3>
             </Menu.Item>
             <Menu.Item>
               <Form>
                 <Form.Field>
                   <label>First Name</label>
                   <input placeholder='First Name'
-                   name='firstName'
-                   value={this.state.firstName} 
-                   onChange={e => this.handleChange(e)} />
+                    name='firstName'
+                    value={this.state.firstName}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Last Name</label>
                   <input placeholder='Last Name'
-                  name='lastName'
-                  value={this.state.lastName} 
-                  onChange={e => this.handleChange(e)} />
+                    name='lastName'
+                    value={this.state.lastName}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Address</label>
                   <input placeholder='Address'
-                  name='address'
-                  value={this.state.address} 
-                  onChange={e => this.handleChange(e)} />
+                    name='address'
+                    value={this.state.address}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
                   <label>zip code</label>
                   <input placeholder='zip code'
-                  name='zipCode'
-                  value={this.state.zipCode} 
-                  onChange={e => this.handleChange(e)} />
+                    name='zipCode'
+                    value={this.state.zipCode}
+                    onChange={e => this.handleChange(e)} />
                 </Form.Field>
-                <div style={{padding:'20'}}>
-                <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChange(e)} />
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
                 </div>
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
@@ -150,7 +178,7 @@ class Market extends Component {
             <h3>Powered by District0x</h3>
           </Sidebar>
         </div>
-        <div style={{marginLeft: 400, marginTop:20}}>
+        <div style={{ marginLeft: 400, marginTop: 20 }}>
           <Grid>
             <Grid.Row columns={3}>
               <Grid.Column></Grid.Column>

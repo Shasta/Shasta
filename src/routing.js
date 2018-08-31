@@ -54,6 +54,7 @@ class App extends React.Component {
                   ipfs={this.props.ipfs} 
                   contract={this.props.contract}
                   address={this.props.address}
+                  web3={this.props.web3}
                   />} />
               <Route path="/map" component={Map} />
             </div>
