@@ -107,7 +107,7 @@ class App extends React.Component {
               ipfsFirstName: aux.firstName,
               ipfsAddress: aux.address,
               ipfsHash: ipfsHash,
-              ipfsValue: aux.contracts[0].value
+              ipfsValue: '40'
             })
           })
         }
