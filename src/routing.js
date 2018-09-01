@@ -29,9 +29,11 @@ class App extends React.Component {
           <div>
             <Tab web3={web3} account={account} balance={balance}></Tab>
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
+              <Link to="/">
               <Menu.Item as='a'>
                 <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
               </Menu.Item>
+            </Link>
               <Link to="/">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
@@ -60,6 +62,7 @@ class App extends React.Component {
                   ipfs={this.props.ipfs}
                   contract={this.props.contract}
                   address={this.props.address}
+                  web3={this.props.web3}
                   ipfsHash={this.props.ipfsHash}
                   ipfsFirstName={this.props.ipfsFirstName}
                   ipfsAddress={this.props.ipfsAddress}

@@ -10,3 +10,7 @@ body, html {
     background-position: center;
     color: white;
 }
+
+.logo-image {
+  filter: drop-shadow(0 0 45px #A35399);
+}
