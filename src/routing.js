@@ -66,6 +66,7 @@ class App extends React.Component {
                   ipfsHash={this.props.ipfsHash}
                   ipfsFirstName={this.props.ipfsFirstName}
                   ipfsAddress={this.props.ipfsAddress}
+                  ipfsValue={this.props.ipfsValue}
                   />} />
               <Route path="/map" component={Map} />
             </div>

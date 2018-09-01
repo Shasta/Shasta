@@ -18,7 +18,7 @@ class Market extends Component {
       dropdownValue: '',
       ipfsHash: '',
       ipfsFirstName: '',
-      ipfsAddress: ''
+      ipfsAddress: '',
 
     }
 
@@ -113,15 +113,15 @@ class Market extends Component {
     const { visible } = this.state
     const prices = [
       {
-        text: '20€',
+        text: '20$',
         value: '20',
       },
       {
-        text: '40€',
+        text: '40$',
         value: '40',
       },
       {
-        text: '60€',
+        text: '60$',
         value: '60',
       }
     ]
@@ -213,6 +213,7 @@ class Market extends Component {
               </Card.Description>
             </Card.Content>
             <Card.Content extra>
+              <h3>{this.props.ipfsValue}$</h3>
               <Button basic color='purple'>
                 More Info
               </Button>

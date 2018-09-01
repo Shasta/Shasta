@@ -25,6 +25,7 @@ class App extends React.Component {
       ipfsFirstName: '',
       ipfsAddress: '',
       ipfsHash: '',
+      ipfsValue: '',
       status: 'Not Connected!',
       userJson: ''
     }
@@ -105,7 +106,8 @@ class App extends React.Component {
               username: aux.username,
               ipfsFirstName: aux.firstName,
               ipfsAddress: aux.address,
-              ipfsHash: ipfsHash
+              ipfsHash: ipfsHash,
+              ipfsValue: aux.contracts[0].value
             })
           })
         }
@@ -134,7 +136,8 @@ class App extends React.Component {
       ipfs,
       ipfsHash,
       ipfsFirstName,
-      ipfsAddress
+      ipfsAddress,
+      ipfsValue
     } = this.state
     console.log("username: ", this.state.username);
     console.log("address: ", this.state.address);
@@ -152,6 +155,7 @@ class App extends React.Component {
             ipfsHash={ipfsHash}
             ipfsFirstName={ipfsFirstName}
             ipfsAddress={ipfsAddress}
+            ipfsValue={ipfsValue}
           >
           </Router>
         </div>
