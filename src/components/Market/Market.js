@@ -203,7 +203,7 @@ class Market extends Component {
             </Grid.Row>
           </Grid>
           <Card.Group>
-            <Card fluid style={{maxWidth: '600px'}} color='purple'>
+            <Card fluid style={{maxWidth: '500px'}} color='purple'>
               <Card.Content>
               <Card.Header>
                 {this.props.ipfsAddress}
