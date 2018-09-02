@@ -64,6 +64,7 @@
     "async": "^2.6.1",
     "axios": "^0.18.0",
     "babel-plugin-styled-components": "^1.6.0",
+    "bluebird": "^3.5.1",
     "d3-array": "^1.2.1",
     "dotenv": "^2.0.0",
     "faker": "^4.1.0",
@@ -126,7 +127,9 @@
     "presets": [
       "react-app"
     ],
-    "plugins": ["styled-components"]
+    "plugins": [
+      "styled-components"
+    ]
   },
   "eslintConfig": {
     "extends": "react-app"
