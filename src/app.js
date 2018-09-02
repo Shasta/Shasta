@@ -104,7 +104,6 @@ class App extends React.Component {
           console.log('getting user info from ', url);
 
           ipfs.cat(ipfsHash, (err, aux) => {
-            console.log(aux, 'first aux');
             aux = aux.toString('utf8')
             aux = JSON.parse(aux)
             console.log(aux, aux.firstName, 'aux parse');
@@ -114,7 +113,7 @@ class App extends React.Component {
               ipfsFirstName: aux.firstName,
               ipfsAddress: aux.address,
               ipfsHash: ipfsHash,
-              ipfsValue: '40'
+              ipfsValue: ''
             })
           })
         }

@@ -31,7 +31,7 @@ class App extends React.Component {
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
               <Link to="/">
               <Menu.Item as='a'>
-                <Image src={logo} size='small' style={{marginLeft: '80px'}}/>
+                <Image src={logo} size='small' style={{marginLeft: '85px'}}/>
               </Menu.Item>
             </Link>
               <Link to="/">
@@ -47,6 +47,11 @@ class App extends React.Component {
               <Link to="/map">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Map</h4>
+                </Menu.Item>
+              </Link>
+              <Link to="/hardware">
+                <Menu.Item as='a'>
+                  <FontAwesomeIcon icon="digital-tachograph"></FontAwesomeIcon><h4>Hardware</h4>
                 </Menu.Item>
               </Link>
               <Link to="/settings">

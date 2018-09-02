@@ -189,7 +189,7 @@ class Market extends Component {
             <Menu.Item>
               <Progress percent={this.state.percent} color='violet' active></Progress>
             </Menu.Item>
-            <h3>Powered by District0x</h3>
+            <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
           </Sidebar>
         </div>
         <div style={{ marginLeft: 400, marginTop: 20 }}>
