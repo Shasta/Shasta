@@ -67,7 +67,12 @@ class App extends React.Component {
                   ipfsFirstName={this.props.ipfsFirstName}
                   ipfsAddress={this.props.ipfsAddress}
                   />} />
-              <Route path="/map" component={Map} />
+              <Route path="/map" render={(props) => <Map
+                  ipfs={this.props.ipfs}
+                  address={this.props.address}
+                  web3={this.props.web3}
+                  sharedMapContract={this.props.sharedMapContract}
+              />} />
             </div>
           </div>
         </Router>

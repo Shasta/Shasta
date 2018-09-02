@@ -91,8 +91,8 @@ contract SharedMap is Ownable, Pausable {
   function addLocation(string locationIpfsHash) public whenNotPaused onlyUser {
     require(bytes(locationIpfsHash).length > 0);
     // Add relation between location index and msg.sender.
-    locationsIpfsHashes.push(locationIpfsHash);
-    uint newIndex = locationsIpfsHashes.length - 1;
+    uint newLength = locationsIpfsHashes.push(locationIpfsHash);
+    uint newIndex = newLength - 1;
     locationIndexByAddress[newIndex] = msg.sender;
     emit NewLocation(locationIpfsHash, newIndex);
   }
