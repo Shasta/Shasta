@@ -13,7 +13,7 @@ body, html {
 
 .logo-image {
   filter: drop-shadow(0 0 45px #A35399);
-  height: 600px;
+  height: 550px;
   margin-top: 70px;
   margin-left: 70px;
 }
