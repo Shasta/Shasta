@@ -5,29 +5,59 @@ import D3 from './d3.js';
 
 class Home extends Component {
 
+  state = {
+    notificationsCount: 0
+  }
+  
+  formatDate(millis) {
+
+    var date = new Date(millis);
+    var monthNames = [
+      "January", "February", "March",
+      "April", "May", "June", "July",
+      "August", "September", "October",
+      "November", "December"
+    ];
+  
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+  
+    return day + ' ' + monthNames[monthIndex] + ' ' + year;
+  }
+  
+
   render() {
+    
+    var example = {
+      date: this.formatDate(Date.now()),
+      message: "Alain wants you to supply him with energy.",
+      marketer: "HolaLuz",
+      value: 20
+    }
+
+    this.props.userJson.contracts.push(example);
+    console.log(this.props.userJson.contracts.length)
+    this.setState = {
+      notificationsCount: this.props.userJson.contracts.length
+    }
+    const notifications = this.props.userJson.contracts.map((contract) => {
+
+      return (
+        <Feed.Event>
+            <Feed.Content date={this.formatDate(contract.date)} summary={'New contract with ' + contract.marketer + ' for ' + contract.value + "€"} />
+          </Feed.Event>
+      );
+    })    
 
     return (
       // Menu with Bulma-React.
       <div style={{ marginLeft: '375px' }}>
         <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href='https://rinkeby.etherscan.io/address/{this.props.account}'>{this.props.username}</a>,</h2>
-        <h5 style={{ marginLeft: '30px', marginTop: '10px' }}>You have 32 notifications.</h5>
+        <h5 style={{ marginLeft: '30px', marginTop: '10px' }}>You have {this.state.notificationsCount} notifications.</h5>
         <D3></D3>
         <Feed style={{ marginLeft: '40px', marginTop: '30px' }}>
-          <Feed.Event
-            icon='pencil'
-            date='Today'
-            summary="You spent 50$ today."
-          />
-          <Feed.Event
-            icon='pencil'
-            date='Today'
-            summary="You earned 350$ today."
-          />
-          <Feed.Event>
-            <Feed.Label icon='pencil' />
-            <Feed.Content date='Today' summary="Alain wants you to supply him with energy." />
-          </Feed.Event>
+          {notifications}
         </Feed>
       </div>
     );

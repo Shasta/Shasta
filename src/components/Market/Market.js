@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon, Message } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
 
@@ -37,18 +37,20 @@ class Market extends Component {
 
     var userJson = {
       username: this.props.username,
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      address: this.state.address,
-      zipCode: this.state.zipCode,
-      contracts: []
+      contracts: this.props.userJson.contracts
     }
 
     var newContract = {
       value: this.state.dropdownValue,
-      date: Date.now()
+      date: Date.now(),
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      address: this.state.address,
+      zipCode: this.state.zipCode,
+      marketer: "HolaLuz"
     }
-
+    console.log("New contract", newContract);
+    
     //Add the new contract to the profile
 
     userJson.contracts.push(newContract);
@@ -105,12 +107,16 @@ class Market extends Component {
       dropdownValue: e.target.textContent.slice(0, -1)
     })
   }
+
   render() {
+
     const {
       ipfsFirstName,
       ipfsAddress
     } = this.props;
+
     const { visible } = this.state
+
     const prices = [
       {
         text: '20$',
@@ -125,6 +131,28 @@ class Market extends Component {
         value: '60',
       }
     ]
+
+    console.log( this.props.userJson.contracts)
+    const contracts = this.props.userJson.contracts.map((contract) => {
+      return (
+        <Card fluid style={{ maxWidth: '500px' }} color='purple'>
+          <Card.Content>
+            <Card.Header>
+              {contract.marketer}
+            </Card.Header>
+            <Card.Description>
+              {this.props.address}
+            </Card.Description>
+          </Card.Content>
+          <Card.Content extra>
+            <h3>{contract.value} €</h3>
+            <Button basic color='purple'>
+              More Info
+              </Button>
+          </Card.Content>
+        </Card>
+      );
+    });
 
     return (
       <div>
@@ -203,22 +231,7 @@ class Market extends Component {
             </Grid.Row>
           </Grid>
           <Card.Group>
-            <Card fluid style={{maxWidth: '500px'}} color='purple'>
-              <Card.Content>
-              <Card.Header>
-                {this.props.ipfsAddress}
-              </Card.Header>
-              <Card.Description>
-                {this.props.address}
-              </Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-              <h3>{this.props.ipfsValue}$</h3>
-              <Button basic color='purple'>
-                More Info
-              </Button>
-            </Card.Content>
-            </Card>
+            {contracts}
           </Card.Group>
         </div>
       </div>

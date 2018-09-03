@@ -61,7 +61,10 @@ class App extends React.Component {
               </Link>
             </Sidebar>
             <div>
-              <Route exact path="/" render={(props) => <Home username={this.props.username} />} />
+              <Route exact path="/" render={(props) => <Home 
+              username={this.props.username}
+              userJson={this.props.userJson}
+              />} />
               <Route path="/market" render={(props) => <Market
                   username={this.props.username}
                   ipfs={this.props.ipfs}
@@ -72,6 +75,7 @@ class App extends React.Component {
                   ipfsFirstName={this.props.ipfsFirstName}
                   ipfsAddress={this.props.ipfsAddress}
                   ipfsValue={this.props.ipfsValue}
+                  userJson={this.props.userJson}
                   />} />
               <Route path="/map" render={(props) => <Map
                   ipfs={this.props.ipfs}
