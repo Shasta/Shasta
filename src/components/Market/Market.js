@@ -50,7 +50,7 @@ class Market extends Component {
       marketer: "HolaLuz"
     }
     console.log("New contract", newContract);
-    
+
     //Add the new contract to the profile
 
     userJson.contracts.push(newContract);
@@ -132,7 +132,6 @@ class Market extends Component {
       }
     ]
 
-    console.log( this.props.userJson.contracts)
     const contracts = this.props.userJson.contracts.map((contract) => {
       return (
         <Card fluid style={{ maxWidth: '500px' }} color='purple'>

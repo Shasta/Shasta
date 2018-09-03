@@ -5,10 +5,14 @@ import D3 from './d3.js';
 
 class Home extends Component {
 
-  state = {
-    notificationsCount: 0
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      notificationsCount: this.props.userJson.contracts.length
+    }
   }
-  
+
   formatDate(millis) {
 
     var date = new Date(millis);
@@ -18,37 +22,25 @@ class Home extends Component {
       "August", "September", "October",
       "November", "December"
     ];
-  
+
     var day = date.getDate();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
-  
+
     return day + ' ' + monthNames[monthIndex] + ' ' + year;
   }
-  
+
 
   render() {
-    
-    var example = {
-      date: this.formatDate(Date.now()),
-      message: "Alain wants you to supply him with energy.",
-      marketer: "HolaLuz",
-      value: 20
-    }
 
-    this.props.userJson.contracts.push(example);
-    console.log(this.props.userJson.contracts.length)
-    this.setState = {
-      notificationsCount: this.props.userJson.contracts.length
-    }
     const notifications = this.props.userJson.contracts.map((contract) => {
 
       return (
         <Feed.Event>
-            <Feed.Content date={this.formatDate(contract.date)} summary={'New contract with ' + contract.marketer + ' for ' + contract.value + "€"} />
-          </Feed.Event>
+          <Feed.Content date={this.formatDate(contract.date)} summary={'New contract with ' + contract.marketer + ' for ' + contract.value + "€"} />
+        </Feed.Event>
       );
-    })    
+    })
 
     return (
       // Menu with Bulma-React.
