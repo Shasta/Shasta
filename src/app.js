@@ -7,7 +7,10 @@ import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
 import { default as contract } from 'truffle-contract'
 import user_artifacts from '../build/contracts/User.json'
+import shared_map_artifacts from '../build/contracts/SharedMap.json'
+
 var userContract = contract(user_artifacts);
+var sharedMapContract = contract(shared_map_artifacts);
 const ipfsAPI = require('ipfs-api');
 const ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
 
@@ -42,7 +45,10 @@ class App extends React.Component {
 
         // set the provider for the User abstraction
         userContract.setProvider(results.web3.currentProvider);
-
+        
+        // set the provider for the SharedMap abstraction
+        sharedMapContract.setProvider(results.web3.currentProvider);
+       
         // Instantiate contract
         this.instantiateContract();
 
@@ -77,7 +83,8 @@ class App extends React.Component {
       })
       // set the provider for the User abstraction
       userContract.setProvider(this.state.web3.currentProvider);
-
+       // set the provider for the SharedMap abstraction
+      sharedMapContract.setProvider(this.state.web3.currentProvider);
     })
   }
 
@@ -151,6 +158,7 @@ class App extends React.Component {
             username={username}
             ipfs={this.state.ipfs}
             contract={userContract}
+            sharedMapContract={sharedMapContract}
             ipfsHash={ipfsHash}
             ipfsFirstName={ipfsFirstName}
             ipfsAddress={ipfsAddress}
