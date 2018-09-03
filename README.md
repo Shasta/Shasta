@@ -1,4 +1,4 @@
-[![Follow](https://img.shields.io/twitter/follow/Filenation_io.svg?style=social&label=Follow)](https://twitter.com/Filenation_io)
+[![Follow](https://img.shields.io/twitter/follow/Filenation_io.svg?style=social&label=Follow)](https://twitter.com/ethshasta)
 
 # Shasta Core Project <img align="right" src="/static/logo.png" height="80px" />
 
