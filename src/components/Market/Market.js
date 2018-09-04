@@ -19,7 +19,7 @@ class Market extends Component {
       ipfsHash: '',
       ipfsFirstName: '',
       ipfsAddress: '',
-
+      dropdownMarketer: ''
     }
 
     this.updateUser = this.updateUser.bind(this);
@@ -47,7 +47,7 @@ class Market extends Component {
       lastName: this.state.lastName,
       address: this.state.address,
       zipCode: this.state.zipCode,
-      marketer: "HolaLuz"
+      marketer: this.state.dropdownMarketer
     }
     console.log("New contract", newContract);
 
@@ -96,7 +96,7 @@ class Market extends Component {
 
   }
 
-  handleChange = (e, value) => {
+  handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
     })
@@ -108,6 +108,11 @@ class Market extends Component {
     })
   }
 
+  handleChangeDropdownMarketer = (e) => {
+    this.setState({
+      dropdownMarketer: e.target.textContent
+    })
+  }
   render() {
 
     const {
@@ -132,6 +137,18 @@ class Market extends Component {
       }
     ]
 
+    const marketers = [
+      {
+        text:'HolaLuz',
+        value:'HolaLuz'
+      },{
+        text: 'SomEnergia',
+        value: 'SomEnergia'
+      },{
+        text:'Gas Natural',
+        value: 'Gas Natural'
+      }
+    ]
     const contracts = this.props.userJson.contracts.map((contract) => {
       return (
         <Card fluid style={{ maxWidth: '500px' }} color='purple'>
@@ -201,6 +218,9 @@ class Market extends Component {
                 </Form.Field>
                 <div style={{ padding: '20' }}>
                   <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
+                </div>
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
                 </div>
                 <Message icon>
                   <Message.Content>
