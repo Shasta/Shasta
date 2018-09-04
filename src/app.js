@@ -1,7 +1,5 @@
 import React from 'react';
 
-import axios from 'axios';
-
 import Router from "./routing.js";
 import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
@@ -106,14 +104,14 @@ class App extends React.Component {
           ipfs.cat(ipfsHash, (err, aux) => {
             aux = aux.toString('utf8')
             aux = JSON.parse(aux)
-            console.log(aux, aux.firstName, 'aux parse');
 
             context.setState({
               username: aux.username,
               ipfsFirstName: aux.firstName,
               ipfsAddress: aux.address,
               ipfsHash: ipfsHash,
-              ipfsValue: ''
+              ipfsValue: '',
+              userJson: aux
             })
           })
         }
@@ -143,7 +141,8 @@ class App extends React.Component {
       ipfsHash,
       ipfsFirstName,
       ipfsAddress,
-      ipfsValue
+      ipfsValue,
+      userJson
     } = this.state
     console.log("username: ", this.state.username);
     console.log("address: ", this.state.address);
@@ -163,6 +162,7 @@ class App extends React.Component {
             ipfsFirstName={ipfsFirstName}
             ipfsAddress={ipfsAddress}
             ipfsValue={ipfsValue}
+            userJson={userJson}
           >
           </Router>
         </div>

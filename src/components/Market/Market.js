@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon, Message } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
 
@@ -19,7 +19,7 @@ class Market extends Component {
       ipfsHash: '',
       ipfsFirstName: '',
       ipfsAddress: '',
-
+      dropdownMarketer: ''
     }
 
     this.updateUser = this.updateUser.bind(this);
@@ -37,17 +37,19 @@ class Market extends Component {
 
     var userJson = {
       username: this.props.username,
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      address: this.state.address,
-      zipCode: this.state.zipCode,
-      contracts: []
+      contracts: this.props.userJson.contracts
     }
 
     var newContract = {
       value: this.state.dropdownValue,
-      date: Date.now()
+      date: Date.now(),
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      address: this.state.address,
+      zipCode: this.state.zipCode,
+      marketer: this.state.dropdownMarketer
     }
+    console.log("New contract", newContract);
 
     //Add the new contract to the profile
 
@@ -94,7 +96,7 @@ class Market extends Component {
 
   }
 
-  handleChange = (e, value) => {
+  handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
     })
@@ -105,12 +107,21 @@ class Market extends Component {
       dropdownValue: e.target.textContent.slice(0, -1)
     })
   }
+
+  handleChangeDropdownMarketer = (e) => {
+    this.setState({
+      dropdownMarketer: e.target.textContent
+    })
+  }
   render() {
+
     const {
       ipfsFirstName,
       ipfsAddress
     } = this.props;
+
     const { visible } = this.state
+
     const prices = [
       {
         text: '20$',
@@ -125,6 +136,39 @@ class Market extends Component {
         value: '60',
       }
     ]
+
+    const marketers = [
+      {
+        text:'HolaLuz',
+        value:'HolaLuz'
+      },{
+        text: 'SomEnergia',
+        value: 'SomEnergia'
+      },{
+        text:'Gas Natural',
+        value: 'Gas Natural'
+      }
+    ]
+    const contracts = this.props.userJson.contracts.map((contract) => {
+      return (
+        <Card fluid style={{ maxWidth: '500px' }} color='purple'>
+          <Card.Content>
+            <Card.Header>
+              {contract.marketer}
+            </Card.Header>
+            <Card.Description>
+              {this.props.address}
+            </Card.Description>
+          </Card.Content>
+          <Card.Content extra>
+            <h3>{contract.value} €</h3>
+            <Button basic color='purple'>
+              More Info
+              </Button>
+          </Card.Content>
+        </Card>
+      );
+    });
 
     return (
       <div>
@@ -175,6 +219,9 @@ class Market extends Component {
                 <div style={{ padding: '20' }}>
                   <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
                 </div>
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
+                </div>
                 <Message icon>
                   <Message.Content>
                     {this.props.address}
@@ -203,22 +250,7 @@ class Market extends Component {
             </Grid.Row>
           </Grid>
           <Card.Group>
-            <Card fluid style={{maxWidth: '500px'}} color='purple'>
-              <Card.Content>
-              <Card.Header>
-                {this.props.ipfsAddress}
-              </Card.Header>
-              <Card.Description>
-                {this.props.address}
-              </Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-              <h3>{this.props.ipfsValue}$</h3>
-              <Button basic color='purple'>
-                More Info
-              </Button>
-            </Card.Content>
-            </Card>
+            {contracts}
           </Card.Group>
         </div>
       </div>
