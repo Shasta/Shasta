@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message, Feed } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 class Market extends Component {
@@ -115,11 +116,6 @@ class Market extends Component {
   }
   render() {
 
-    const {
-      ipfsFirstName,
-      ipfsAddress
-    } = this.props;
-
     const { visible } = this.state
 
     const prices = [
@@ -159,103 +155,114 @@ class Market extends Component {
             <Card.Description>
               {this.props.address}
             </Card.Description>
-          </Card.Content>
-          <Card.Content extra>
-            <h3>{contract.value} €</h3>
-            <Button basic color='purple'>
-              More Info
+            <Feed>
+              <Feed.Event>
+                <Feed.Label><FontAwesomeIcon icon="home"></FontAwesomeIcon></Feed.Label>
+                  <Feed.Content>
+                    <Feed.Date content='Street address' />
+                    <Feed.Summary>
+                      {this.props.ipfsAddress}
+                    </Feed.Summary>
+                  </Feed.Content>
+                </Feed.Event>
+              </Feed>
+            </Card.Content>
+            <Card.Content extra>
+              <h3>{contract.value} €</h3>
+              <Button basic color='purple'>
+                More Info
               </Button>
-          </Card.Content>
-        </Card>
-      );
-    });
+            </Card.Content>
+          </Card>
+        );
+      });
 
-    return (
-      <div>
+      return (
         <div>
-          <Sidebar
-            as={Menu}
-            animation='overlay'
-            icon='labeled'
-            onHide={this.handleSidebarHide}
-            vertical
-            direction='right'
-            visible={visible}
-            width='very wide'
-          >
-            <Menu.Item>
-              <h3 style={{ position: 'relative' }}>New Contract</h3>
-            </Menu.Item>
-            <Menu.Item>
-              <Form>
-                <Form.Field>
-                  <label>First Name</label>
-                  <input placeholder='First Name'
-                    name='firstName'
-                    value={this.state.firstName}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label>Last Name</label>
-                  <input placeholder='Last Name'
-                    name='lastName'
-                    value={this.state.lastName}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label>Address</label>
-                  <input placeholder='Address'
-                    name='address'
-                    value={this.state.address}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label>zip code</label>
-                  <input placeholder='zip code'
-                    name='zipCode'
-                    value={this.state.zipCode}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <div style={{ padding: '20' }}>
-                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
-                </div>
-                <div style={{ padding: '20' }}>
-                  <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
-                </div>
-                <Message icon>
-                  <Message.Content>
-                    {this.props.address}
-                  </Message.Content>
-                </Message>
-                <Form.Field>
-                  <Checkbox label='I agree to the Terms and Conditions' />
-                </Form.Field>
-                <Button onClick={this.updateUser} type='submit'>Submit</Button>
-              </Form>
-            </Menu.Item>
-            <Menu.Item>
-              <Progress percent={this.state.percent} color='violet' active></Progress>
-            </Menu.Item>
-            <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
-          </Sidebar>
+          <div>
+            <Sidebar
+              as={Menu}
+              animation='overlay'
+              icon='labeled'
+              onHide={this.handleSidebarHide}
+              vertical
+              direction='right'
+              visible={visible}
+              width='very wide'
+              >
+              <Menu.Item>
+                <h3 style={{ position: 'relative' }}>New Contract</h3>
+              </Menu.Item>
+              <Menu.Item>
+                <Form>
+                  <Form.Field>
+                    <label>First Name</label>
+                    <input placeholder='First Name'
+                      name='firstName'
+                      value={this.state.firstName}
+                      onChange={e => this.handleChange(e)} />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>Last Name</label>
+                    <input placeholder='Last Name'
+                      name='lastName'
+                      value={this.state.lastName}
+                      onChange={e => this.handleChange(e)} />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>Address</label>
+                    <input placeholder='Address'
+                      name='address'
+                      value={this.state.address}
+                      onChange={e => this.handleChange(e)} />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>zip code</label>
+                    <input placeholder='zip code'
+                      name='zipCode'
+                      value={this.state.zipCode}
+                      onChange={e => this.handleChange(e)} />
+                  </Form.Field>
+                  <div style={{ padding: '20' }}>
+                    <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
+                  </div>
+                  <div style={{ padding: '20' }}>
+                    <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
+                  </div>
+                  <Message icon>
+                    <Message.Content>
+                      {this.props.address}
+                    </Message.Content>
+                  </Message>
+                  <Form.Field>
+                    <Checkbox label='I agree to the Terms and Conditions' />
+                  </Form.Field>
+                  <Button onClick={this.updateUser} type='submit'>Submit</Button>
+                </Form>
+              </Menu.Item>
+              <Menu.Item>
+                <Progress percent={this.state.percent} color='violet' active></Progress>
+              </Menu.Item>
+              <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
+            </Sidebar>
+          </div>
+          <div style={{ marginLeft: 400, marginTop: 20 }}>
+            <Grid>
+              <Grid.Row columns={3}>
+                <Grid.Column></Grid.Column>
+                <Grid.Column></Grid.Column>
+                <Grid.Column>
+                  <Button onClick={this.handleButtonClick}>Start a Contract</Button>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+            <Card.Group>
+              {contracts}
+            </Card.Group>
+          </div>
         </div>
-        <div style={{ marginLeft: 400, marginTop: 20 }}>
-          <Grid>
-            <Grid.Row columns={3}>
-              <Grid.Column></Grid.Column>
-              <Grid.Column></Grid.Column>
-              <Grid.Column>
-                <Button onClick={this.handleButtonClick}>Start a Contract</Button>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-          <Card.Group>
-            {contracts}
-          </Card.Group>
-        </div>
-      </div>
-    );
+      );
+    }
   }
-}
 
-export default Market
+  export default Market
