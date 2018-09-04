@@ -33,8 +33,19 @@ class Home extends Component {
 
   render() {
 
-    const notifications = this.props.userJson.contracts.map((contract) => {
+    //Sort by date
+    var sortedNotifications = this.props.userJson.contracts.sort(function(a, b){
+      return b.date - a.date
+    });
 
+    var count = 0;
+    const notifications = sortedNotifications.map((contract) => {
+
+      if (count >= 5) {
+        return '';
+      }
+
+      count ++;
       return (
         <Feed.Event>
           <Feed.Content date={this.formatDate(contract.date)} summary={'New contract with ' + contract.marketer + ' for ' + contract.value + "€"} />
