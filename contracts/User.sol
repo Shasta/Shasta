@@ -40,7 +40,7 @@ contract User {
 
   }
 
-  function hasUser(address userAddress) public view returns(bool hasIndeed) 
+  function hasUser(address userAddress) public returns(bool hasIndeed) 
   {
     return (addressToIndex[userAddress] > 0);
   }

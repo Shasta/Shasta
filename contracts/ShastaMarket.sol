@@ -64,18 +64,18 @@ contract ShastaMarket is Ownable, Pausable {
         emit newOffer(msg.sender, _value);
     }
     
-    function getBidFromIndex(uint _index) public view returns(uint) {
+    function getBidFromIndex(uint _index) public view returns(uint, address) {
         require(bidsList.length > _index);
-        return bidsList[_index].value;
+        return (bidsList[_index].value, bidsList[_index].seller);
     }
     
     function getBidsIndexesFromAddress() public view returns(uint[]) {
         return addressToBidsIndex[msg.sender];
     }
 
-    function getOfferFromIndex(uint _index) public view returns(uint) {
+    function getOfferFromIndex(uint _index) public view returns(uint, address) {
         require(offersList.length > _index);
-        return offersList[_index].value;
+        return (offersList[_index].value, offersList[_index].buyer);
     }
     
     function getOfferIndexesFromAddress() public view returns(uint[]) {
