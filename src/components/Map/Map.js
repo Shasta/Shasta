@@ -11,6 +11,7 @@ class Map extends Component {
     chargerStatus: "open",
     chargerLatitude: "",
     chargerLongitude: "",
+    price: 0,
     chargers: []
   }
 
@@ -109,14 +110,16 @@ class Map extends Component {
     // Get the SharedMap.sol instance
     const sharedMapInstance = await this.props.sharedMapContract.deployed();
     const currentAddress = this.props.address;
+    const web3 = this.props.web3;
 
     // Generate the location object, will be saved later in JSON.
     const locationObject = {
       chargerName: this.state.chargerName,
       chargerStatus: this.state.chargerStatus,
       latitude: this.state.chargerLatitude,
-      longitude: this.state.chargerLongitude
+      longitude: this.state.chargerLongitude,
     }
+    const priceBG = web3.toBigNumber(this.state.price);
     const jsonBuffer = Buffer.from(JSON.stringify(locationObject));
     try {
       // Show loader spinner
@@ -125,17 +128,17 @@ class Map extends Component {
       const ipfsResponse = await this.props.ipfs.add(jsonBuffer);
       const ipfsHash = ipfsResponse[0].hash;
       // Estimate gas
-      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(ipfsHash, {from: currentAddress});
+      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(priceBG, ipfsHash, {from: currentAddress});
       // Send a transaction to addLocation method.
-      await sharedMapInstance.addLocation(ipfsHash, {gas: estimatedGas, from: currentAddress})  //Call the transaction
-      this.setState({chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false})
+      await sharedMapInstance.addLocation(priceBG, ipfsHash, {gas: estimatedGas, from: currentAddress})  //Call the transaction
+      this.setState({chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, price: 0})
     } catch (err) {
       console.error(err)
     }
   }
 
   render() {
-    const { visible, chargerName, chargerStatus,  chargerLatitude, chargerLongitude, chargers} = this.state;
+    const { visible, chargerName, chargerStatus,  price, chargerLatitude, chargerLongitude, chargers} = this.state;
     let fieldErrors = []
     const chargerStates = [{
       text: 'Open',
@@ -151,6 +154,9 @@ class Map extends Component {
     }
     if (chargerStatus.length === 0) {
       fieldErrors.push("Charger status must be selected.")
+    }
+    if (price <= 0) {
+      fieldErrors.push("Price of kWh must be set.")
     }
     if (chargerLatitude.length === 0 || chargerLatitude === 0) {
       fieldErrors.push("You must click in the map to select a location.")
@@ -176,15 +182,22 @@ class Map extends Component {
                 <p style={{ textAlign: "start"}}>You can click in the map to select the charger location. Add a charger name, and the status of the charger. Once the form is complete, click on Submit button.</p>
               </Form.Field>
               <Form.Field>
-                <label>Charger name</label>
+                <label>Provider name</label>
                 <input type="text" placeholder='Charger name'
                   name='chargerName'
                   value={chargerName}
                   onChange={e => this.handleChange(e)} />
               </Form.Field>
               <Form.Field>
-                <label>Charger status</label>
+                <label>Provider status</label>
                 <Dropdown placeholder='Charger status' value={chargerStatus} name='dropdownValue' fluid selection options={chargerStates} onChange={this.handleChangeDropdown} />
+              </Form.Field>
+              <Form.Field>
+                <label>Price per kWh</label>
+                <input type="text" placeholder='0.23'
+                  name='price'
+                  value={price}
+                  onChange={e => this.handleChange(e)} />
               </Form.Field>
               <Form.Field>
                 <label>Latitude</label>

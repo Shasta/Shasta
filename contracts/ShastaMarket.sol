@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.24;
 
 import './OpenZeppelin/Ownable.sol';
 import './OpenZeppelin/Pausable.sol';
@@ -62,6 +62,17 @@ contract ShastaMarket is Ownable, Pausable {
         uint index = offersList.push(myOffer) - 1;
         addressToOffersIndex[msg.sender].push(index);
         emit newOffer(msg.sender, _value);
+    }
+
+    // Not secure, for demo purposes only, this call need to be whitelisted via a modifier.
+    function createOfferFor(address origin, uint _value) public whenNotPaused {
+        Offer memory myOffer;
+        myOffer.buyer = origin;
+        myOffer.value = _value;
+            
+        uint index = offersList.push(myOffer) - 1;
+        addressToOffersIndex[origin].push(index);
+        emit newOffer(origin, _value);
     }
     
     function getBidFromIndex(uint _index) public view returns(uint) {
