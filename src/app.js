@@ -8,9 +8,12 @@ import getWeb3 from './getWeb3.js'
 import { default as contract } from 'truffle-contract'
 import user_artifacts from '../build/contracts/User.json'
 import shared_map_artifacts from '../build/contracts/SharedMap.json'
+import shasta_market_artifacts from '../build/contracts/ShastaMarket.json';
 
 var userContract = contract(user_artifacts);
 var sharedMapContract = contract(shared_map_artifacts);
+var shastaMarketContract = contract(shasta_market_artifacts);
+
 const ipfsAPI = require('ipfs-api');
 const ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
 
@@ -30,7 +33,9 @@ class App extends React.Component {
       ipfsHash: '',
       ipfsValue: '',
       status: 'Not Connected!',
-      userJson: ''
+      userJson: '',
+      bids: [],
+      asks: []
     }
   }
 
@@ -49,8 +54,14 @@ class App extends React.Component {
         // set the provider for the SharedMap abstraction
         sharedMapContract.setProvider(results.web3.currentProvider);
        
+         // set the provider for the ShastaMarket abstraction
+        shastaMarketContract.setProvider(results.web3.currentProvider);
+       
         // Instantiate contract
         this.instantiateContract();
+
+        //get market 
+        this.checkMarket();
 
       })
       .catch(() => {
@@ -85,6 +96,8 @@ class App extends React.Component {
       userContract.setProvider(this.state.web3.currentProvider);
        // set the provider for the SharedMap abstraction
       sharedMapContract.setProvider(this.state.web3.currentProvider);
+      // set the provider for the ShastaMarket abstraction
+      shastaMarketContract.setProvider(this.state.web3.currentProvider);
     })
   }
 
@@ -159,6 +172,7 @@ class App extends React.Component {
             ipfs={this.state.ipfs}
             contract={userContract}
             sharedMapContract={sharedMapContract}
+            shastaMarketContract={shastaMarketContract}
             ipfsHash={ipfsHash}
             ipfsFirstName={ipfsFirstName}
             ipfsAddress={ipfsAddress}

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.19;
 
-import './Ownable.sol';
-import './Pausable.sol';
+import './OpenZeppelin/Ownable.sol';
+import './OpenZeppelin/Pausable.sol';
 import './User.sol';
 
  /**
@@ -43,7 +43,7 @@ contract ShastaMarket is Ownable, Pausable {
         _;
     }
 
-    function createBid(uint _value) public whenNotPaused onlyUser {
+    function createBid(uint _value) public whenNotPaused {
         Bid memory myBid;
         myBid.seller = msg.sender;
         myBid.value = _value;
@@ -54,7 +54,7 @@ contract ShastaMarket is Ownable, Pausable {
     }
     
     
-    function createOffer(uint _value ) public whenNotPaused onlyUser{
+    function createOffer(uint _value ) public whenNotPaused {
         Offer memory myOffer;
         myOffer.buyer = msg.sender;
         myOffer.value = _value;

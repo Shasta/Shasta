@@ -74,6 +74,7 @@ class Market extends Component {
         console.log("toPay", newContract.value);
 
         var value = this.props.web3.toWei(res.data.ETH * newContract.value);
+        var self = this;
 
         //Call the transaction
         contract.deployed().then(function (contractInstance) {
@@ -84,6 +85,16 @@ class Market extends Component {
             } else {
               console.log('error updateing user on ethereum.');
             }
+
+            var dValue = self.state.dropdownValue
+            //Post bid
+            self.props.shastaMarketContract.deployed().then(function (shastaMarketInstance) {
+              shastaMarketInstance.createBid.sendTransaction( dValue, { from: self.props.address }).then((result) => {
+
+                  console.log("Created contract to market", result);
+              });
+          })
+
           }).catch(function (e) {
             console.log('error creating user:', userJson.username, ':', e);
           });
