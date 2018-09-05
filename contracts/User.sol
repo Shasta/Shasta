@@ -9,6 +9,7 @@ contract User {
   mapping(address => uint) private addressToBalance;
 
   event NewUser(bytes16 username, address owner);
+  event UpdatedUser(address owner, bytes ipfsHash);
 
   address[] private addresses;
   bytes16[] private usernames;
@@ -79,6 +80,7 @@ contract User {
     ipfsHashes[addressToIndex[msg.sender]] = ipfsHash;
     addressToBalance[msg.sender] += msg.value;
     
+    emit UpdatedUser(msg.sender, ipfsHash);
     return true;
   }  
  

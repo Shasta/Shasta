@@ -69,6 +69,11 @@ class App extends React.Component {
             <Route exact path="/" render={(props) => <Home 
               username={this.props.username}
               userJson={this.props.userJson}
+              userContract={this.props.contract}
+              shastaMarketContract={this.props.shastaMarketContract}
+              ipfs={this.props.ipfs}
+              web3={this.props.web3}
+              sharedMapContract={this.props.sharedMapContract}
               />} />
               <Route exact path="/marketer" render={(props) => <Marketer 
               username={this.props.username}
