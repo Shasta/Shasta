@@ -187,7 +187,7 @@ class Market extends Component {
         value: "Other"
       }
     ]
-
+    console.log("contracts", this.props.userJson.contracts);
     const contracts = this.props.userJson.contracts.map((contract) => {
       return (
         <Card fluid style={{ maxWidth: '500px' }} color='purple'>
@@ -197,6 +197,9 @@ class Market extends Component {
             </Card.Header>
             <Card.Description>
               {this.props.address}
+            </Card.Description>
+            <Card.Description>
+              {contract.country}
             </Card.Description>
           </Card.Content>
           <Card.Content extra>
