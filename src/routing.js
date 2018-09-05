@@ -8,7 +8,7 @@ import Tab from './components/Tab/Tab';
 import Home from './components/Home/Home';
 import Market from './components/Market/Market';
 import Map from './components/Map/Map';
-
+import Marketer from './components/Marketer/Marketer'
 import logo from './static/shasta-logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -44,6 +44,11 @@ class App extends React.Component {
                   <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Market</h4>
                 </Menu.Item>
               </Link>
+              <Link to="/marketer">
+                <Menu.Item as='a'>
+                  <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Marketer</h4>
+                </Menu.Item>
+              </Link>
               <Link to="/map">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Map</h4>
@@ -61,10 +66,18 @@ class App extends React.Component {
               </Link>
             </Sidebar>
             <div>
-              <Route exact path="/" render={(props) => <Home
+            <Route exact path="/" render={(props) => <Home 
               username={this.props.username}
               userJson={this.props.userJson}
               />} />
+              <Route exact path="/marketer" render={(props) => <Marketer 
+              username={this.props.username}
+              address={this.props.address}
+              shastaMarketContract={this.props.shastaMarketContract}
+              userContract={this.props.contract}
+              web3={this.props.web3}
+              sharedMapContract={this.props.sharedMapContract}
+              ipfs={this.props.ipfs} />} />             
               <Route path="/market" render={(props) => <Market
                   username={this.props.username}
                   ipfs={this.props.ipfs}
@@ -75,6 +88,7 @@ class App extends React.Component {
                   ipfsFirstName={this.props.ipfsFirstName}
                   ipfsAddress={this.props.ipfsAddress}
                   ipfsValue={this.props.ipfsValue}
+                  shastaMarketContract={this.props.shastaMarketContract}
                   userJson={this.props.userJson}
                   />} />
               <Route path="/map" render={(props) => <Map
