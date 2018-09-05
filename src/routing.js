@@ -31,7 +31,7 @@ class App extends React.Component {
             <Sidebar as={Menu} animation='overlay'  icon='labeled' vertical visible width='wide'>
               <Link to="/">
               <Menu.Item as='a'>
-                <Image src={logo} size='small' style={{marginLeft: '85px'}}/>
+                <Image src={logo} size='small' style={{marginLeft: '85px'}}></Image>
               </Menu.Item>
             </Link>
               <Link to="/">

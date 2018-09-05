@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message, Feed } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 class Market extends Component {
@@ -134,11 +135,6 @@ class Market extends Component {
 
   render() {
 
-    const {
-      ipfsFirstName,
-      ipfsAddress
-    } = this.props;
-
     const { visible } = this.state
 
     const prices = [
@@ -207,13 +203,12 @@ class Market extends Component {
             <Button basic color='purple'>
               More Info
               </Button>
-          </Card.Content>
-        </Card>
-      );
-    });
+            </Card.Content>
+          </Card>
+        );
+      });
 
-    return (
-      <div>
+      return (
         <div>
           <Sidebar
             as={Menu}
@@ -301,6 +296,5 @@ class Market extends Component {
       </div>
     );
   }
-}
 
-export default Market
+  export default Market
