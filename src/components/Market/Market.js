@@ -210,6 +210,7 @@ class Market extends Component {
 
       return (
         <div>
+        <div>
           <Sidebar
             as={Menu}
             animation='overlay'
@@ -296,5 +297,5 @@ class Market extends Component {
       </div>
     );
   }
-
+}
   export default Market
