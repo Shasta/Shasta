@@ -14,13 +14,14 @@ class Market extends Component {
       percent: 0,
       firstName: '',
       lastName: '',
-      address: '',
-      zipCode: '',
+      country: '',
       dropdownValue: '',
       ipfsHash: '',
       ipfsFirstName: '',
       ipfsAddress: '',
-      dropdownMarketer: ''
+      dropdownMarketer: '',
+      dropdownSource: '',
+      description: ''
     }
 
     this.updateUser = this.updateUser.bind(this);
@@ -46,9 +47,9 @@ class Market extends Component {
       date: Date.now(),
       firstName: this.state.firstName,
       lastName: this.state.lastName,
-      address: this.state.address,
-      zipCode: this.state.zipCode,
-      marketer: this.state.dropdownMarketer
+      country: this.state.country,
+      marketer: this.state.dropdownMarketer,
+      source: this.state.dropdownSource
     }
     console.log("New contract", newContract);
 
@@ -77,6 +78,7 @@ class Market extends Component {
         console.log("toPay", newContract.value);
 
         var value = this.props.web3.toWei(res.data.ETH * newContract.value);
+        var self = this;
 
         //Call the transaction
         contract.deployed().then(function (contractInstance) {
@@ -87,6 +89,16 @@ class Market extends Component {
             } else {
               console.log('error updateing user on ethereum.');
             }
+
+            var dValue = self.state.dropdownValue
+            //Post bid
+            self.props.shastaMarketContract.deployed().then(function (shastaMarketInstance) {
+              shastaMarketInstance.createBid.sendTransaction( dValue, { from: self.props.address }).then((result) => {
+
+                  console.log("Created contract to market", result);
+              });
+          })
+
           }).catch(function (e) {
             console.log('error creating user:', userJson.username, ':', e);
           });
@@ -114,6 +126,13 @@ class Market extends Component {
       dropdownMarketer: e.target.textContent
     })
   }
+
+  handleChangeDropdownSource = (e) => {
+    this.setState({
+      dropdownSource: e.target.textContent
+    })
+  }
+
   render() {
 
     const { visible } = this.state
@@ -145,6 +164,26 @@ class Market extends Component {
         value: 'Gas Natural'
       }
     ]
+
+    const sources = [
+      {
+        text: "Solar",
+        value: "Solar"
+      },{
+        text: "Nuclear",
+        value: "Nuclear"
+      },{
+        text: "Eolic",
+        value: "Eolic"
+      },{
+        text: "Biomass",
+        value: "Biomass"
+      },{
+        text: "Other",
+        value: "Other"
+      }
+    ]
+    console.log("contracts", this.props.userJson.contracts);
     const contracts = this.props.userJson.contracts.map((contract) => {
       return (
         <Card fluid style={{ maxWidth: '500px' }} color='purple'>
@@ -155,22 +194,14 @@ class Market extends Component {
             <Card.Description>
               {this.props.address}
             </Card.Description>
-            <Feed>
-              <Feed.Event>
-                <Feed.Label><FontAwesomeIcon icon="home"></FontAwesomeIcon></Feed.Label>
-                  <Feed.Content>
-                    <Feed.Date content='Street address' />
-                    <Feed.Summary>
-                      {this.props.ipfsAddress}
-                    </Feed.Summary>
-                  </Feed.Content>
-                </Feed.Event>
-              </Feed>
-            </Card.Content>
-            <Card.Content extra>
-              <h3>{contract.value} €</h3>
-              <Button basic color='purple'>
-                More Info
+            <Card.Description>
+              {contract.country}
+            </Card.Description>
+          </Card.Content>
+          <Card.Content extra>
+            <h3>{contract.value} €</h3>
+            <Button basic color='purple'>
+              More Info
               </Button>
             </Card.Content>
           </Card>
@@ -179,90 +210,92 @@ class Market extends Component {
 
       return (
         <div>
-          <div>
-            <Sidebar
-              as={Menu}
-              animation='overlay'
-              icon='labeled'
-              onHide={this.handleSidebarHide}
-              vertical
-              direction='right'
-              visible={visible}
-              width='very wide'
-              >
-              <Menu.Item>
-                <h3 style={{ position: 'relative' }}>New Contract</h3>
-              </Menu.Item>
-              <Menu.Item>
-                <Form>
-                  <Form.Field>
-                    <label>First Name</label>
-                    <input placeholder='First Name'
-                      name='firstName'
-                      value={this.state.firstName}
-                      onChange={e => this.handleChange(e)} />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>Last Name</label>
-                    <input placeholder='Last Name'
-                      name='lastName'
-                      value={this.state.lastName}
-                      onChange={e => this.handleChange(e)} />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>Address</label>
-                    <input placeholder='Address'
-                      name='address'
-                      value={this.state.address}
-                      onChange={e => this.handleChange(e)} />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>zip code</label>
-                    <input placeholder='zip code'
-                      name='zipCode'
-                      value={this.state.zipCode}
-                      onChange={e => this.handleChange(e)} />
-                  </Form.Field>
-                  <div style={{ padding: '20' }}>
-                    <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
-                  </div>
-                  <div style={{ padding: '20' }}>
-                    <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
-                  </div>
-                  <Message icon>
-                    <Message.Content>
-                      {this.props.address}
-                    </Message.Content>
-                  </Message>
-                  <Form.Field>
-                    <Checkbox label='I agree to the Terms and Conditions' />
-                  </Form.Field>
-                  <Button onClick={this.updateUser} type='submit'>Submit</Button>
-                </Form>
-              </Menu.Item>
-              <Menu.Item>
-                <Progress percent={this.state.percent} color='violet' active></Progress>
-              </Menu.Item>
-              <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
-            </Sidebar>
-          </div>
-          <div style={{ marginLeft: 400, marginTop: 20 }}>
-            <Grid>
-              <Grid.Row columns={3}>
-                <Grid.Column></Grid.Column>
-                <Grid.Column></Grid.Column>
-                <Grid.Column>
-                  <Button onClick={this.handleButtonClick}>Start a Contract</Button>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-            <Card.Group>
-              {contracts}
-            </Card.Group>
-          </div>
+        <div>
+          <Sidebar
+            as={Menu}
+            animation='overlay'
+            icon='labeled'
+            onHide={this.handleSidebarHide}
+            vertical
+            direction='right'
+            visible={visible}
+            width='very wide'
+          >
+            <Menu.Item>
+              <h3 style={{ position: 'relative' }}>New Contract</h3>
+            </Menu.Item>
+            <Menu.Item>
+              <Form>
+                <Form.Field>
+                  <label>First Name</label>
+                  <input placeholder='First Name'
+                    name='firstName'
+                    value={this.state.firstName}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
+                <Form.Field>
+                  <label>Last Name</label>
+                  <input placeholder='Last Name'
+                    name='lastName'
+                    value={this.state.lastName}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
+                <Form.Field>
+                  <label>Country</label>
+                  <input placeholder='Country'
+                    name='country'
+                    value={this.state.country}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
+                <Form.Field>
+                  <label>Description</label>
+                  <input placeholder='description'
+                    name='description'
+                    value={this.state.description}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={e => this.handleChangeDropdownSource(e)} />
+                </div>
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
+                </div>
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
+                </div>
+                <Message icon>
+                  <Message.Content>
+                    {this.props.address}
+                  </Message.Content>
+                </Message>
+                <Form.Field>
+                  <Checkbox label='I agree to the Terms and Conditions' />
+                </Form.Field>
+                <Button onClick={this.updateUser} type='submit'>Submit</Button>
+              </Form>
+            </Menu.Item>
+            <Menu.Item>
+              <Progress percent={this.state.percent} color='violet' active></Progress>
+            </Menu.Item>
+            <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
+          </Sidebar>
         </div>
-      );
-    }
+        <div style={{ marginLeft: 400, marginTop: 20 }}>
+          <Grid>
+            <Grid.Row columns={3}>
+              <Grid.Column><h3>Your purchases: </h3></Grid.Column>
+              <Grid.Column></Grid.Column>
+              <Grid.Column>
+                <Button onClick={this.handleButtonClick}>Start a Contract</Button>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+          <Card.Group>
+            {contracts}
+          </Card.Group>
+        </div>
+      </div>
+    );
   }
-
+}
   export default Market
