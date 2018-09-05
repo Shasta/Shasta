@@ -9,6 +9,9 @@ class Map extends Component {
     visible: false,
     chargerName: "",
     chargerStatus: "open",
+    chargerAddress: "",
+    providerSource: "solar",
+    providerAddress: "",
     chargerLatitude: "",
     chargerLongitude: "",
     price: 0,
@@ -100,6 +103,12 @@ class Map extends Component {
     })
   }
   
+  handleChangeSource = (e, data) => {
+    this.setState({
+      providerSource: data.value
+    })
+  }
+
   handleChange = (e, value) => {
     this.setState({
       [e.target.name]: e.target.value
@@ -118,6 +127,8 @@ class Map extends Component {
       chargerStatus: this.state.chargerStatus,
       latitude: this.state.chargerLatitude,
       longitude: this.state.chargerLongitude,
+      providerSource: this.state.providerSource,
+      address: this.state.providerAddress,
     }
     const priceBG = web3.toBigNumber(this.state.price);
     const jsonBuffer = Buffer.from(JSON.stringify(locationObject));
@@ -138,7 +149,7 @@ class Map extends Component {
   }
 
   render() {
-    const { visible, chargerName, chargerStatus,  price, chargerLatitude, chargerLongitude, chargers} = this.state;
+    const { visible, chargerName, chargerStatus,  providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers} = this.state;
     let fieldErrors = []
     const chargerStates = [{
       text: 'Open',
@@ -148,12 +159,33 @@ class Map extends Component {
       text: 'Closed',
       value: 'closed',
     }]
-
+    const providerSources = [{
+      text: 'Solar',
+      value: 'solar',
+    },
+    {
+      text: 'Wind',
+      value: 'wind',
+    },
+    {
+      text: 'Gas',
+      value: 'gas',
+    },
+    {
+      text: 'Carbon',
+      value: 'carbon',
+    }]
     if (chargerName.length === 0) {
-      fieldErrors.push("Charger name can not be empty.")
+      fieldErrors.push("Provider name can not be empty.")
     }
     if (chargerStatus.length === 0) {
-      fieldErrors.push("Charger status must be selected.")
+      fieldErrors.push("Provider status must be selected.")
+    }
+    if (providerAddress.length === 0) {
+      fieldErrors.push("Provider status must be selected.")
+    }
+    if (providerSource.length === 0) {
+      fieldErrors.push("Provider source must be selected.")
     }
     if (price <= 0) {
       fieldErrors.push("Price of kWh must be set.")
@@ -174,23 +206,34 @@ class Map extends Component {
             width='very wide'
         >
           <Menu.Item>
-            <h3 style={{ position: 'relative' }}>New charger location</h3>
+            <h3 style={{ position: 'relative' }}>New provider location</h3>
           </Menu.Item>
           <Menu.Item>
             <Form warning={!!fieldErrors.length}>
             <Form.Field>
-                <p style={{ textAlign: "start"}}>You can click in the map to select the charger location. Add a charger name, and the status of the charger. Once the form is complete, click on Submit button.</p>
+                <p style={{ textAlign: "start"}}>You can click in the map to select the charger location. Add a provider name, and the status of the provider. Once the form is complete, click on Submit button.</p>
               </Form.Field>
               <Form.Field>
                 <label>Provider name</label>
-                <input type="text" placeholder='Charger name'
+                <input type="text" placeholder='Provider name'
                   name='chargerName'
                   value={chargerName}
                   onChange={e => this.handleChange(e)} />
               </Form.Field>
               <Form.Field>
+                <label>Address</label>
+                <input type="text" placeholder='Av la paloma, 16, 29003'
+                  name='providerAddress'
+                  value={providerAddress}
+                  onChange={e => this.handleChange(e)} />
+              </Form.Field>
+              <Form.Field>
                 <label>Provider status</label>
-                <Dropdown placeholder='Charger status' value={chargerStatus} name='dropdownValue' fluid selection options={chargerStates} onChange={this.handleChangeDropdown} />
+                <Dropdown placeholder='Provider status' value={chargerStatus} name='dropdownValue' fluid selection options={chargerStates} onChange={this.handleChangeDropdown} />
+              </Form.Field>
+              <Form.Field>
+                <label>Source of energy</label>
+                <Dropdown placeholder='Source of energy' value={providerSource} name='dropdownValue' fluid selection options={providerSources} onChange={this.handleChangeSource} />
               </Form.Field>
               <Form.Field>
                 <label>Price per kWh</label>

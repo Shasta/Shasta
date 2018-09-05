@@ -26,10 +26,11 @@ contract ShastaMarket is Ownable, Pausable {
     struct Offer {
         address buyer;
         uint value;
+        uint locationIndex;
     }
 
     event newBid(address seller, uint value);
-    event newOffer(address buyer, uint value);
+    event newOffer(address buyer, uint value, uint locationIndex);
 
     constructor () public {
         owner = msg.sender;
@@ -61,32 +62,33 @@ contract ShastaMarket is Ownable, Pausable {
         
         uint index = offersList.push(myOffer) - 1;
         addressToOffersIndex[msg.sender].push(index);
-        emit newOffer(msg.sender, _value);
+        emit newOffer(msg.sender, _value, 999);
     }
 
     // Not secure, for demo purposes only, this call need to be whitelisted via a modifier.
-    function createOfferFor(address origin, uint _value) public whenNotPaused {
+    function createOfferFor(address origin, uint _value, uint _locationIndex) public whenNotPaused {
         Offer memory myOffer;
         myOffer.buyer = origin;
         myOffer.value = _value;
+        myOffer.locationIndex = _locationIndex;
             
         uint index = offersList.push(myOffer) - 1;
         addressToOffersIndex[origin].push(index);
-        emit newOffer(origin, _value);
+        emit newOffer(origin, _value, _locationIndex);
     }
     
-    function getBidFromIndex(uint _index) public view returns(uint) {
+    function getBidFromIndex(uint _index) public view returns(uint, address) {
         require(bidsList.length > _index);
-        return bidsList[_index].value;
+        return (bidsList[_index].value, bidsList[_index].seller);
     }
     
     function getBidsIndexesFromAddress() public view returns(uint[]) {
         return addressToBidsIndex[msg.sender];
     }
 
-    function getOfferFromIndex(uint _index) public view returns(uint) {
+    function getOfferFromIndex(uint _index) public view returns(uint, address, uint) {
         require(offersList.length > _index);
-        return offersList[_index].value;
+        return (offersList[_index].value, offersList[_index].buyer, offersList[_index].locationIndex);
     }
     
     function getOfferIndexesFromAddress() public view returns(uint[]) {

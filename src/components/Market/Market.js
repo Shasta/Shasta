@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Icon, Message } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
 
@@ -13,13 +13,14 @@ class Market extends Component {
       percent: 0,
       firstName: '',
       lastName: '',
-      address: '',
-      zipCode: '',
+      country: '',
       dropdownValue: '',
       ipfsHash: '',
       ipfsFirstName: '',
       ipfsAddress: '',
-
+      dropdownMarketer: '',
+      dropdownSource: '',
+      description: ''
     }
 
     this.updateUser = this.updateUser.bind(this);
@@ -37,17 +38,19 @@ class Market extends Component {
 
     var userJson = {
       username: this.props.username,
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      address: this.state.address,
-      zipCode: this.state.zipCode,
-      contracts: []
+      contracts: this.props.userJson.contracts
     }
 
     var newContract = {
       value: this.state.dropdownValue,
-      date: Date.now()
+      date: Date.now(),
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      country: this.state.country,
+      marketer: this.state.dropdownMarketer,
+      source: this.state.dropdownSource
     }
+    console.log("New contract", newContract);
 
     //Add the new contract to the profile
 
@@ -105,7 +108,7 @@ class Market extends Component {
 
   }
 
-  handleChange = (e, value) => {
+  handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
     })
@@ -116,12 +119,28 @@ class Market extends Component {
       dropdownValue: e.target.textContent.slice(0, -1)
     })
   }
+
+  handleChangeDropdownMarketer = (e) => {
+    this.setState({
+      dropdownMarketer: e.target.textContent
+    })
+  }
+
+  handleChangeDropdownSource = (e) => {
+    this.setState({
+      dropdownSource: e.target.textContent
+    })
+  }
+
   render() {
+
     const {
       ipfsFirstName,
       ipfsAddress
     } = this.props;
+
     const { visible } = this.state
+
     const prices = [
       {
         text: '20$',
@@ -136,6 +155,59 @@ class Market extends Component {
         value: '60',
       }
     ]
+
+    const marketers = [
+      {
+        text:'HolaLuz',
+        value:'HolaLuz'
+      },{
+        text: 'SomEnergia',
+        value: 'SomEnergia'
+      },{
+        text:'Gas Natural',
+        value: 'Gas Natural'
+      }
+    ]
+
+    const sources = [
+      {
+        text: "Solar",
+        value: "Solar"
+      },{
+        text: "Nuclear",
+        value: "Nuclear"
+      },{
+        text: "Eolic",
+        value: "Eolic"
+      },{
+        text: "Biomass",
+        value: "Biomass"
+      },{
+        text: "Other",
+        value: "Other"
+      }
+    ]
+
+    const contracts = this.props.userJson.contracts.map((contract) => {
+      return (
+        <Card fluid style={{ maxWidth: '500px' }} color='purple'>
+          <Card.Content>
+            <Card.Header>
+              {contract.marketer}
+            </Card.Header>
+            <Card.Description>
+              {this.props.address}
+            </Card.Description>
+          </Card.Content>
+          <Card.Content extra>
+            <h3>{contract.value} €</h3>
+            <Button basic color='purple'>
+              More Info
+              </Button>
+          </Card.Content>
+        </Card>
+      );
+    });
 
     return (
       <div>
@@ -170,21 +242,27 @@ class Market extends Component {
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
-                  <label>Address</label>
+                  <label>Country</label>
                   <input placeholder='Address'
-                    name='address'
-                    value={this.state.address}
+                    name='country'
+                    value={this.state.country}
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
-                  <label>zip code</label>
-                  <input placeholder='zip code'
-                    name='zipCode'
-                    value={this.state.zipCode}
+                  <label>Description</label>
+                  <input placeholder='description'
+                    name='description'
+                    value={this.state.description}
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={e => this.handleChangeDropdownSource(e)} />
+                </div>
+                <div style={{ padding: '20' }}>
                   <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
+                </div>
+                <div style={{ padding: '20' }}>
+                  <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
                 </div>
                 <Message icon>
                   <Message.Content>
@@ -206,7 +284,7 @@ class Market extends Component {
         <div style={{ marginLeft: 400, marginTop: 20 }}>
           <Grid>
             <Grid.Row columns={3}>
-              <Grid.Column></Grid.Column>
+              <Grid.Column><h3>Your purchases: </h3></Grid.Column>
               <Grid.Column></Grid.Column>
               <Grid.Column>
                 <Button onClick={this.handleButtonClick}>Start a Contract</Button>
@@ -214,22 +292,7 @@ class Market extends Component {
             </Grid.Row>
           </Grid>
           <Card.Group>
-            <Card fluid style={{maxWidth: '500px'}} color='purple'>
-              <Card.Content>
-              <Card.Header>
-                {this.props.ipfsAddress}
-              </Card.Header>
-              <Card.Description>
-                {this.props.address}
-              </Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-              <h3>{this.props.ipfsValue}$</h3>
-              <Button basic color='purple'>
-                More Info
-              </Button>
-            </Card.Content>
-            </Card>
+            {contracts}
           </Card.Group>
         </div>
       </div>

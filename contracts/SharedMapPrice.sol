@@ -103,7 +103,7 @@ contract SharedMapPrice is Ownable, Pausable {
     uint newLength = locationsIpfsHashes.push(locationIpfsHash);
     uint newIndex = newLength - 1;
     locationIndexByAddress[newIndex] = msg.sender;
-    shastaMarket.createOfferFor(msg.sender, price);
+    shastaMarket.createOfferFor(msg.sender, price, newIndex);
     emit NewLocation(locationIpfsHash, newIndex);
   }
 
