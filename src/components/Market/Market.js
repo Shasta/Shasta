@@ -243,7 +243,7 @@ class Market extends Component {
                 </Form.Field>
                 <Form.Field>
                   <label>Country</label>
-                  <input placeholder='Address'
+                  <input placeholder='Country'
                     name='country'
                     value={this.state.country}
                     onChange={e => this.handleChange(e)} />
