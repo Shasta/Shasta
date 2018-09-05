@@ -121,7 +121,7 @@ class Marketer extends Component {
                     <Card.Content extra>
                         <div className='ui two buttons'>
                             <Button basic color='green'>
-                                Sell you energy
+                                Buy energy
                     </Button>
                         </div>
                     </Card.Content>
