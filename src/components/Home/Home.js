@@ -30,7 +30,6 @@ class Home extends Component {
       }
       web3.eth.getBlock(result.blockNumber, false, async (err, blockInfo) => {
         const timestamp = new Date(blockInfo.timestamp * 1000);
-        let currentNotifications = this.state.notifications;
         const { value, locationIndex} = result.args
         const providerHash = await shastaMapInstance.locationsIpfsHashes.call(locationIndex);
         const rawProvider = await this.props.ipfs.cat(providerHash);
@@ -56,7 +55,6 @@ class Home extends Component {
         console.error("Could not watch UpdatedUser event.", err)
         return;
       }
-      let currentNotifications = this.state.notifications;
       const rawIpfsHash = result.args.ipfsHash;
 
       const userHash = this.props.web3.toAscii(rawIpfsHash);
@@ -83,19 +81,18 @@ class Home extends Component {
   }
 
   render() {
-      console.log(this.state.notifications)
     const notifications = this.state.notifications.map((notification, index) => {
       if (notification.type == "contract") {
         return (
-          <Feed.Event key={index}>
+          <Feed.Event key={index} style={{marginTop: 10}}>
             <Feed.Content date={notification.timestamp.toLocaleString()} summary={`New contract with ${notification.marketer} for ${notification.value} €`} />
           </Feed.Event>
         );
       }
       if (notification.type == "newProvider") {
         return (
-          <Feed.Event key={index}>
-            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`New provider ${notification.provider.chargerName} offers ${notification.price} kWh/€ from ${notification.provider.providerSource} energy source.`} />
+          <Feed.Event key={index} style={{marginTop: 10}}>
+            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`Provider ${notification.provider.chargerName} offers ${notification.price} kWh/€ from ${notification.provider.providerSource} energy source.`} />
           </Feed.Event>
         );
       }
