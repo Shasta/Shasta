@@ -177,7 +177,7 @@ class Map extends Component {
     }]
     const marketers = [
       {
-        name: "respira",
+        name: "Respira",
         price: 0.127
       }, {
         name: "HolaLuz",
