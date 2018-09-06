@@ -10,6 +10,8 @@ contract User {
   mapping(address => uint) private addressToBalance;
 
   event NewUser(bytes16 username, address owner);
+  event UpdatedUser(address owner, bytes ipfsHash);
+
   ShastaMarket public shastaMarket;
   address public shastaMarketAddress;
   address[] private addresses;
@@ -88,6 +90,7 @@ function createBid(uint _value, bytes ipfsHash) public payable {
     ipfsHashes[addressToIndex[msg.sender]] = ipfsHash;
     addressToBalance[msg.sender] += msg.value;
     
+    emit UpdatedUser(msg.sender, ipfsHash);
     return true;
   }  
  
