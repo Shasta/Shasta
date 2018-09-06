@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Form, Sidebar, Menu, Dropdown, Message } from 'semantic-ui-react';
+import { Button, Form, Sidebar, Menu, Dropdown, Message, List, Segment } from 'semantic-ui-react';
 import Promise from 'bluebird';
 import SharedMap from './SharedMap';
 import axios from 'axios';
@@ -24,42 +24,42 @@ class Map extends Component {
     // Get the SharedMap.sol instance
     try {
       const sharedMapInstance = await this.props.sharedMapContract.deployed();
-  
+
       // Watch for NewLocation events, since this current block
-      sharedMapInstance.NewLocation(null, { fromBlock: 'latest'}, (err, result) => {
+      sharedMapInstance.NewLocation(null, { fromBlock: 'latest' }, (err, result) => {
         if (err) {
           console.error("Could not watch NewLocation event.", err)
           return;
         }
         const currentLatestIndex = this.state.chargers.length - 1;
-        const {ipfsHash, index} = result.args
+        const { ipfsHash, index } = result.args
         // If the index is greater than the current one, there is a new Location!
         if (index > currentLatestIndex) {
           return axios.get(`https://ipfs.io/ipfs/${ipfsHash}`)
-          .then(result => {
-            this.setState({
-              chargers: [...this.state.chargers, ...[result.data]]
+            .then(result => {
+              this.setState({
+                chargers: [...this.state.chargers, ...[result.data]]
+              });
+            })
+            .catch(error => {
+              console.error(error.response)
             });
-          })
-          .catch(error => {
-            console.error(error.response)
-          });
         }
       });
-  
+
       // Retrieve the current charger locations length, to be able to retrieve the IPFS hashes
       const locationsLengthRaw = await sharedMapInstance.getLocationsLength.call();
       const locationsLength = locationsLengthRaw.toNumber();
       // Retrieve all the current IPFS hashes, in parallel, and with concurrency 5
       const storedIpfsHashes = await Promise.map(
         // Create an array that contains a range of numbers from 0 to (locationsLength - 1) 
-        Array.from({ length: locationsLength}, (value, index) => index),
+        Array.from({ length: locationsLength }, (value, index) => index),
         // Retrieve each IPFS hash by index
         x => sharedMapInstance.locationsIpfsHashes.call(this.props.web3.toBigNumber(x)),
         // Sets concurrency to 5, so it send requests in batches of 5.
         { concurrency: 5 }
       );
-  
+
       // Retrieve all the JSON chargers data from IPFS, in the same way than above, using axios to grab the JSON data.
       const chargersJSON = await Promise.map(
         // Map storedIpfsHashes to an axios request
@@ -67,17 +67,17 @@ class Map extends Component {
         // Retrieve each JSON data via the ipfs gateway with each ipfsHash
         ipfsHash => axios.get(`https://ipfs.io/ipfs/${ipfsHash}`)
           .then(result => result.data)
-          .catch(error => ({error: error.response})),
+          .catch(error => ({ error: error.response })),
         // Sets concurrency to 5, so it send requests in batches of 5.
         { concurrency: 5 }
       );
-      this.setState({chargers: chargersJSON})
+      this.setState({ chargers: chargersJSON })
     } catch (err) {
       console.log(err);
     }
-    
+
   }
-  
+
   locationSelected = (lat, lng) => {
     this.setState({
       chargerLatitude: lat,
@@ -87,22 +87,22 @@ class Map extends Component {
 
   openForm = (e) => {
     e.preventDefault();
-    
-    this.setState({visible: true})
+
+    this.setState({ visible: true })
   }
 
   closeForm = (e) => {
     e.preventDefault();
-    
-    this.setState({visible: false})
+
+    this.setState({ visible: false })
   }
-  
+
   handleChangeDropdown = (e, data) => {
     this.setState({
       chargerStatus: data.value
     })
   }
-  
+
   handleChangeSource = (e, data) => {
     this.setState({
       providerSource: data.value
@@ -134,22 +134,22 @@ class Map extends Component {
     const jsonBuffer = Buffer.from(JSON.stringify(locationObject));
     try {
       // Show loader spinner
-      this.setState({loader: true})
+      this.setState({ loader: true })
       // Upload to IPFS and receive response
       const ipfsResponse = await this.props.ipfs.add(jsonBuffer);
       const ipfsHash = ipfsResponse[0].hash;
       // Estimate gas
-      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(priceBG, ipfsHash, {from: currentAddress});
+      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(priceBG, ipfsHash, { from: currentAddress });
       // Send a transaction to addLocation method.
-      await sharedMapInstance.addLocation(priceBG, ipfsHash, {gas: estimatedGas, from: currentAddress})  //Call the transaction
-      this.setState({chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, price: 0})
+      await sharedMapInstance.addLocation(priceBG, ipfsHash, { gas: estimatedGas, from: currentAddress })  //Call the transaction
+      this.setState({ chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, price: 0 })
     } catch (err) {
       console.error(err)
     }
   }
 
   render() {
-    const { visible, chargerName, chargerStatus,  providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers} = this.state;
+    const { visible, chargerName, chargerStatus, providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers } = this.state;
     let fieldErrors = []
     const chargerStates = [{
       text: 'Open',
@@ -175,6 +175,37 @@ class Map extends Component {
       text: 'Carbon',
       value: 'carbon',
     }]
+    const marketers = [
+      {
+        name: "respira",
+        price: 0.127
+      }, {
+        name: "HolaLuz",
+        price: 0.123
+      }, {
+        name: "SomEnergia",
+        price: 0.129
+      }, {
+        name: "Endesa",
+        price: 0.421
+      }
+    ]
+    marketers.sort((a, b) => a.price - b.price);
+    const providers = marketers.map((marketer) => {
+      return (
+        <List.Item>
+          <List.Content>
+            <List.Header>
+              <div style={{ float: 'left' }}><div>{marketer.name}</div><div>{marketer.price} €/kWh</div></div>
+              <Button basic color='green' style={{ backgroundColor: 'white', float: 'right' }}>
+                Sell your energy
+              </Button>
+            </List.Header>
+          </List.Content>
+        </List.Item>
+      )
+    });
+
     if (chargerName.length === 0) {
       fieldErrors.push("Provider name can not be empty.")
     }
@@ -194,24 +225,24 @@ class Map extends Component {
       fieldErrors.push("You must click in the map to select a location.")
     }
     return (
-      <div style={{marginLeft: '375px', marginTop: '50px'}}>
+      <div style={{ marginLeft: '375px', marginTop: '50px' }}>
         <Sidebar
-            as={Menu}
-            animation='overlay'
-            icon='labeled'
-            onHide={this.handleSidebarHide}
-            vertical
-            direction='right'
-            visible={visible}
-            width='very wide'
+          as={Menu}
+          animation='overlay'
+          icon='labeled'
+          onHide={this.handleSidebarHide}
+          vertical
+          direction='right'
+          visible={visible}
+          width='very wide'
         >
           <Menu.Item>
             <h3 style={{ position: 'relative' }}>New provider location</h3>
           </Menu.Item>
           <Menu.Item>
             <Form warning={!!fieldErrors.length}>
-            <Form.Field>
-                <p style={{ textAlign: "start"}}>You can click in the map to select the charger location. Add a provider name, and the status of the provider. Once the form is complete, click on Submit button.</p>
+              <Form.Field>
+                <p style={{ textAlign: "start" }}>You can click in the map to select the charger location. Add a provider name, and the status of the provider. Once the form is complete, click on Submit button.</p>
               </Form.Field>
               <Form.Field>
                 <label>Provider name</label>
@@ -259,16 +290,24 @@ class Map extends Component {
                   value={chargerLongitude}
                   onChange={e => this.handleChange(e)} />
               </Form.Field>
-              <Message warning header='Check the next fields' list={fieldErrors}/>
-              <Button onClick={this.closeForm} style={{marginRight: 30}}>Close</Button>
+              <Message warning header='Check the next fields' list={fieldErrors} />
+              <Button onClick={this.closeForm} style={{ marginRight: 30 }}>Close</Button>
               <Button disabled={!!fieldErrors.length} onClick={this.addLocation} type='submit'>Submit</Button>
             </Form>
           </Menu.Item>
         </Sidebar>
 
-        <span style={{fontSize: '1.71428571rem', marginRight: 40}}>Chargers Map</span>
+        <span style={{ fontSize: '1.71428571rem', marginRight: 40 }}>Chargers Map</span>
         <Button onClick={this.openForm}>Add a location</Button>
-        <SharedMap newLocation={{chargerLatitude, chargerLongitude}} chargers={chargers} emitLocation={this.locationSelected} />
+        <SharedMap newLocation={{ chargerLatitude, chargerLongitude }} chargers={chargers} emitLocation={this.locationSelected} />
+        <div style={{ padding: 15 }}> <h3>Sell your energy directly: </h3></div>
+
+        <Segment style={{ width: '65%' }}>
+          <List divided relaxed>
+            {providers}
+          </List>
+        </Segment>
+        <p></p>
       </div>
     );
   }
