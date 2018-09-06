@@ -94,9 +94,9 @@ class CreateUser extends Component {
                     <Form>
                       <Form.Field style={{ marginRight: '450px' }}>
                         <label>Username</label>
-                        <Input placeholder='Username' onChange={this.updateInput} />
+                        <Input id="usernameInput" placeholder='Username' onChange={this.updateInput} />
                       </Form.Field>
-                      <Button type='submit' onClick={this.createUser}>Create a new organization</Button>
+                      <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
                     </Form>
                   </Grid.Column>
                   <Grid.Column style={{ marginTop: '100px' }}>
