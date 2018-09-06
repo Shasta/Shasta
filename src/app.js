@@ -1,5 +1,4 @@
 import React from 'react';
-var isTesting = false;
 import Router from "./routing.js";
 import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
@@ -7,7 +6,6 @@ import { default as contract } from 'truffle-contract'
 import user_artifacts from 'shasta-os/build/contracts/User.json'
 import shared_map_artifacts from 'shasta-os/build/contracts/SharedMapPrice.json'
 import shasta_market_artifacts from 'shasta-os/build/contracts/ShastaMarket.json';
-import demoConfig from '../demoFile.json';
 
 var userContract = contract(user_artifacts);
 var sharedMapContract = contract(shared_map_artifacts);
@@ -46,8 +44,7 @@ class App extends React.Component {
         this.setState({
           web3: results.web3
         })
-
-        if (isTesting) {
+        if (process.env.isTesting === true) {
           this.loadDemoEnvironment();
         } else {
 
@@ -70,9 +67,10 @@ class App extends React.Component {
   }
 
   loadDemoEnvironment() {
-    userContract = this.state.web3.eth.contract(user_artifacts.abi).at(demoConfig.userAddress);
-    sharedMapContract = this.state.web3.eth.contract(shared_map_artifacts.abi).at(demoConfig.mapAddress);
-    shastaMarketContract = this.state.web3.eth.contract(shasta_market_artifacts.abi).at(demoConfig.marketAddress);
+    const { userAddress, mapAddress, marketAddress } = process.env;
+    userContract = this.state.web3.eth.contract(user_artifacts.abi).at(userAddress);
+    sharedMapContract = this.state.web3.eth.contract(shared_map_artifacts.abi).at(mapAddress);
+    shastaMarketContract = this.state.web3.eth.contract(shasta_market_artifacts.abi).at(marketAddress);
   }
 
   instantiateContract() {
