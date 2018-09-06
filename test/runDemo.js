@@ -1,14 +1,21 @@
 const shastaContract = artifacts.require("User");
 const shastaMarket = artifacts.require('ShastaMarket');
+const shastaMap = artifacts.require('SharedMap')
 const ipfsAPI = require('ipfs-api');
-var ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
+let ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
+let fs = require('fs');
 
 contract('Demo', async (accounts) => {
 
-    var instance;
-    var marketInstance;
-    var lastIpfsHash;
-    var jsonUser;
+    let instance;
+    let marketInstance;
+    let mapInstance;
+    let lastIpfsHash;
+    let jsonUser;
+
+    let userAddress;
+    let marketAddress;
+    let mapAddress;
 
     console.log("acc balance", web3.eth.getBalance(web3.eth.accounts[0]).toNumber() / web3.toWei(1, "ether"));
 
@@ -18,9 +25,27 @@ contract('Demo', async (accounts) => {
         console.log("ipfs id: ", res.id);
     })
 
+    after(function() {
+
+        const demoJson = {
+            userAddress,
+            marketAddress,
+            mapAddress
+        }
+        
+        fs.writeFile("../demoFile.json", JSON.stringify(demoJson), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        }); 
+    })
+
     it("Deploy shasta market", async () => {
         marketInstance = await shastaMarket.new();
         console.log("address", marketInstance.address)
+        marketAddress =  marketInstance.address;
         assert(marketInstance.address);
     });
 
@@ -29,6 +54,12 @@ contract('Demo', async (accounts) => {
         var receipt = await web3.eth.getTransactionReceipt(instance.transactionHash);
         console.log("shastaContract\n\tdeployment cost: ", receipt.gasUsed, "\n\tcontract address:", receipt.contractAddress)
         assert(shastaContract.address);
+        userAddress = shastaContract.address;
+    });
+
+    it("Deploy sharedMap contract", async() => {
+        mapInstance = await shastaMap.new(instance.address);
+        mapAddress = mapInstance.address;
     });
 
     it("Create a new organization", async () => {
@@ -82,7 +113,7 @@ contract('Demo', async (accounts) => {
 
     it("Create an ask offer", async() => {
 
-        
+
 
     });
 

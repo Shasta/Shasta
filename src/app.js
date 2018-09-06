@@ -1,5 +1,5 @@
 import React from 'react';
-
+var isTesting = false;
 import Router from "./routing.js";
 import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
@@ -7,11 +7,11 @@ import { default as contract } from 'truffle-contract'
 import user_artifacts from '../build/contracts/User.json'
 import shared_map_artifacts from '../build/contracts/SharedMapPrice.json'
 import shasta_market_artifacts from '../build/contracts/ShastaMarket.json';
+import demoConfig from '../demoFile.json';
 
 var userContract = contract(user_artifacts);
 var sharedMapContract = contract(shared_map_artifacts);
 var shastaMarketContract = contract(shasta_market_artifacts);
-
 const ipfsAPI = require('ipfs-api');
 const ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
 
@@ -47,15 +47,19 @@ class App extends React.Component {
           web3: results.web3
         })
 
-        // set the provider for the User abstraction
-        userContract.setProvider(results.web3.currentProvider);
+        if (isTesting) {
+          this.loadDemoEnvironment();
+        } else {
 
-        // set the provider for the SharedMap abstraction
-        sharedMapContract.setProvider(results.web3.currentProvider);
+          // set the provider for the User abstraction
+          userContract.setProvider(results.web3.currentProvider);
 
-        // set the provider for the ShastaMarket abstraction
-        shastaMarketContract.setProvider(results.web3.currentProvider);
+          // set the provider for the SharedMap abstraction
+          sharedMapContract.setProvider(results.web3.currentProvider);
 
+          // set the provider for the ShastaMarket abstraction
+          shastaMarketContract.setProvider(results.web3.currentProvider);
+        }
         // Instantiate contract
         this.instantiateContract();
 
@@ -63,6 +67,12 @@ class App extends React.Component {
       .catch((e) => {
         console.log('Error: ', e)
       })
+  }
+
+  loadDemoEnvironment() {
+    userContract = this.state.web3.eth.contract(user_artifacts.abi).at(demoConfig.userAddress);
+    sharedMapContract = this.state.web3.eth.contract(shared_map_artifacts.abi).at(demoConfig.mapAddress);
+    shastaMarketContract = this.state.web3.eth.contract(shasta_market_artifacts.abi).at(demoConfig.marketAddress);
   }
 
   instantiateContract() {
@@ -88,12 +98,7 @@ class App extends React.Component {
         //Authenticate the address from metamask
         this.checkAuthentication(accounts[0], this);
       })
-      // set the provider for the User abstraction
-      userContract.setProvider(this.state.web3.currentProvider);
-      // set the provider for the SharedMap abstraction
-      sharedMapContract.setProvider(this.state.web3.currentProvider);
-      // set the provider for the ShastaMarket abstraction
-      shastaMarketContract.setProvider(this.state.web3.currentProvider);
+
     })
   }
 

@@ -33,25 +33,22 @@ class CreateUser extends Component {
     }
     this.setState = ({ userJson });
     var ipfsHash = '';
-    var contract = this.props.userContract;
-    var account = this.props.account;
 
     const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
     ipfsHash = res[0].hash;
     console.log("ipfs hash: ", ipfsHash);
-    const contractInstance = await contract.deployed();
+    const contractInstance = await this.props.userContract.deployed();
 
-    const success = await contractInstance.createUser(username, ipfsHash, { gas: 400000, from: account });
+
+    const success = await contractInstance.createUser(username, ipfsHash, { gas: 400000, from: this.props.account });
     if (success) {
       console.log("self:", self)
       console.log('created user ' + username + ' on ethereum!');
-      this.setState({ isLoged: true })
+      //this.setState({ isLoged: true })
     } else {
       console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
     }
-
-
   }
 
   updateInput(event) {
