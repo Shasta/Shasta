@@ -82,13 +82,16 @@
     "react-router-dom": "^4.3.1",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.3",
+    "shasta-os": "git+ssh://git@github.com/alexsicart/ShastaOS.git#master",
     "styled-components": "^3.4.5",
     "topojson-client": "^3.0.0",
+    "truffle": "^5.0.0-gnosis.1",
     "truffle-hdwallet-provider": "0.0.6",
     "vx": "0.0.1",
     "web3": "^0.20.7"
   },
   "scripts": {
+    "dev": "truffle migrate --reset && npm run start",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
