@@ -26,7 +26,7 @@ class Map extends Component {
       const sharedMapInstance = await this.props.sharedMapContract.deployed();
   
       // Watch for NewLocation events, since this current block
-      sharedMapInstance.NewLocation(null, { fromBlock: 'latest'}, (err, result) => {
+      sharedMapInstance.NewLocation(null, { fromBlock: 0}, (err, result) => {
         if (err) {
           console.error("Could not watch NewLocation event.", err)
           return;
