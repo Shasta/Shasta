@@ -4,9 +4,9 @@ import Router from "./routing.js";
 import CreateUser from "./components/CreateUser/CreateUser.js";
 import getWeb3 from './getWeb3.js'
 import { default as contract } from 'truffle-contract'
-import user_artifacts from '../build/contracts/User.json'
-import shared_map_artifacts from '../build/contracts/SharedMapPrice.json'
-import shasta_market_artifacts from '../build/contracts/ShastaMarket.json';
+import user_artifacts from 'shasta-os/build/contracts/User.json'
+import shared_map_artifacts from 'shasta-os/build/contracts/SharedMapPrice.json'
+import shasta_market_artifacts from 'shasta-os/build/contracts/ShastaMarket.json';
 import demoConfig from '../demoFile.json';
 
 var userContract = contract(user_artifacts);

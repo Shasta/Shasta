@@ -1,11 +1,11 @@
-const shastaContract = artifacts.require("User");
-const shastaMarket = artifacts.require('ShastaMarket');
-const shastaMap = artifacts.require('SharedMap')
+const shastaContract = artifacts.require("shasta-os/User");
+const shastaMarket = artifacts.require('shasta-os/ShastaMarket');
+const shastaMap = artifacts.require('shasta-os/SharedMapPrice')
 const ipfsAPI = require('ipfs-api');
 let ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
 let fs = require('fs');
 
-contract('Demo', async (accounts) => {
+contract('Demo', function (accounts){
 
     let instance;
     let marketInstance;
@@ -17,10 +17,14 @@ contract('Demo', async (accounts) => {
     let marketAddress;
     let mapAddress;
 
-    console.log("acc balance", web3.eth.getBalance(web3.eth.accounts[0]).toNumber() / web3.toWei(1, "ether"));
+    
 
     before(async function () {
         //Init ipfs
+        // Web3 1.0.0 eth.getBalance is now async
+        const balance = await web3.eth.getBalance(accounts[0])
+    
+        console.log("acc balance", web3.utils.fromWei(balance, 'ether'))
         const res = await ipfs.id();
         console.log("ipfs id: ", res.id);
     })
@@ -58,13 +62,13 @@ contract('Demo', async (accounts) => {
     });
 
     it("Deploy sharedMap contract", async() => {
-        mapInstance = await shastaMap.new(instance.address);
+        mapInstance = await shastaMap.new(instance.address, marketInstance.address);
         mapAddress = mapInstance.address;
     });
 
     it("Create a new organization", async () => {
 
-        const name = "Vitalik";
+        const name = web3.utils.utf8ToHex("Vitalik");
         var userJson = {
             username: name,
             contracts: []
@@ -75,21 +79,21 @@ contract('Demo', async (accounts) => {
         console.log("Obtained ipfs hash: ", hash);
 
         assert(hash);
-        lastIpfsHash = hash
+        lastIpfsHash = web3.utils.utf8ToHex(hash)
 
         //Post to blockchain
-        await instance.createUser(name, hash);
+        await instance.createUser(name, lastIpfsHash);
         let retHash = await instance.getIpfsHashByAddress(accounts[0]);
-        retHash = web3.toAscii(retHash);
+        retHash = web3.utils.hexToUtf8(retHash);
 
         assert.equal(retHash, hash);
 
-        jsonUser = await getJsonFromIpfs(lastIpfsHash);
+        jsonUser = await getJsonFromIpfs(retHash);
         console.log("json: ", jsonUser);
         assert.equal(jsonUser.username, name);
     });
 
-    it("Create a bid offer", async () => {
+    it("Create a bid offer", async function () {
 
         const bid = {
             value: 40,
@@ -103,7 +107,7 @@ contract('Demo', async (accounts) => {
         jsonUser.contracts.push(bid);
 
         lastIpfsHash = await uploadToIpfsAndGetHash(jsonUser);
-        await instance.createBid(bid.value, lastIpfsHash);
+        await instance.createBid(bid.value, web3.utils.utf8ToHex(lastIpfsHash));
 
         var nBids = await marketInstance.getBidsLength.call();
         
