@@ -19,8 +19,7 @@ class App extends React.Component {
     const {
       web3,
       account,
-      balance,
-      ipfsHash
+      balance
     } = this.props;
 
     return (

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Segment, Divider, Card } from 'semantic-ui-react'
 import Promise from 'bluebird'
+var checkedAddresses = [];
 
 const toCapital = (string) => {
     return string && string.length > 0 ? string.charAt(0).toUpperCase() + string.slice(1) : "";
@@ -19,14 +20,12 @@ class Marketer extends Component {
     }
 
     componentDidMount() {
-       this.checkMarket();
+        this.checkMarket();
     }
     async checkMarket() {
 
         var self = this;
-        console.log("address", self.props.username)
-        const bids = [];
-        const asks = [];
+        console.log("address", self.props.address)
 
         try {
             const shastaMarketInstance = await this.props.shastaMarketContract.deployed();
@@ -34,22 +33,42 @@ class Marketer extends Component {
             const userContractInstance = await this.props.userContract.deployed();
 
             // Bids
-            const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
-            console.log("indexes", bidIndexes)
-            const ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(self.props.address, {from: self.props.address});
-            const ipfsHash = this.props.web3.toAscii(ipfsHashRaw);
-            console.log("ipfs", ipfsHash)
-            const rawContent = await this.props.ipfs.cat(ipfsHash);
-            const userData = JSON.parse(rawContent.toString("utf8"));
-            const bidsJsonData = bidIndexes.map(indexBN => {
-                const index = indexBN.toNumber();
-                return userData.contracts[index];
+            let bidsJsonData = [];
+            //const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
+            const bidsLength = await shastaMarketInstance.getBidsLength.call({ from: self.props.address });
+            let auxArray = Array.from({length: bidsLength.toNumber()}, (x, item)=> item);
+    
+            auxArray.forEach(async (item, i) => {
+                
+                let userContract = await shastaMarketInstance.getBidFromIndex.call(i, { from: self.props.address });
+                let userAddress = userContract[1];
+
+                if (!checkedAddresses.includes(userAddress)) {
+
+                    checkedAddresses.push(userAddress);
+                    let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: self.props.address });
+                    let ipfsHash = this.props.web3.toAscii(ipfsHashRaw);
+                   
+                    let rawContent = await this.props.ipfs.cat(ipfsHash);
+                    let userData = JSON.parse(rawContent.toString("utf8"));
+
+                    for (let key in userData.contracts) {
+                        bidsJsonData.push(userData.contracts[key])
+                    }
+                    this.setState(({
+                        bids: bidsJsonData,
+                        asks: asksJsonData
+                    }));
+                }
             })
             
-            console.log("bidsdata", bidsJsonData)
             // Asks
-            const indexes = await shastaMarketInstance.getOfferIndexesFromAddress.call({ from: this.props.address });
-            const askData = await Promise.map(indexes, indexBn => 
+            const asksLength = await shastaMarketInstance.getOffersLength.call({ from: this.props.address });
+            console.log("index: ", asksLength.toNumber());
+
+            let auxArray2 = Array.from({length: asksLength.toNumber()}, (x, item)=> item);
+
+            const askData = await Promise.map(auxArray2, indexBn =>
                 shastaMarketInstance.getOfferFromIndex.call(indexBn, { from: this.props.address })
             )
             const asksJsonData = await Promise.map(askData, async (ask) => {
@@ -58,7 +77,6 @@ class Marketer extends Component {
                 };
                 const ipfsHash = await shastaMapInstance.locationsIpfsHashes.call(ask[2]);
                 const ipfsRawContent = await this.props.ipfs.cat(ipfsHash);
-                console.log(ipfsRawContent)
                 const providerData = JSON.parse(ipfsRawContent.toString("utf8"));
                 console.log(providerData)
                 return Object.assign(price, providerData);
@@ -94,7 +112,7 @@ class Marketer extends Component {
                         <Card.Meta>Provider: {bid.marketer}</Card.Meta>
                         <Card.Description>
                             {bid.description}
-                  </Card.Description>
+                        </Card.Description>
                     </Card.Content>
                     <Card.Content extra>
                         <div className='ui two buttons'>
@@ -142,7 +160,7 @@ class Marketer extends Component {
                     <Button secondary fluid>
                         Sales offers
                      </Button>
-                     <Card.Group>
+                    <Card.Group>
                         {asks}
                     </Card.Group>
                 </Segment>

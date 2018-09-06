@@ -48,22 +48,19 @@ class App extends React.Component {
 
         // set the provider for the User abstraction
         userContract.setProvider(results.web3.currentProvider);
-        
+
         // set the provider for the SharedMap abstraction
         sharedMapContract.setProvider(results.web3.currentProvider);
-       
-         // set the provider for the ShastaMarket abstraction
+
+        // set the provider for the ShastaMarket abstraction
         shastaMarketContract.setProvider(results.web3.currentProvider);
-       
+
         // Instantiate contract
         this.instantiateContract();
 
-        //get market 
-        this.checkMarket();
-
       })
-      .catch(() => {
-        console.log('Error finding web3.')
+      .catch((e) => {
+        console.log('Error: ', e)
       })
   }
 
@@ -92,7 +89,7 @@ class App extends React.Component {
       })
       // set the provider for the User abstraction
       userContract.setProvider(this.state.web3.currentProvider);
-       // set the provider for the SharedMap abstraction
+      // set the provider for the SharedMap abstraction
       sharedMapContract.setProvider(this.state.web3.currentProvider);
       // set the provider for the ShastaMarket abstraction
       shastaMarketContract.setProvider(this.state.web3.currentProvider);
@@ -157,8 +154,6 @@ class App extends React.Component {
       ipfsValue,
       userJson
     } = this.state
-    console.log("username: ", this.state.username);
-    console.log("address: ", this.state.address);
 
     if (this.state.username) {
       return (
@@ -183,7 +178,14 @@ class App extends React.Component {
       );
     } else {
       return (
-        <div><CreateUser web3={web3} userContract={userContract} account={address} status={status} balance={balance} ipfs={ipfs}></CreateUser></div>
+        <div><CreateUser
+          web3={web3}
+          userContract={userContract}
+          account={address}
+          status={status}
+          balance={balance}
+          ipfs={ipfs}>
+        </CreateUser></div>
       );
     }
   }
