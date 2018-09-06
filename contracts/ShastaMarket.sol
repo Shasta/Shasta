@@ -15,8 +15,8 @@ contract ShastaMarket is Ownable, Pausable {
     User public userStorage;
     mapping(address => uint[]) private addressToBidsIndex;
     mapping(address => uint[]) private addressToOffersIndex;
-    Bid[] public bidsList;
-    Offer[] public offersList;
+    Bid[] private bidsList;
+    Offer[] private offersList;
     
     struct Bid {
         address seller;
@@ -44,9 +44,9 @@ contract ShastaMarket is Ownable, Pausable {
         _;
     }
 
-    function createBid(uint _value) public whenNotPaused {
+    function createBid(uint _value, address _seller) public whenNotPaused {
         Bid memory myBid;
-        myBid.seller = msg.sender;
+        myBid.seller = _seller;
         myBid.value = _value;
         
         uint index = bidsList.push(myBid) - 1;
@@ -54,8 +54,7 @@ contract ShastaMarket is Ownable, Pausable {
         emit newBid(msg.sender, _value);
     }
     
-    
-    function createOffer(uint _value ) public whenNotPaused {
+    function createOffer(uint _value) public whenNotPaused {
         Offer memory myOffer;
         myOffer.buyer = msg.sender;
         myOffer.value = _value;
@@ -94,4 +93,20 @@ contract ShastaMarket is Ownable, Pausable {
     function getOfferIndexesFromAddress() public view returns(uint[]) {
         return addressToOffersIndex[msg.sender];
     }
+    function getBidsLength() public view returns(uint) {
+        return bidsList.length;
+    }
+    function getOffersLength() public view returns(uint) {
+        return offersList.length;
+    }
+      function updateUser(bytes ipfsHash) private returns(bool success)
+  {
+    return userStorage.updateUser(ipfsHash);
+  }  
+
+function createUser(bytes16 username, bytes ipfsHash) public returns(bool success)
+  {
+      return userStorage.createUser(username, ipfsHash);
+
+  }
 }

@@ -1,6 +1,7 @@
 pragma solidity ^0.4.19;
 
 import "./SafeMath.sol";
+import "./ShastaMarket.sol";
 
 contract User {
     
@@ -11,6 +12,8 @@ contract User {
   event NewUser(bytes16 username, address owner);
   event UpdatedUser(address owner, bytes ipfsHash);
 
+  ShastaMarket public shastaMarket;
+  address public shastaMarketAddress;
   address[] private addresses;
   bytes16[] private usernames;
   bytes[] private ipfsHashes;
@@ -21,7 +24,7 @@ contract User {
     _;
   }
 
-  constructor() public {
+  constructor(address _shastaMarketAddress) public {
 
     // mappings are virtually initialized to zero values so we need to "waste" the first element of the arrays
     // instead of wasting it we use it to create a user for the contract itself
@@ -29,6 +32,8 @@ contract User {
     usernames.push('self');
     ipfsHashes.push('not-available');
     owner = msg.sender;
+    shastaMarketAddress = _shastaMarketAddress;
+    shastaMarket = ShastaMarket(shastaMarketAddress);
 
   }
 
@@ -41,7 +46,7 @@ contract User {
 
   }
 
-  function hasUser(address userAddress) public returns(bool hasIndeed) 
+  function hasUser(address userAddress) public view returns(bool hasIndeed) 
   {
     return (addressToIndex[userAddress] > 0);
   }
@@ -72,6 +77,11 @@ contract User {
     emit NewUser(username, msg.sender);
     return true;
   }
+
+function createBid(uint _value, bytes ipfsHash) public payable {
+       shastaMarket.createBid(_value, msg.sender);
+        updateUser(ipfsHash);
+}
 
   function updateUser(bytes ipfsHash) public payable returns(bool success)
   {

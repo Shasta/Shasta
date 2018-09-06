@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message, Feed } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
 import './Market.css';
 import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 class Market extends Component {
@@ -79,29 +78,21 @@ class Market extends Component {
 
         var value = this.props.web3.toWei(res.data.ETH * newContract.value);
         var self = this;
-
+        
         //Call the transaction
         contract.deployed().then(function (contractInstance) {
-          contractInstance.updateUser.sendTransaction(ipfsHash, { gas: 400000, from: address, value: value }).then(function (success) {
+          console.log("contractInstance", contractInstance);
+          console.log("ipfsH", ipfsHash)
+          console.log("value: ", self.state.dropdownValue)
+          contractInstance.createBid.sendTransaction(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value }).then(function (success) {
             if (success) {
-              console.log('Updated user ' + userJson.username + ' on ethereum!');
+              console.log('Updated user ' + userJson.username + ' on ethereum!, and bid correctly created');
 
             } else {
-              console.log('error updateing user on ethereum.');
+              console.log('error updating user on ethereum.');
             }
 
-            var dValue = self.state.dropdownValue
-            //Post bid
-            self.props.shastaMarketContract.deployed().then(function (shastaMarketInstance) {
-              shastaMarketInstance.createBid.sendTransaction( dValue, { from: self.props.address }).then((result) => {
-
-                  console.log("Created contract to market", result);
-              });
           })
-
-          }).catch(function (e) {
-            console.log('error creating user:', userJson.username, ':', e);
-          });
 
         });
       });

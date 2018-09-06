@@ -13,16 +13,16 @@ class CreateUser extends Component {
 
     this.state = {
       username: '',
-      isLoged: false
+      isLoged: false,
+      userJson: ''
     }
     // This binding is necessary to make `this` work in the callback
     this.createUser = this.createUser.bind(this);
     this.updateInput = this.updateInput.bind(this);
-    this.updateLoginStatus = this.updateLoginStatus.bind(this);
   }
 
   //It should save a json file to ipfs and save the hash to the smart contract
-  createUser() {
+  async createUser() {
 
     console.log("Creating user " + this.state.username);
 
@@ -31,36 +31,24 @@ class CreateUser extends Component {
       username: username,
       contracts: []
     }
-
+    this.setState = ({ userJson });
     var ipfsHash = '';
-    var contract = this.props.userContract;
-    var account = this.props.account;
 
-    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], function (err, res) {
+    const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-      if (err) throw err;
-      ipfsHash = res[0].hash;
-      console.log("ipfs hash: ", ipfsHash);
+    ipfsHash = res[0].hash;
+    console.log("ipfs hash: ", ipfsHash);
+    const contractInstance = await this.props.userContract.deployed();
 
-      contract.deployed().then(function (contractInstance) {
-        contractInstance.createUser(username, ipfsHash, { gas: 400000, from: account }).then(function (success) {
-          if (success) {
-            console.log('created user ' + username + ' on ethereum!');
-            this.updateLoginStatus(true);
-          } else {
-            console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
-          }
-        }).catch(function (e) {
-          console.log('error creating user:', username, ':', e);
-        });
 
-      });
-    });
-
-  }
-
-  updateLoginStatus(isLoged) {
-    this.setState({ isLoged: isLoged })
+    const success = await contractInstance.createUser(username, ipfsHash, { gas: 400000, from: this.props.account });
+    if (success) {
+      console.log("self:", self)
+      console.log('created user ' + username + ' on ethereum!');
+      //this.setState({ isLoged: true })
+    } else {
+      console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
+    }
   }
 
   updateInput(event) {
@@ -68,7 +56,7 @@ class CreateUser extends Component {
   }
 
   render() {
-
+    console.log("logged: ", this.state.isLoged)
     if (this.state.isLoged) {
 
       return (
@@ -80,6 +68,7 @@ class CreateUser extends Component {
             username={this.state.username}
             ipfs={this.state.ipfs}
             contract={this.props.userContract}
+            userJson={this.state.userJson}
           >
           </Router>
         </div>
@@ -102,9 +91,9 @@ class CreateUser extends Component {
                     <Form>
                       <Form.Field style={{ marginRight: '450px' }}>
                         <label>Username</label>
-                        <Input placeholder='Username' onChange={this.updateInput} />
+                        <Input id="usernameInput" placeholder='Username' onChange={this.updateInput} />
                       </Form.Field>
-                      <Button type='submit' onClick={this.createUser}>Create a new organization</Button>
+                      <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
                     </Form>
                   </Grid.Column>
                   <Grid.Column style={{ marginTop: '100px' }}>
