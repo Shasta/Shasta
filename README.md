@@ -6,26 +6,32 @@ _Decentralized Energy Network_
 
 ## Run on your own computer
 
-If you would like to test Shasta on your own computer make sure you have Node installed and clone this repo
+If you would like to test Shasta on your own computer, please before check the needed dependencies are met:
+-  Node 10
+-  NPM 6.2.x
+-  git
+- Ganache GUI or Ganache CLI or any other Ethereum blockchain dev enviroment.
 
-      git clone https://github.com/alexsicart/Shasta
+Clone the repository
+```
+git clone https://github.com/alexsicart/Shasta
+```
 
 Go into the folder and download modules:
+```
+cd Shasta
+npm install
+```
 
-      npm install
+Run your Ethereum dev enviroment, example with ganache-cli:
+```
+ganache-cli
+```
 
-Compile the contracts:
-
-      truffle compile
-
-Migrate the contracts:
-
-      truffle migrate
-
-Testrun the the App on http://localhost:3000 with:
-
-      npm start
-
+Migrate contracts and run the web app in local at http://localhost:3000
+```
+npm run dev
+```
 
 ## Contributors
 
