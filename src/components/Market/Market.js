@@ -23,9 +23,8 @@ class Market extends Component {
       description: ''
     }
 
-    this.updateUser = this.updateUser.bind(this);
+    this.createBidOffer = this.createBidOffer.bind(this);
   }
-
 
   toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
 
@@ -34,7 +33,7 @@ class Market extends Component {
   handleSidebarHide = () => this.setState({ visible: false })
 
 
-  updateUser() {
+  async createBidOffer() {
 
     var userJson = {
       username: this.props.username,
@@ -61,42 +60,30 @@ class Market extends Component {
     var address = this.props.address;
     var url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
 
-    this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))], (err, res) => {
+    let res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-      if (err) throw err;
+    var ipfsHash = res[0].hash;
 
-      var ipfsHash = res[0].hash;
+    console.log("ipfs hash: ", ipfsHash);
 
-      console.log("ipfs hash: ", ipfsHash);
+    //Get the exact value in ethers
+    let result = await axios.get(url);
 
-      //Get the exact value in ethers
-      axios.get(url).then(res => {
+    //Set the conversion from EUR to WEI
 
-        //Set te conversion from EUR to WEI
-        console.log("ETH", res.data.ETH);
-        console.log("toPay", newContract.value);
+    var value = this.props.web3.toWei(result.data.ETH * newContract.value);
+    var self = this;
 
-        var value = this.props.web3.toWei(res.data.ETH * newContract.value);
-        var self = this;
-        
-        //Call the transaction
-        contract.deployed().then(function (contractInstance) {
-          console.log("contractInstance", contractInstance);
-          console.log("ipfsH", ipfsHash)
-          console.log("value: ", self.state.dropdownValue)
-          contractInstance.createBid.sendTransaction(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value }).then(function (success) {
-            if (success) {
-              console.log('Updated user ' + userJson.username + ' on ethereum!, and bid correctly created');
+    //Call the transaction
+    const contractInstance = await contract.deployed();
+  
+    let success = await contractInstance.createBid(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value });
+    if (success) {
+      console.log('Updated user ' + userJson.username + ' on ethereum!, and bid correctly created');
 
-            } else {
-              console.log('error updating user on ethereum.');
-            }
-
-          })
-
-        });
-      });
-    });
+    } else {
+      console.log('error updating user on ethereum.');
+    }
 
   }
 
@@ -145,13 +132,13 @@ class Market extends Component {
 
     const marketers = [
       {
-        text:'HolaLuz',
-        value:'HolaLuz'
-      },{
+        text: 'HolaLuz',
+        value: 'HolaLuz'
+      }, {
         text: 'SomEnergia',
         value: 'SomEnergia'
-      },{
-        text:'Gas Natural',
+      }, {
+        text: 'Gas Natural',
         value: 'Gas Natural'
       }
     ]
@@ -160,16 +147,16 @@ class Market extends Component {
       {
         text: "Solar",
         value: "Solar"
-      },{
+      }, {
         text: "Nuclear",
         value: "Nuclear"
-      },{
+      }, {
         text: "Eolic",
         value: "Eolic"
-      },{
+      }, {
         text: "Biomass",
         value: "Biomass"
-      },{
+      }, {
         text: "Other",
         value: "Other"
       }
@@ -194,13 +181,13 @@ class Market extends Component {
             <Button basic color='purple'>
               More Info
               </Button>
-            </Card.Content>
-          </Card>
-        );
-      });
+          </Card.Content>
+        </Card>
+      );
+    });
 
-      return (
-        <div>
+    return (
+      <div>
         <div>
           <Sidebar
             as={Menu}
@@ -262,7 +249,7 @@ class Market extends Component {
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
                 </Form.Field>
-                <Button onClick={this.updateUser} type='submit'>Submit</Button>
+                <Button onClick={this.createBidOffer} type='submit'>Submit</Button>
               </Form>
             </Menu.Item>
             <Menu.Item>
@@ -289,4 +276,4 @@ class Market extends Component {
     );
   }
 }
-  export default Market
+export default Market
