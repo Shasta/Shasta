@@ -64,7 +64,6 @@ class Marketer extends Component {
             
             // Asks
             const asksLength = await shastaMarketInstance.getOffersLength.call({ from: this.props.address });
-            console.log("index: ", asksLength.toNumber());
 
             let auxArray2 = Array.from({length: asksLength.toNumber()}, (x, item)=> item);
 
@@ -72,14 +71,10 @@ class Marketer extends Component {
                 shastaMarketInstance.getOfferFromIndex.call(indexBn, { from: this.props.address })
             )
             const asksJsonData = await Promise.map(askData, async (ask) => {
-                const price = {
-                    value: ask[0].toString(),
-                };
                 const ipfsHash = await shastaMapInstance.locationsIpfsHashes.call(ask[2]);
                 const ipfsRawContent = await this.props.ipfs.cat(ipfsHash);
                 const providerData = JSON.parse(ipfsRawContent.toString("utf8"));
-                console.log(providerData)
-                return Object.assign(price, providerData);
+                return providerData;
             });
             this.setState(({
                 bids: bidsJsonData,
@@ -106,7 +101,7 @@ class Marketer extends Component {
             return (
                 <Card>
                     <Card.Content>
-                        <Card.Header>{bid.firstName} {bid.lastName}, Buys energy for {bid.value}€</Card.Header>
+                        <Card.Header>{bid.firstName} {bid.lastName}, at {bid.value}€/kWh</Card.Header>
                         <Card.Meta>{bid.source} Energy</Card.Meta>
                         <Card.Meta>{bid.country}</Card.Meta>
                         <Card.Meta>Provider: {bid.marketer}</Card.Meta>
@@ -129,19 +124,12 @@ class Marketer extends Component {
             return (
                 <Card>
                     <Card.Content>
-                        <Card.Header>{ask.chargerName}, sells energy for {ask.value}€</Card.Header>
+                        <Card.Header>{ask.marketerName} bought energy from {ask.chargerName}, at {ask.marketerPrice}€/kWh</Card.Header>
                         <Card.Meta>{toCapital(ask.providerSource)} Energy</Card.Meta>
                         <Card.Meta>{ask.address}</Card.Meta>
                         <Card.Description>
                             {ask.description}
                         </Card.Description>
-                    </Card.Content>
-                    <Card.Content extra>
-                        <div className='ui two buttons'>
-                            <Button basic color='green'>
-                                Buy energy
-                    </Button>
-                        </div>
                     </Card.Content>
                 </Card>
             )
@@ -151,14 +139,14 @@ class Marketer extends Component {
             <div style={{ marginLeft: 400, marginTop: 20 }}>
                 <Segment padded>
                     <Button primary fluid>
-                        Purchase offers
+                        Sales history
                     </Button>
                     <Card.Group>
                         {bids}
                     </Card.Group>
                     <Divider horizontal></Divider>
                     <Button secondary fluid>
-                        Sales offers
+                        Buys history
                      </Button>
                     <Card.Group>
                         {asks}
