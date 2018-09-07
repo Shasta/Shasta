@@ -119,7 +119,7 @@ class App extends React.Component {
               </Link>
               <Link to="/map">
                 <Menu.Item as='a'>
-                  <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Map</h4>
+                  <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Providers</h4>
                 </Menu.Item>
               </Link>
               <Link to="/hardware">
@@ -169,6 +169,8 @@ class App extends React.Component {
                 ipfs={this.props.ipfs}
                 address={this.props.address}
                 web3={this.props.web3}
+                userContract={this.props.contract}
+                userJson={this.props.userJson}
                 sharedMapContract={this.props.sharedMapContract}
               />} />
             </div>
