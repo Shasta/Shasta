@@ -29,7 +29,9 @@ class CreateUser extends Component {
     var username = this.state.username;
     var userJson = {
       username: username,
-      contracts: []
+      consumerContracts: [],
+      producerContracts: [],
+      userInfo: {}
     }
     this.setState = ({ userJson });
     var ipfsHash = '';

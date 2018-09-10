@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import Tab from './components/Tab/Tab';
 import Home from './components/Home/Home';
-import Market from './components/Market/Market';
+import Consumer from './components/Consumer/Consumer';
 import Map from './components/Map/Map';
 import Marketer from './components/Marketer/Marketer'
 import logo from './static/shasta-logo.png';
@@ -107,9 +107,9 @@ class App extends React.Component {
                   <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
                 </Menu.Item>
               </Link>
-              <Link to="/market">
+              <Link to="/consumer">
                 <Menu.Item as='a'>
-                  <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Market</h4>
+                  <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Consumer</h4>
                 </Menu.Item>
               </Link>
               <Link to="/marketer">
@@ -152,7 +152,7 @@ class App extends React.Component {
                 web3={this.props.web3}
                 sharedMapContract={this.props.sharedMapContract}
                 ipfs={this.props.ipfs} />} />
-              <Route path="/market" render={(props) => <Market
+              <Route path="/consumer" render={(props) => <Consumer
                 username={this.props.username}
                 ipfs={this.props.ipfs}
                 contract={this.props.contract}
