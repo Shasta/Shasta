@@ -14,8 +14,21 @@ class Map extends Component {
     providerAddress: "",
     chargerLatitude: "",
     chargerLongitude: "",
-    price: 0,
-    chargers: []
+    marketerIndex: 0,
+    chargers: [],
+    marketersList: [{
+      name: "Respira",
+      price: 0.129
+    }, {
+      name: "HolaLuz",
+      price: 0.132
+    }, {
+      name: "SomEnergia",
+      price: 0.127
+    }, {
+      name: "Endesa",
+      price: 0.09
+    }].sort((a, b) => a.price < b.price)
   }
 
   // Add Web3 event watchers at ComponentDidMount lifecycle,
@@ -59,7 +72,6 @@ class Map extends Component {
         // Sets concurrency to 5, so it send requests in batches of 5.
         { concurrency: 5 }
       );
-
       // Retrieve all the JSON chargers data from IPFS, in the same way than above, using axios to grab the JSON data.
       const chargersJSON = await Promise.map(
         // Map storedIpfsHashes to an axios request
@@ -124,13 +136,14 @@ class Map extends Component {
     // Generate the location object, will be saved later in JSON.
     const locationObject = {
       chargerName: this.state.chargerName,
-      chargerStatus: this.state.chargerStatus,
       latitude: this.state.chargerLatitude,
       longitude: this.state.chargerLongitude,
       providerSource: this.state.providerSource,
       address: this.state.providerAddress,
+      marketerName: this.state.marketersList[this.state.marketerIndex].name,
+      marketerPrice: this.state.marketersList[this.state.marketerIndex].price
     }
-    const priceBG = web3.toBigNumber(this.state.price);
+    const priceBN = web3.toBigNumber(locationObject.marketerPrice)
     const jsonBuffer = Buffer.from(JSON.stringify(locationObject));
     try {
       // Show loader spinner
@@ -139,26 +152,34 @@ class Map extends Component {
       const ipfsResponse = await this.props.ipfs.add(jsonBuffer);
       const ipfsHash = ipfsResponse[0].hash;
       // Estimate gas
-      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(priceBG, ipfsHash, { from: currentAddress });
+      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(priceBN, ipfsHash, { from: currentAddress });
       // Send a transaction to addLocation method.
-      await sharedMapInstance.addLocation(priceBG, ipfsHash, { gas: estimatedGas, from: currentAddress })  //Call the transaction
+      await sharedMapInstance.addLocation(priceBN, ipfsHash, { gas: estimatedGas, from: currentAddress })  //Call the transaction
       this.setState({ chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, price: 0 })
     } catch (err) {
       console.error(err)
     }
   }
 
+  handleChangeMarketer = (e, a) => {
+    e.preventDefault();
+    const marketerIndex = a.value;
+    this.setState({ marketerIndex })
+  }
+
+  setMarketer = (e) => {
+    e.preventDefault();
+    const marketerIndex = Number.parseInt(e.target.value);
+    if (marketerIndex !== this.state.marketerIndex) {
+      this.setState({ marketerIndex, visible: true});
+    } else {
+      this.setState({ visible: true});
+    }
+  }
+
   render() {
-    const { visible, chargerName, chargerStatus, providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers } = this.state;
+    const { visible, chargerName, marketersList, marketerIndex, providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers } = this.state;
     let fieldErrors = []
-    const chargerStates = [{
-      text: 'Open',
-      value: 'open',
-    },
-    {
-      text: 'Closed',
-      value: 'closed',
-    }]
     const providerSources = [{
       text: 'Solar',
       value: 'solar',
@@ -175,29 +196,17 @@ class Map extends Component {
       text: 'Carbon',
       value: 'carbon',
     }]
-    const marketers = [
-      {
-        name: "Respira",
-        price: 0.127
-      }, {
-        name: "HolaLuz",
-        price: 0.123
-      }, {
-        name: "SomEnergia",
-        price: 0.129
-      }, {
-        name: "Endesa",
-        price: 0.421
-      }
-    ]
-    marketers.sort((a, b) => a.price - b.price);
-    const providers = marketers.map((marketer) => {
+    const marketers = marketersList;
+    const marketerPrice = marketers[marketerIndex].price;
+    const marketerName = marketers[marketerIndex].name;
+    const marketersOptions = marketers.map((x, index) => ({text: x.name, value: index}))
+    const providers = marketers.map((marketer, index) => {
       return (
-        <List.Item>
+        <List.Item key={index}>
           <List.Content>
             <List.Header>
               <div style={{ float: 'left' }}><div>{marketer.name}</div><div>{marketer.price} €/kWh</div></div>
-              <Button basic color='green' style={{ backgroundColor: 'white', float: 'right' }}>
+              <Button basic color='green' value={index} onClick={this.setMarketer} style={{ backgroundColor: 'white', float: 'right' }}>
                 Sell your energy
               </Button>
             </List.Header>
@@ -209,17 +218,11 @@ class Map extends Component {
     if (chargerName.length === 0) {
       fieldErrors.push("Provider name can not be empty.")
     }
-    if (chargerStatus.length === 0) {
-      fieldErrors.push("Provider status must be selected.")
-    }
     if (providerAddress.length === 0) {
-      fieldErrors.push("Provider status must be selected.")
+      fieldErrors.push("Provider address must be filled.")
     }
     if (providerSource.length === 0) {
       fieldErrors.push("Provider source must be selected.")
-    }
-    if (price <= 0) {
-      fieldErrors.push("Price of kWh must be set.")
     }
     if (chargerLatitude.length === 0 || chargerLatitude === 0) {
       fieldErrors.push("You must click in the map to select a location.")
@@ -242,10 +245,10 @@ class Map extends Component {
           <Menu.Item>
             <Form warning={!!fieldErrors.length}>
               <Form.Field>
-                <p style={{ textAlign: "start" }}>You can click in the map to select the charger location. Add a provider name, and the status of the provider. Once the form is complete, click on Submit button.</p>
+                <p style={{ textAlign: "start" }}>You can click in the map to select the charger location. Add your name, address, your energy source and select the marketer that you want to sell your energy. Once the form is complete, click on Submit button.</p>
               </Form.Field>
               <Form.Field>
-                <label>Provider name</label>
+                <label>Your name</label>
                 <input type="text" placeholder='Provider name'
                   name='chargerName'
                   value={chargerName}
@@ -259,19 +262,20 @@ class Map extends Component {
                   onChange={e => this.handleChange(e)} />
               </Form.Field>
               <Form.Field>
-                <label>Provider status</label>
-                <Dropdown placeholder='Provider status' value={chargerStatus} name='dropdownValue' fluid selection options={chargerStates} onChange={this.handleChangeDropdown} />
-              </Form.Field>
-              <Form.Field>
                 <label>Source of energy</label>
                 <Dropdown placeholder='Source of energy' value={providerSource} name='dropdownValue' fluid selection options={providerSources} onChange={this.handleChangeSource} />
               </Form.Field>
               <Form.Field>
+                <label>Marketer to sell your energy</label>
+                <Dropdown placeholder='Marketer' value={marketerIndex} name='marketerIndex' fluid selection options={marketersOptions} onChange={this.handleChangeMarketer} />
+              </Form.Field>
+              <Form.Field>
                 <label>Price per kWh</label>
-                <input type="text" placeholder='0.23'
+                <input type="text"
+                  disabled
                   name='price'
-                  value={price}
-                  onChange={e => this.handleChange(e)} />
+                  value={`${marketerPrice} €/kWh`}
+                />
               </Form.Field>
               <Form.Field>
                 <label>Latitude</label>
@@ -297,8 +301,8 @@ class Map extends Component {
           </Menu.Item>
         </Sidebar>
 
-        <span style={{ fontSize: '1.71428571rem', marginRight: 40 }}>Chargers Map</span>
-        <Button onClick={this.openForm}>Add a location</Button>
+        <span style={{ fontSize: '1.71428571rem', marginRight: 40 }}>Current providers</span>
+        <Button onClick={this.openForm}>Sell your energy</Button>
         <SharedMap newLocation={{ chargerLatitude, chargerLongitude }} chargers={chargers} emitLocation={this.locationSelected} />
         <div style={{ padding: 15 }}> <h3>Sell your energy directly: </h3></div>
 

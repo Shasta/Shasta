@@ -76,7 +76,7 @@ class Market extends Component {
 
     //Call the transaction
     const contractInstance = await contract.deployed();
-  
+
     let success = await contractInstance.createBid(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value });
     if (success) {
       console.log('Updated user ' + userJson.username + ' on ethereum!, and bid correctly created');
@@ -177,7 +177,7 @@ class Market extends Component {
             </Card.Description>
           </Card.Content>
           <Card.Content extra>
-            <h3>{contract.value} €</h3>
+            <h3>{contract.value} € / month</h3>
             <Button basic color='purple'>
               More Info
               </Button>
