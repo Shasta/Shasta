@@ -113,13 +113,6 @@ class Marketer extends Component {
                             {bid.description}
                         </Card.Description>
                     </Card.Content>
-                    <Card.Content extra>
-                        <div className='ui two buttons'>
-                            <Button basic color='green'>
-                                Sell your energy
-                    </Button>
-                        </div>
-                    </Card.Content>
                 </Card>
             )
         });

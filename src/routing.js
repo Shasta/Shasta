@@ -35,7 +35,7 @@ class App extends React.Component {
     }
 
 
-    this.props.userJson.contracts.push(bid);
+    this.props.userJson.consumerContracts.push(bid);
 
     const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
 
@@ -53,7 +53,7 @@ class App extends React.Component {
       marketer: "The Marketer",
       source: "Solar"
     }
-    this.props.userJson.contracts.push(bid2);
+    this.props.userJson.consumerContracts.push(bid2);
     const res2 = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
 
     ipfsH = res2[0].hash;
