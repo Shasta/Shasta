@@ -28,7 +28,8 @@ class App extends React.Component {
       ipfsCountry: '',
       ipfsHash: '',
       ipfsValue: '',
-      status: 'Not Connected!',
+      status: 'Not Connected! Try connecting Metamask',
+      button: false,
       userJson: '',
       bids: [],
       asks: []
@@ -91,7 +92,8 @@ class App extends React.Component {
         this.setState({
           address: accounts[0],
           balance: this.state.web3.fromWei(balance.toString(), 'ether'),
-          status: 'Connected!'
+          status: 'Connected!',
+          button:true
         })
         //Authenticate the address from metamask
         this.checkAuthentication(accounts[0], this);

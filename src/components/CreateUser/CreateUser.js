@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
 import Router from "../../routing.js";
+import { CountryDropdown } from 'react-country-region-selector';
 
 import './CreateUser.css';
 import shasta from './shasta.png'
@@ -22,7 +23,6 @@ class CreateUser extends Component {
     this.handleOrgNameChange = this.handleOrgNameChange.bind(this);
     this.handleFNameChange = this.handleFNameChange.bind(this);
     this.handleLNameChange = this.handleLNameChange.bind(this);
-    this.handleCountryChange = this.handleCountryChange.bind(this);
   }
 
   //It should save a json file to ipfs and save the hash to the smart contract
@@ -70,13 +70,13 @@ class CreateUser extends Component {
     organizationData.lastName = event.target.value;
     this.setState({ organization: organizationData })
   }
-  handleCountryChange(event) {
-    organizationData.country = event.target.value;
-    this.setState({ organization: organizationData })
+  selectCountry(val) {
+    console.log("val: ", val);
+    organizationData.country = val;
+    this.setState({ country: val });
   }
-
   render() {
-   
+
     if (this.state.isLoged) {
 
       return (
@@ -121,7 +121,9 @@ class CreateUser extends Component {
                           <label>Last Name</label>
                           <Input placeholder='Last Name' onChange={this.handleLNameChange} />
                           <label>Country</label>
-                          <Input placeholder='Country' onChange={this.handleCountryChange} />
+                          <CountryDropdown
+                            value={this.state.country}
+                            onChange={(val) => this.selectCountry(val)} />
                         </Form.Field>
                         <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
                       </Form>
