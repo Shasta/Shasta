@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Button, Form, Grid, Image, Input } from 'semantic-ui-react'
+import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
 import Router from "../../routing.js";
 
 import './CreateUser.css';
 import shasta from './shasta.png'
-
+var organizationData = {}
 
 class CreateUser extends Component {
 
@@ -12,28 +12,31 @@ class CreateUser extends Component {
     super(props);
 
     this.state = {
-      username: '',
+      organization: {},
       isLoged: false,
-      userJson: ''
+      userJson: '',
+      formVisible: false
     }
     // This binding is necessary to make `this` work in the callback
     this.createUser = this.createUser.bind(this);
-    this.updateInput = this.updateInput.bind(this);
+    this.handleOrgNameChange = this.handleOrgNameChange.bind(this);
+    this.handleFNameChange = this.handleFNameChange.bind(this);
+    this.handleLNameChange = this.handleLNameChange.bind(this);
+    this.handleCountryChange = this.handleCountryChange.bind(this);
   }
 
   //It should save a json file to ipfs and save the hash to the smart contract
   async createUser() {
 
-    console.log("Creating user " + this.state.username);
+    console.log("Creating user " + this.state.organization.name);
 
-    var username = this.state.username;
     var userJson = {
-      username: username,
+      organization: this.state.organization,
       consumerContracts: [],
-      producerContracts: [],
-      userInfo: {}
+      producerContracts: []
     }
-    this.setState = ({ userJson });
+    var organizationName = userJson.organization.name;
+
     var ipfsHash = '';
 
     const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
@@ -43,22 +46,37 @@ class CreateUser extends Component {
     const contractInstance = await this.props.userContract.deployed();
 
 
-    const success = await contractInstance.createUser(username, ipfsHash, { gas: 400000, from: this.props.account });
+    const success = await contractInstance.createUser(organizationName, ipfsHash, { gas: 400000, from: this.props.account });
     if (success) {
       console.log("self:", self)
-      console.log('created user ' + username + ' on ethereum!');
+      console.log('created user ' + organizationName + ' on ethereum!');
       //this.setState({ isLoged: true })
     } else {
       console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
     }
   }
 
-  updateInput(event) {
-    this.setState({ username: event.target.value })
+  toggleVisibility = () => this.setState({ formVisible: !this.state.formVisible })
+
+  handleOrgNameChange(event) {
+    organizationData.name = event.target.value;
+    this.setState({ organization: organizationData })
+  }
+  handleFNameChange(event) {
+    organizationData.firstName = event.target.value;
+    this.setState({ organization: organizationData })
+  }
+  handleLNameChange(event) {
+    organizationData.lastName = event.target.value;
+    this.setState({ organization: organizationData })
+  }
+  handleCountryChange(event) {
+    organizationData.country = event.target.value;
+    this.setState({ organization: organizationData })
   }
 
   render() {
-    console.log("logged: ", this.state.isLoged)
+   
     if (this.state.isLoged) {
 
       return (
@@ -90,13 +108,24 @@ class CreateUser extends Component {
                     <h1> Welcome to Shasta </h1>
                   </Grid.Column>
                   <Grid.Column style={{ marginTop: '20px' }}>
-                    <Form>
-                      <Form.Field style={{ marginRight: '450px' }}>
-                        <label>Username</label>
-                        <Input id="usernameInput" placeholder='Username' onChange={this.updateInput} />
-                      </Form.Field>
-                      <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
-                    </Form>
+                    <Transition visible={!this.state.formVisible} animation='scale' duration={500}>
+                      <Button type='submit' id="createOrgBtn" onClick={this.toggleVisibility}>Create a new organization</Button>
+                    </Transition>
+                    <Transition visible={this.state.formVisible} animation='scale' duration={500}>
+                      <Form>
+                        <Form.Field style={{ marginRight: '450px' }}>
+                          <label>Organization Name</label>
+                          <Input placeholder='Organization Name' onChange={this.handleOrgNameChange} />
+                          <label>First Name</label>
+                          <Input placeholder='First Name' onChange={this.handleFNameChange} />
+                          <label>Last Name</label>
+                          <Input placeholder='Last Name' onChange={this.handleLNameChange} />
+                          <label>Country</label>
+                          <Input placeholder='Country' onChange={this.handleCountryChange} />
+                        </Form.Field>
+                        <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
+                      </Form>
+                    </Transition>
                   </Grid.Column>
                   <Grid.Column style={{ marginTop: '100px' }}>
                     <h2>{this.props.status}</h2>
@@ -106,7 +135,7 @@ class CreateUser extends Component {
               </Grid.Column>
             </Grid.Row>
           </Grid>
-        </div>
+        </div >
       );
 
     }

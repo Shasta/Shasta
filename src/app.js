@@ -23,9 +23,9 @@ class App extends React.Component {
       ipfs: null,
       address: '',
       balance: '',
-      username: '',
+      organizationName: '',
       ipfsFirstName: '',
-      ipfsAddress: '',
+      ipfsCountry: '',
       ipfsHash: '',
       ipfsValue: '',
       status: 'Not Connected!',
@@ -115,17 +115,16 @@ class App extends React.Component {
           var url = 'https://ipfs.io/ipfs/' + ipfsHash;
           console.log('getting user info from ', url);
 
-          ipfs.cat(ipfsHash, (err, aux) => {
-            aux = aux.toString('utf8')
-            aux = JSON.parse(aux)
+          ipfs.cat(ipfsHash, (err, ipfsResponse) => {
+            ipfsResponse = ipfsResponse.toString('utf8')
+            ipfsResponse = JSON.parse(ipfsResponse)
 
             context.setState({
-              username: aux.username,
-              ipfsFirstName: aux.firstName,
-              ipfsAddress: aux.address,
+              organizationName: ipfsResponse.organization.name,
+              ipfsFirstName: ipfsResponse.organization.firstName,
+              ipfsCountry: ipfsResponse.organization.country,
               ipfsHash: ipfsHash,
-              ipfsValue: '',
-              userJson: aux
+              userJson: ipfsResponse
             })
           })
         }
@@ -150,30 +149,30 @@ class App extends React.Component {
       address,
       status,
       balance,
-      username,
+      organizationName,
       ipfs,
       ipfsHash,
       ipfsFirstName,
-      ipfsAddress,
+      ipfsCountry,
       ipfsValue,
       userJson
     } = this.state
 
-    if (this.state.username) {
+    if (this.state.organizationName) {
       return (
         <div>
           <Router
             web3={web3}
             address={address}
             balance={balance}
-            username={username}
+            organizationName={organizationName}
             ipfs={this.state.ipfs}
             contract={userContract}
             sharedMapContract={sharedMapContract}
             shastaMarketContract={shastaMarketContract}
             ipfsHash={ipfsHash}
             ipfsFirstName={ipfsFirstName}
-            ipfsAddress={ipfsAddress}
+            ipfsCountry={ipfsCountry}
             ipfsValue={ipfsValue}
             userJson={userJson}
           >

@@ -136,7 +136,7 @@ class App extends React.Component {
             </Sidebar>
             <div>
              <Route exact path="/" render={(props) => <Home 
-              username={this.props.username}
+              organizationName={this.props.organizationName}
               userJson={this.props.userJson}
               userContract={this.props.contract}
               shastaMarketContract={this.props.shastaMarketContract}
@@ -145,7 +145,7 @@ class App extends React.Component {
               sharedMapContract={this.props.sharedMapContract}
               />} />
               <Route exact path="/marketer" render={(props) => <Marketer
-                username={this.props.username}
+                organizationName={this.props.organizationName}
                 address={this.props.address}
                 shastaMarketContract={this.props.shastaMarketContract}
                 userContract={this.props.contract}
@@ -153,7 +153,7 @@ class App extends React.Component {
                 sharedMapContract={this.props.sharedMapContract}
                 ipfs={this.props.ipfs} />} />
               <Route path="/consumer" render={(props) => <Consumer
-                username={this.props.username}
+                organizationName={this.props.organizationName}
                 ipfs={this.props.ipfs}
                 contract={this.props.contract}
                 address={this.props.address}

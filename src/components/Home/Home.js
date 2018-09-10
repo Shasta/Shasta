@@ -61,8 +61,8 @@ class Home extends Component {
 
       const rawUser = await this.props.ipfs.cat(userHash);
       const user = JSON.parse(rawUser.toString("utf8"));
-      const currentLatestContractIndex = user.contracts.length - 1;
-      const latestContract = user.contracts[currentLatestContractIndex];
+      const currentLatestContractIndex = user.consumerContracts.length - 1;
+      const latestContract = user.consumerContracts[currentLatestContractIndex];
       if (currentLatestContractIndex > this.state.latestContractIndex) {
         const notification = _.merge(latestContract, {
           type: 'contract',
@@ -102,7 +102,7 @@ class Home extends Component {
     return (
       // Menu with Bulma-React.
       <div style={{ marginLeft: '375px' }}>
-        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href='https://rinkeby.etherscan.io/address/{this.props.account}'>{this.props.username}</a>,</h2>
+        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href='https://rinkeby.etherscan.io/address/{this.props.account}'>{this.props.userJson.organization.firstName}</a>,</h2>
         <h5 style={{ marginLeft: '30px', marginTop: '10px' }}>You have {this.state.notifications.length} notifications.</h5>
         <D3></D3>
         <Feed style={{ marginLeft: '40px', marginTop: '30px' }}>

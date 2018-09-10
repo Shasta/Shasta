@@ -64,17 +64,15 @@ class Consumer extends Component {
 
   async createConsumerContract() {
 
-    var userJson = {
-      username: this.props.username,
-      consumerContracts: this.props.userJson.consumerContracts
-    }
+    var userJson = this.props.userJson;
+
     console.log("marketer", this.state.dropdownMarketer);
     var newContract = {
       value: this.state.dropdownMarketer.price,
       date: Date.now(),
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      country: this.state.country,
+      firstName: userJson.organization.firstName,
+      lastName: userJson.organization.lastName,
+      country: userJson.organization.country,
       address: this.state.address,
       marketer: this.state.dropdownMarketer.text,
       source: this.state.dropdownSource,
@@ -111,7 +109,7 @@ class Consumer extends Component {
   
     let success = await contractInstance.createBid(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value });
     if (success) {
-      console.log('Updated user ' + userJson.username + ' on ethereum!, and bid correctly created');
+      console.log('Updated user ' + userJson.organization.name + ' on ethereum!, and bid correctly created');
 
     } else {
       console.log('error updating user on ethereum.');
@@ -213,27 +211,6 @@ class Consumer extends Component {
             </Menu.Item>
             <Menu.Item>
               <Form>
-                <Form.Field>
-                  <label>First Name</label>
-                  <input placeholder='First Name'
-                    name='firstName'
-                    value={this.state.firstName}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label>Last Name</label>
-                  <input placeholder='Last Name'
-                    name='lastName'
-                    value={this.state.lastName}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label>Country</label>
-                  <input placeholder='Country'
-                    name='country'
-                    value={this.state.country}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
                 <Form.Field>
                   <label>Address</label>
                   <input placeholder='Address'
