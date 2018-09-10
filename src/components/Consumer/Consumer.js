@@ -1,10 +1,38 @@
 import React, { Component } from 'react';
 import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
-import './Market.css';
+import './Consumer.css';
 import axios from 'axios';
 
 
-class Market extends Component {
+const marketers = [
+  {
+    key: 0,
+    text: 'HolaLuz',
+    value: 0,
+    price: 0.123,
+    description: "0.123 €/kWh",        
+  }, {
+    key: 1,
+    text: 'SomEnergia',
+    value: 1,
+    price: 0.127,
+    description: "0.127 €/kWh"
+  }, {
+    key: 2,
+    text: 'Gas Natural',
+    value: 2,
+    price: 0.141,
+    description: "0.141 €/kWh"
+  },{
+    key: 3,
+    text: 'Respira',
+    value: 3,
+    price: 0.132,
+    description: "0.132 €/kWh"
+  }
+]
+
+class Consumer extends Component {
   constructor(props) {
     super(props)
 
@@ -20,10 +48,11 @@ class Market extends Component {
       ipfsAddress: '',
       dropdownMarketer: '',
       dropdownSource: '',
-      description: ''
+      description: '',
+      address: ''
     }
 
-    this.createBidOffer = this.createBidOffer.bind(this);
+    this.createConsumerContract = this.createConsumerContract.bind(this);
   }
 
   toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
@@ -33,27 +62,28 @@ class Market extends Component {
   handleSidebarHide = () => this.setState({ visible: false })
 
 
-  async createBidOffer() {
+  async createConsumerContract() {
 
     var userJson = {
       username: this.props.username,
-      contracts: this.props.userJson.contracts
+      consumerContracts: this.props.userJson.consumerContracts
     }
-
+    console.log("marketer", this.state.dropdownMarketer);
     var newContract = {
-      value: this.state.dropdownValue,
+      value: this.state.dropdownMarketer.price,
       date: Date.now(),
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       country: this.state.country,
-      marketer: this.state.dropdownMarketer,
+      address: this.state.address,
+      marketer: this.state.dropdownMarketer.text,
       source: this.state.dropdownSource
     }
     console.log("New contract", newContract);
 
     //Add the new contract to the profile
 
-    userJson.contracts.push(newContract);
+    userJson.consumerContracts.push(newContract);
     console.log("Info to update: ", userJson);
 
     var contract = this.props.contract;
@@ -70,13 +100,12 @@ class Market extends Component {
     let result = await axios.get(url);
 
     //Set the conversion from EUR to WEI
-
     var value = this.props.web3.toWei(result.data.ETH * newContract.value);
     var self = this;
 
     //Call the transaction
     const contractInstance = await contract.deployed();
-
+  
     let success = await contractInstance.createBid(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value });
     if (success) {
       console.log('Updated user ' + userJson.username + ' on ethereum!, and bid correctly created');
@@ -99,10 +128,11 @@ class Market extends Component {
     })
   }
 
-  handleChangeDropdownMarketer = (e) => {
+  handleChangeDropdownMarketer = (e, data) => {   
     this.setState({
-      dropdownMarketer: e.target.textContent
+      dropdownMarketer: marketers[data.value]
     })
+    console.log("state", this.state);
   }
 
   handleChangeDropdownSource = (e) => {
@@ -114,34 +144,6 @@ class Market extends Component {
   render() {
 
     const { visible } = this.state
-
-    const prices = [
-      {
-        text: '20$',
-        value: '20',
-      },
-      {
-        text: '40$',
-        value: '40',
-      },
-      {
-        text: '60$',
-        value: '60',
-      }
-    ]
-
-    const marketers = [
-      {
-        text: 'HolaLuz',
-        value: 'HolaLuz'
-      }, {
-        text: 'SomEnergia',
-        value: 'SomEnergia'
-      }, {
-        text: 'Gas Natural',
-        value: 'Gas Natural'
-      }
-    ]
 
     const sources = [
       {
@@ -161,25 +163,29 @@ class Market extends Component {
         value: "Other"
       }
     ]
-    console.log("contracts", this.props.userJson.contracts);
-    const contracts = this.props.userJson.contracts.map((contract) => {
+    console.log("consumerContracts", this.props.userJson.consumerContracts);
+    const consumerContracts = this.props.userJson.consumerContracts.map((contract) => {
       return (
-        <Card fluid style={{ maxWidth: '500px' }} color='purple'>
+        <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
             <Card.Header>
               {contract.marketer}
             </Card.Header>
             <Card.Description>
-              {this.props.address}
+              Ethereum account: {this.props.address}
             </Card.Description>
             <Card.Description>
-              {contract.country}
+              Country: {contract.country}
             </Card.Description>
           </Card.Content>
           <Card.Content extra>
-            <h3>{contract.value} € / month</h3>
+            <h3 style={{color: 'black'}}>Consumer:</h3>
+            <p>Name: {contract.firstName} {contract.lastName}</p>
+            <p>{contract.country}</p>
+            <p>Address: {contract.address}</p>
+            <h3>{contract.value} €/kWh</h3>
             <Button basic color='purple'>
-              More Info
+              Cancel contract
               </Button>
           </Card.Content>
         </Card>
@@ -226,6 +232,13 @@ class Market extends Component {
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
+                  <label>Address</label>
+                  <input placeholder='Address'
+                    name='Address'
+                    value={this.state.Address}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
+                <Form.Field>
                   <label>Description</label>
                   <input placeholder='description'
                     name='description'
@@ -233,13 +246,10 @@ class Market extends Component {
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <div style={{ padding: '20' }}>
-                  <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={e => this.handleChangeDropdownSource(e)} />
+                  <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={this.handleChangeDropdownSource} />
                 </div>
                 <div style={{ padding: '20' }}>
-                  <Dropdown placeholder='Choose price' name='dropdownValue' fluid selection options={prices} onChange={e => this.handleChangeDropdown(e)} />
-                </div>
-                <div style={{ padding: '20' }}>
-                  <Dropdown placeholder='Choose provider' name='dropdownProvider' fluid selection options={marketers} onChange={e => this.handleChangeDropdownMarketer(e)} />
+                  <Dropdown placeholder='Choose marketer' name='dropdownMarketer' fluid selection options={marketers} onChange={this.handleChangeDropdownMarketer} />
                 </div>
                 <Message icon>
                   <Message.Content>
@@ -249,7 +259,7 @@ class Market extends Component {
                 <Form.Field>
                   <Checkbox label='I agree to the Terms and Conditions' />
                 </Form.Field>
-                <Button onClick={this.createBidOffer} type='submit'>Submit</Button>
+                <Button onClick={this.createConsumerContract} type='submit'>Submit</Button>
               </Form>
             </Menu.Item>
             <Menu.Item>
@@ -261,7 +271,7 @@ class Market extends Component {
         <div style={{ marginLeft: 400, marginTop: 20 }}>
           <Grid>
             <Grid.Row columns={3}>
-              <Grid.Column><h3>Your purchases: </h3></Grid.Column>
+              <Grid.Column><h3>Your contract: </h3></Grid.Column>
               <Grid.Column></Grid.Column>
               <Grid.Column>
                 <Button onClick={this.handleButtonClick}>Start a Contract</Button>
@@ -269,11 +279,11 @@ class Market extends Component {
             </Grid.Row>
           </Grid>
           <Card.Group>
-            {contracts}
+            {consumerContracts}
           </Card.Group>
         </div>
       </div>
     );
   }
 }
-export default Market
+export default Consumer
