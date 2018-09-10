@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu } from 'semantic-ui-react'
+import { Menu, Button } from 'semantic-ui-react'
 
 class Tab extends Component {
 
@@ -8,7 +8,8 @@ class Tab extends Component {
     return (
       <div>
         <Menu size='massive'>
-          <Menu.Menu position='right'></Menu.Menu>
+          <Menu.Menu position='right'>
+          </Menu.Menu>
         </Menu>
       </div>
     );
