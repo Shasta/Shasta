@@ -77,7 +77,8 @@ class Consumer extends Component {
       country: this.state.country,
       address: this.state.address,
       marketer: this.state.dropdownMarketer.text,
-      source: this.state.dropdownSource
+      source: this.state.dropdownSource,
+      description: this.state.description
     }
     console.log("New contract", newContract);
 
@@ -101,6 +102,8 @@ class Consumer extends Component {
 
     //Set the conversion from EUR to WEI
     var value = this.props.web3.toWei(result.data.ETH * newContract.value);
+    value = Math.round(value);
+    console.log("value: ", value);
     var self = this;
 
     //Call the transaction
@@ -234,7 +237,7 @@ class Consumer extends Component {
                 <Form.Field>
                   <label>Address</label>
                   <input placeholder='Address'
-                    name='Address'
+                    name='address'
                     value={this.state.Address}
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
