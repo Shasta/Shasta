@@ -16,6 +16,7 @@ class Map extends Component {
     chargerLongitude: "",
     marketerIndex: 0,
     chargers: [],
+    organizationData: this.props.userJson,
     marketersList: [{
       name: "Respira",
       price: 0.129
@@ -135,7 +136,7 @@ class Map extends Component {
 
     // Generate the location object, will be saved later in JSON.
     const locationObject = {
-      chargerName: this.state.chargerName,
+      chargerName: this.state.organizationData.organization.name,
       latitude: this.state.chargerLatitude,
       longitude: this.state.chargerLongitude,
       providerSource: this.state.providerSource,
@@ -143,6 +144,7 @@ class Map extends Component {
       marketerName: this.state.marketersList[this.state.marketerIndex].name,
       marketerPrice: this.state.marketersList[this.state.marketerIndex].price
     }
+    console.log("state:", this.state)
     const priceBN = web3.toBigNumber(locationObject.marketerPrice)
     const jsonBuffer = Buffer.from(JSON.stringify(locationObject));
     try {
@@ -178,7 +180,7 @@ class Map extends Component {
   }
 
   render() {
-    const { visible, chargerName, marketersList, marketerIndex, providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers } = this.state;
+    const { visible, marketersList, marketerIndex, providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers } = this.state;
     let fieldErrors = []
     const providerSources = [{
       text: 'Solar',
@@ -215,9 +217,6 @@ class Map extends Component {
       )
     });
 
-    if (chargerName.length === 0) {
-      fieldErrors.push("Provider name can not be empty.")
-    }
     if (providerAddress.length === 0) {
       fieldErrors.push("Provider address must be filled.")
     }
@@ -245,14 +244,7 @@ class Map extends Component {
           <Menu.Item>
             <Form warning={!!fieldErrors.length}>
               <Form.Field>
-                <p style={{ textAlign: "start" }}>You can click in the map to select the charger location. Add your name, address, your energy source and select the marketer that you want to sell your energy. Once the form is complete, click on Submit button.</p>
-              </Form.Field>
-              <Form.Field>
-                <label>Your name</label>
-                <input type="text" placeholder='Provider name'
-                  name='chargerName'
-                  value={chargerName}
-                  onChange={e => this.handleChange(e)} />
+                <p style={{ textAlign: "start" }}>You can click in the map to select the charger location. Add your address, your energy source and select the marketer that you want to sell your energy. Once the form is complete, click on Submit button.</p>
               </Form.Field>
               <Form.Field>
                 <label>Address</label>

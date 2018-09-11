@@ -10,6 +10,7 @@ import Map from './components/Map/Map';
 import Marketer from './components/Marketer/Marketer'
 import logo from './static/shasta-logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Settings from './components/Settings/Settings';
 
 
 class App extends React.Component {
@@ -136,7 +137,7 @@ class App extends React.Component {
             </Sidebar>
             <div>
              <Route exact path="/" render={(props) => <Home 
-              username={this.props.username}
+              organizationName={this.props.organizationName}
               userJson={this.props.userJson}
               userContract={this.props.contract}
               shastaMarketContract={this.props.shastaMarketContract}
@@ -145,7 +146,7 @@ class App extends React.Component {
               sharedMapContract={this.props.sharedMapContract}
               />} />
               <Route exact path="/marketer" render={(props) => <Marketer
-                username={this.props.username}
+                organizationName={this.props.organizationName}
                 address={this.props.address}
                 shastaMarketContract={this.props.shastaMarketContract}
                 userContract={this.props.contract}
@@ -153,7 +154,7 @@ class App extends React.Component {
                 sharedMapContract={this.props.sharedMapContract}
                 ipfs={this.props.ipfs} />} />
               <Route path="/consumer" render={(props) => <Consumer
-                username={this.props.username}
+                organizationName={this.props.organizationName}
                 ipfs={this.props.ipfs}
                 contract={this.props.contract}
                 address={this.props.address}
@@ -173,6 +174,13 @@ class App extends React.Component {
                 userJson={this.props.userJson}
                 sharedMapContract={this.props.sharedMapContract}
               />} />
+              <Route path="/settings" render={(props) => <Settings
+                userJson={this.props.userJson}
+                ipfs={this.props.ipfs}
+                userContract={this.props.contract}
+                address={this.props.address}
+
+              />}/>
             </div>
           </div>
         </Router>
