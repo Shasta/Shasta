@@ -10,7 +10,7 @@ class Tab extends Component {
       <div>
         <Menu size='massive'>
           <Menu.Menu position='right'>
-            <Account accountIndex={0} unit="ether" precision="3"/>
+            <Account accountIndex={0} units="ether" precision="3"/>
           </Menu.Menu>
         </Menu>
       </div>
