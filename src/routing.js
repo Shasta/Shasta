@@ -113,11 +113,11 @@ class App extends React.Component {
                   <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Consumer</h4>
                 </Menu.Item>
               </Link>
-              <Link to="/marketer">
+              {/* <Link to="/marketer">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Marketer</h4>
                 </Menu.Item>
-              </Link>
+              </Link> */}
               <Link to="/map">
                 <Menu.Item as='a'>
                   <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Providers</h4>
@@ -145,14 +145,14 @@ class App extends React.Component {
               web3={this.props.web3}
               sharedMapContract={this.props.sharedMapContract}
               />} />
-              <Route exact path="/marketer" render={(props) => <Marketer
+              {/* <Route exact path="/marketer" render={(props) => <Marketer
                 organizationName={this.props.organizationName}
                 address={this.props.address}
                 shastaMarketContract={this.props.shastaMarketContract}
                 userContract={this.props.contract}
                 web3={this.props.web3}
                 sharedMapContract={this.props.sharedMapContract}
-                ipfs={this.props.ipfs} />} />
+                ipfs={this.props.ipfs} />} /> */}
               <Route path="/consumer" render={(props) => <Consumer
                 organizationName={this.props.organizationName}
                 ipfs={this.props.ipfs}

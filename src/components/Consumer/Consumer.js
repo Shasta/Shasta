@@ -10,7 +10,7 @@ const marketers = [
     text: 'HolaLuz',
     value: 0,
     price: 0.123,
-    description: "0.123 €/kWh",        
+    description: "0.123 €/kWh",
   }, {
     key: 1,
     text: 'SomEnergia',
@@ -23,7 +23,7 @@ const marketers = [
     value: 2,
     price: 0.141,
     description: "0.141 €/kWh"
-  },{
+  }, {
     key: 3,
     text: 'Respira',
     value: 3,
@@ -46,10 +46,11 @@ class Consumer extends Component {
       ipfsHash: '',
       ipfsFirstName: '',
       ipfsAddress: '',
-      dropdownMarketer: '',
+      fiatAmount: '',
+      energyPrice: '',
       dropdownSource: '',
       description: '',
-      address: ''
+      address: '',
     }
 
     this.createConsumerContract = this.createConsumerContract.bind(this);
@@ -68,13 +69,13 @@ class Consumer extends Component {
 
     console.log("marketer", this.state.dropdownMarketer);
     var newContract = {
-      value: this.state.dropdownMarketer.price,
       date: Date.now(),
       firstName: userJson.organization.firstName,
       lastName: userJson.organization.lastName,
       country: userJson.organization.country,
       address: this.state.address,
-      marketer: this.state.dropdownMarketer.text,
+      energyPrice: this.state.energyPrice,
+      fiatAmount: this.state.fiatAmount,
       source: this.state.dropdownSource,
       description: this.state.description
     }
@@ -99,15 +100,15 @@ class Consumer extends Component {
     let result = await axios.get(url);
 
     //Set the conversion from EUR to WEI
-    var value = this.props.web3.toWei(result.data.ETH * newContract.value);
+    var value = this.props.web3.toWei(result.data.ETH * newContract.fiatAmount);
     value = Math.round(value);
     console.log("value: ", value);
     var self = this;
 
     //Call the transaction
     const contractInstance = await contract.deployed();
-  
-    let success = await contractInstance.createBid(self.state.dropdownValue, ipfsHash, { gas: 400000, from: address, value: value });
+
+    let success = await contractInstance.createBid(self.state.fiatAmount, ipfsHash, { gas: 400000, from: address, value: value });
     if (success) {
       console.log('Updated user ' + userJson.organization.name + ' on ethereum!, and bid correctly created');
 
@@ -121,19 +122,6 @@ class Consumer extends Component {
     this.setState({
       [e.target.name]: e.target.value
     })
-  }
-
-  handleChangeDropdown = (e) => {
-    this.setState({
-      dropdownValue: e.target.textContent.slice(0, -1)
-    })
-  }
-
-  handleChangeDropdownMarketer = (e, data) => {   
-    this.setState({
-      dropdownMarketer: marketers[data.value]
-    })
-    console.log("state", this.state);
   }
 
   handleChangeDropdownSource = (e) => {
@@ -170,7 +158,7 @@ class Consumer extends Component {
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
             <Card.Header>
-              {contract.marketer}
+              {contract.fiatAmount}€ at {contract.energyPrice}€/kWh
             </Card.Header>
             <Card.Description>
               Ethereum account: {this.props.address}
@@ -178,15 +166,14 @@ class Consumer extends Component {
             <Card.Description>
               Country: {contract.country}
             </Card.Description>
+            <Card.Description>
+              Address: {contract.address}
+            </Card.Description>            
           </Card.Content>
           <Card.Content extra>
-            <h3 style={{color: 'black'}}>Consumer:</h3>
-            <p>Name: {contract.firstName} {contract.lastName}</p>
-            <p>{contract.country}</p>
-            <p>Address: {contract.address}</p>
-            <h3>{contract.value} €/kWh</h3>
+          <p>Source: {contract.source}</p>
             <Button basic color='purple'>
-              Cancel contract
+              Cancel Offer
               </Button>
           </Card.Content>
         </Card>
@@ -225,11 +212,23 @@ class Consumer extends Component {
                     value={this.state.description}
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
+                <Form.Field>
+                  <label> Energy Price (€/kWh)</label>
+                  <input placeholder='The price of the energy to buy'
+                    name='energyPrice'
+                    value={this.state.energyPrice}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
+                <Form.Field>
+                  <label>Amount (€)</label>
+                  <input placeholder='Currency amount to buy'
+                    name='fiatAmount'
+                    value={this.state.fiatAmount}
+                    onChange={e => this.handleChange(e)} />
+                </Form.Field>
                 <div style={{ padding: '20' }}>
+                  <label>Source</label>
                   <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={this.handleChangeDropdownSource} />
-                </div>
-                <div style={{ padding: '20' }}>
-                  <Dropdown placeholder='Choose marketer' name='dropdownMarketer' fluid selection options={marketers} onChange={this.handleChangeDropdownMarketer} />
                 </div>
                 <Message icon>
                   <Message.Content>
@@ -251,7 +250,7 @@ class Consumer extends Component {
         <div style={{ marginLeft: 400, marginTop: 20 }}>
           <Grid>
             <Grid.Row columns={3}>
-              <Grid.Column><h3>Your contract: </h3></Grid.Column>
+              <Grid.Column><h3>Your Offers: </h3></Grid.Column>
               <Grid.Column></Grid.Column>
               <Grid.Column>
                 <Button onClick={this.handleButtonClick}>Start a Contract</Button>
