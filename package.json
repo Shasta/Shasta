@@ -68,6 +68,8 @@
     "bluebird": "^3.5.1",
     "d3-array": "^1.2.1",
     "dotenv": "^2.0.0",
+    "drizzle": "^1.2.3",
+    "drizzle-react": "^1.2.0",
     "faker": "^4.1.0",
     "google-map-react": "^1.0.6",
     "i": "^0.3.6",
