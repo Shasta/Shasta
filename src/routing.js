@@ -181,7 +181,7 @@ class App extends React.Component {
                 address={this.props.address}
 
               />}/>
-            </div>
+              </div>
           </div>
         </Router>
       </div>
