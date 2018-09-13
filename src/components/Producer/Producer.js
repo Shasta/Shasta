@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Form, Sidebar, Menu, Dropdown, Message, List, Segment } from 'semantic-ui-react';
-import Promise from 'bluebird';
+import { Button, Form, Sidebar, Menu, Dropdown, Message, List, Segment, Input } from 'semantic-ui-react';
 import SharedMap from './SharedMap';
-import axios from 'axios';
 let checkedAddresses = [];
 
-class Map extends Component {
+class Producer extends Component {
   state = {
     visible: false,
     chargerName: "",
@@ -19,8 +17,10 @@ class Map extends Component {
     chargers: [],
     organizationData: this.props.userJson,
     consumerOffersList: [],
-    energyPrice: '',
-    fiatAmount: ''
+    energyPrice: 0.112,
+    fiatAmount: '',
+    totalToPay: 0,
+    ammountkWh: 0
   }
 
   // Add Web3 event watchers at ComponentDidMount lifecycle,
@@ -47,7 +47,7 @@ class Map extends Component {
     // Bids
     let consumerOffersList = [];
     //const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
-    const bidsLength = await shastaMarketInstance.getBidsLength.call({ from:this.props.address });
+    const bidsLength = await shastaMarketInstance.getBidsLength.call({ from: this.props.address });
 
     let auxArray = Array.from({ length: bidsLength.toNumber() }, (x, item) => item);
 
@@ -65,13 +65,16 @@ class Map extends Component {
 
         let rawContent = await this.props.ipfs.cat(ipfsHash);
         let userData = JSON.parse(rawContent.toString("utf8"));
-        
+
         for (let key in userData.consumerOffers) {
-          consumerOffersList.push(userData.consumerOffers[key])
+          if (userData.producerOffers.hasOwnProperty(key)) {
+            consumerOffersList.push(userData.consumerOffers[key])
+          }
         }
         this.setState(({
           consumerOffersList: consumerOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
-        }));      }
+        }));
+      }
     })
 
   }
@@ -119,10 +122,11 @@ class Map extends Component {
       providerSource: this.state.providerSource,
       address: this.state.providerAddress,
       energyPrice: this.state.energyPrice,
-      fiatAmount: this.state.fiatAmount,
+      fiatAmount: this.state.totalToPay,
       date: Date.now(),
       pendingOffer: true,
-      ethAddress: currentAddress
+      ethAddress: currentAddress,
+      ammountkWh: this.state.ammountkWh
     }
     this.props.userJson.producerOffers.push(newProducerOffer);
     try {
@@ -143,18 +147,20 @@ class Map extends Component {
     }
   }
 
-  setMarketer = (e) => {
-    e.preventDefault();
-    const marketerIndex = Number.parseInt(e.target.value);
-    if (marketerIndex !== this.state.marketerIndex) {
-      this.setState({ marketerIndex, visible: true });
-    } else {
-      this.setState({ visible: true });
-    }
+  handleChangeAmmount = (e) => {
+    let isNumeric = Number.isInteger(Number(e.target.value));
+    let totalToPay = (isNumeric) ? Number(e.target.value) * this.state.energyPrice : 0;
+    //Format number
+    totalToPay = Math.round(totalToPay * 100) / 100;
+    this.setState({
+      [e.target.name]: e.target.value,
+      totalToPay: totalToPay
+    })
+    console.log("state:", this.state)
   }
 
   render() {
-    const { visible, energyPrice, providerAddress, providerSource, fiatAmount, chargerLatitude, chargerLongitude, chargers } = this.state;
+    const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers } = this.state;
     let fieldErrors = []
     const providerSources = [{
       text: 'Solar',
@@ -173,7 +179,7 @@ class Map extends Component {
       value: 'carbon',
     }]
     const consumerOffers = this.state.consumerOffersList.map((offer, index) => {
-      if (offer.ethAddress == this.props.address) {
+      if (offer.ethAddress === this.props.address) {
         return ''
       }
       return (
@@ -182,15 +188,15 @@ class Map extends Component {
             <List.Header>
               <div style={{ float: 'left' }}>
                 <div>{offer.firstName} {offer.lastName}</div>
-                <div>Is buying {offer.fiatAmount}€ at <b>{offer.energyPrice} €/kWh</b></div>
-                <div style={{color:"grey"}}>Source: {offer.source}</div>
+                <div>Is buying {offer.fiatAmount} Shas at <b>{offer.energyPrice} Shas/kWh</b></div>
+                <div style={{ color: "grey" }}>Source: {offer.source}</div>
               </div>
-  
-              <Button basic color='green' value={index} onClick={this.setMarketer} style={{ backgroundColor: 'white', float: 'right' }}>
+
+              <Button basic color='green' value={index} style={{ backgroundColor: 'white', float: 'right' }}>
                 Sell your energy
               </Button>
             </List.Header>
-            
+
           </List.Content>
         </List.Item>
       )
@@ -203,15 +209,15 @@ class Map extends Component {
             <List.Header>
               <div style={{ float: 'left' }}>
                 <div>{offer.firstName} {offer.lastName}</div>
-                <div>You are buying {offer.fiatAmount}€ at <b>{offer.energyPrice} €/kWh</b></div>
-                <div style={{color:"grey"}}>Source: {offer.providerSource}</div>
+                <div>You are selling {offer.ammountkWh} kWh at <b>{offer.energyPrice} Shas/kWh</b></div>
+                <div style={{ color: "grey" }}>Source: {offer.providerSource}</div>
               </div>
-  
-              <Button basic color='red' value={index} onClick={this.setMarketer} style={{ backgroundColor: 'white', float: 'right' }}>
+
+              <Button basic color='red' value={index} style={{ backgroundColor: 'white', float: 'right' }}>
                 Cancel Offer
               </Button>
             </List.Header>
-            
+
           </List.Content>
         </List.Item>
       )
@@ -226,10 +232,7 @@ class Map extends Component {
     if (chargerLatitude.length === 0 || chargerLatitude === 0) {
       fieldErrors.push("You must click in the map to select a location.")
     }
-    if (!energyPrice) {
-      fieldErrors.push("You must set a price for energy to sell");
-    }
-    if(!fiatAmount) {
+    if (this.state.totalToPay === 0) {
       fieldErrors.push("You must set an amount of money to sell");
     }
 
@@ -265,20 +268,21 @@ class Map extends Component {
                 <Dropdown placeholder='Source of energy' value={providerSource} name='dropdownValue' fluid selection options={providerSources} onChange={this.handleChangeSource} />
               </Form.Field>
               <Form.Field>
-                <label>Price per kWh</label>
-                <input type="text"
-                  name='energyPrice'
-                  placeholder='Energy price'
-                  onChange={e => this.handleChange(e)}                
-                />
+                <label style={{ float: 'left', padding: 5 }}> Energy Price: {this.state.energyPrice} (Shas/kWh)</label>
+                <Message icon>
+                  <Message.Content>
+                    The current price is decided every day through the governance system. Want to participate? Click here
+                    </Message.Content>
+                </Message>
               </Form.Field>
               <Form.Field>
-                <label>Amount (€)</label>
-                <input type="text"
-                  name='fiatAmount'
-                  placeholder='Amount of energy' 
-                  onChange={e => this.handleChange(e)}               
-                />
+                <label >Amount kWh you want to Sell for a month:</label>
+                <Input placeholder='Amount'
+                  name='ammountkWh'
+                  value={this.state.ammountkWh}
+                  label={{ basic: true, content: 'kWh/month' }}
+                  labelPosition='right'
+                  onChange={e => this.handleChangeAmmount(e)} />
               </Form.Field>
               <Form.Field>
                 <label>Latitude</label>
@@ -297,6 +301,12 @@ class Map extends Component {
                   value={chargerLongitude}
                   onChange={e => this.handleChange(e)} />
               </Form.Field>
+              <Message>
+                <Message.Content>
+                  <p>1 Shas = 1$</p>
+                  Total shas earned: {this.state.totalToPay}
+                </Message.Content>
+              </Message>
               <Message warning header='Check the next fields' list={fieldErrors} />
               <Button onClick={this.closeForm} style={{ marginRight: 30 }}>Close</Button>
               <Button disabled={!!fieldErrors.length} onClick={this.addLocation} type='submit'>Submit</Button>
@@ -325,4 +335,4 @@ class Map extends Component {
   }
 }
 
-export default Map;
+export default Producer;

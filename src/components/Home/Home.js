@@ -99,15 +99,15 @@ class Home extends Component {
 
   render() {
     const notifications = this.state.notifications.map((notification, index) => {
-      if (notification.type == "contract") {
-        var name = (notification.ethAddress == this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
+      if (notification.type === "contract") {
+        var name = (notification.ethAddress === this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
             <Feed.Content date={notification.timestamp.toLocaleString()} summary={`${name} posted new offer to buy ${notification.fiatAmount}€ at ${notification.energyPrice} €/kWh`} />
           </Feed.Event>
         );
       }
-      if (notification.type == "newProvider") {
+      if (notification.type === "newProvider") {
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
             <Feed.Content date={notification.timestamp.toLocaleString()} summary={`Provider ${notification.chargerName} offers energy at ${notification.energyPrice} kWh/€ from ${notification.providerSource} energy source.`} />

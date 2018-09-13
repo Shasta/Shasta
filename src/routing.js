@@ -6,8 +6,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Tab from './components/Tab/Tab';
 import Home from './components/Home/Home';
 import Consumer from './components/Consumer/Consumer';
-import Map from './components/Map/Map';
-import Marketer from './components/Marketer/Marketer'
+import Producer from './components/Producer/Producer';
 import logo from './static/shasta-logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Settings from './components/Settings/Settings';
@@ -33,8 +32,6 @@ class App extends React.Component {
       country: "Russia",
       source: "Nuclear",
       energyPrice: "0.15",
-      fiatAmount: "24",
-      description: "Real energy directly from mother Russia",
       pendingOffer: true,
       ethAddress: this.props.address,
       address: faker.address.streetAddress(),
@@ -58,7 +55,6 @@ class App extends React.Component {
       country: faker.address.country(),
       source: "Solar",
       energyPrice: "0.15",
-      description: "Lorem Ipsum",
       pendingOffer: true,
       ethAddress: this.props.address,
       address: faker.address.streetAddress(),
@@ -69,9 +65,6 @@ class App extends React.Component {
     ipfsH = res2[0].hash;
 
     await contractInstance.createBid(consumerOffer2.fiatAmount, ipfsH, { gas: 400000, from: this.props.address, value: consumerOffer2.fiatAmount })
-
-    // Get the SharedMap.sol instance
-    const sharedMapInstance = await this.props.sharedMapContract.deployed();
 
     // Generate the location object, will be saved later in JSON.
     const producerOffer = {
@@ -84,7 +77,9 @@ class App extends React.Component {
       fiatAmount: "13",
       date: Date.now(),
       pendingOffer: true,
-      ethAddress: this.props.address
+      ethAddress: this.props.address,
+      ammountkWh: 108
+      
     }
     this.props.userJson.producerOffers.push(producerOffer);
 
@@ -129,7 +124,7 @@ class App extends React.Component {
                   <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Marketer</h4>
                 </Menu.Item>
               </Link> */}
-            <Link to="/map">
+            <Link to="/producer">
               <Menu.Item as='a'>
                 <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Providers</h4>
               </Menu.Item>
@@ -179,7 +174,7 @@ class App extends React.Component {
               userJson={this.props.userJson}
               userContract={this.props.contract}
             />} />
-            <Route path="/map" render={(props) => <Map
+            <Route path="/producer" render={(props) => <Producer
               ipfs={this.props.ipfs}
               address={this.props.address}
               web3={this.props.web3}

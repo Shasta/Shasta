@@ -109,9 +109,7 @@ class Marketer extends Component {
                         <Card.Meta>{bid.source} Energy</Card.Meta>
                         <Card.Meta>{bid.country}</Card.Meta>
                         <Card.Meta>Provider: {bid.marketer}</Card.Meta>
-                        <Card.Description>
-                            {bid.description}
-                        </Card.Description>
+
                     </Card.Content>
                 </Card>
             )
@@ -124,9 +122,7 @@ class Marketer extends Component {
                         <Card.Header>{ask.marketerName} bought energy from {ask.chargerName}, at {ask.marketerPrice}€/kWh</Card.Header>
                         <Card.Meta>{toCapital(ask.providerSource)} Energy</Card.Meta>
                         <Card.Meta>{ask.address}</Card.Meta>
-                        <Card.Description>
-                            {ask.description}
-                        </Card.Description>
+    
                     </Card.Content>
                 </Card>
             )

@@ -7,7 +7,7 @@ import Marker from './Marker';
 const API_KEY = 'AIzaSyA8npv0UHbvFAnvAO3FeMgbLXh4u_5trS8';
 
 // For this example Malaga will be the default map location.
-const malagaCoordenates = {lat: 36.7213189, lng: -4.421437200000014}
+const defaultCoordenates = {lat: 49.677, lng: 11}
 class SharedMap extends Component {
 
   getCoordenates = (mapEvent) => {
@@ -40,8 +40,8 @@ class SharedMap extends Component {
             key: API_KEY,
           }}
           onClick={this.getCoordenates}
-          defaultZoom={13}
-          defaultCenter={malagaCoordenates}
+          defaultZoom={4}
+          defaultCenter={defaultCoordenates}
         >
           {
             chargerLatitude !== "" &&
