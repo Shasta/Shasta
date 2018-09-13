@@ -12,7 +12,8 @@ class Home extends Component {
 
     this.state = {
       notifications: [],
-      latestContractIndex: -1,
+      lastestConsumerOfferIndex: -1,
+      lastestProducerOfferIndex: -1,
     }
   }
 
@@ -61,20 +62,36 @@ class Home extends Component {
 
       const rawUser = await this.props.ipfs.cat(userHash);
       const user = JSON.parse(rawUser.toString("utf8"));
-      const currentLatestContractIndex = user.consumerContracts.length - 1;
-      const latestContract = user.consumerContracts[currentLatestContractIndex];
-      if (currentLatestContractIndex > this.state.latestContractIndex) {
-        const notification = _.merge(latestContract, {
+      const currentLatestOfferIndex = user.consumerOffers.length - 1;
+      const currentLatestPOfferIndex = user.producerOffers.length - 1;
+      const latestOffer = user.consumerOffers[currentLatestOfferIndex];
+      const latestPOffer = user.producerOffers[currentLatestPOfferIndex];
+      if (currentLatestOfferIndex > this.state.lastestConsumerOfferIndex) {
+        const consumerNotification = _.merge(latestOffer, {
           type: 'contract',
-          timestamp: new Date(latestContract.date)
+          timestamp: new Date(latestOffer.date)
         })
 
         this.setState( prevState => ({
-          notifications: _([...prevState.notifications, ...[notification]])
+          notifications: _([...prevState.notifications, ...[consumerNotification]])
           .orderBy('timestamp', 'desc')
           .slice(0, 5)
           .value(),
-          latestContractIndex: currentLatestContractIndex
+          lastestConsumerOfferIndex: currentLatestOfferIndex
+        }))
+      }
+      if (currentLatestPOfferIndex > this.state.lastestProducerOfferIndex) {
+        const producerNotification = _.merge(latestPOffer, {
+          type: 'newProvider',
+          timestamp: new Date(latestPOffer.date)
+        })
+
+        this.setState( prevState => ({
+          notifications: _([...prevState.notifications, ...[producerNotification]])
+          .orderBy('timestamp', 'desc')
+          .slice(0, 5)
+          .value(),
+          lastestProducerOfferIndex: currentLatestPOfferIndex
         }))
       }
     });
@@ -83,16 +100,17 @@ class Home extends Component {
   render() {
     const notifications = this.state.notifications.map((notification, index) => {
       if (notification.type == "contract") {
+        var name = (notification.ethAddress == this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
-            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`New contract with ${notification.marketer} for ${notification.value} €`} />
+            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`${name} posted new offer to buy ${notification.fiatAmount}€ at ${notification.energyPrice} €/kWh`} />
           </Feed.Event>
         );
       }
       if (notification.type == "newProvider") {
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
-            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`Provider ${notification.provider.chargerName} offers ${notification.price} kWh/€ from ${notification.provider.providerSource} energy source.`} />
+            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`Provider ${notification.chargerName} offers energy at ${notification.energyPrice} kWh/€ from ${notification.providerSource} energy source.`} />
           </Feed.Event>
         );
       }
