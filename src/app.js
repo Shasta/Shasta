@@ -162,7 +162,6 @@ class App extends React.Component {
 
     if (this.state.organizationName) {
       return (
-        <div>
           <Router
             web3={web3}
             address={address}
@@ -179,7 +178,6 @@ class App extends React.Component {
             userJson={userJson}
           >
           </Router>
-        </div>
       );
     } else {
       return (
