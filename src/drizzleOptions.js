@@ -15,7 +15,10 @@ const options = {
     ShaLedger,
     ContractRegistry,
     BillSystem
-  ]
+  ],
+  polls: {
+    accounts: 4000
+  },
 };
 
 const drizzleStore = generateStore(options);
