@@ -3,6 +3,7 @@ import { Button, Form, Sidebar, Menu, Dropdown, Message, List, Segment } from 's
 import Promise from 'bluebird';
 import SharedMap from './SharedMap';
 import axios from 'axios';
+let checkedAddresses = [];
 
 class Map extends Component {
   state = {
@@ -17,19 +18,9 @@ class Map extends Component {
     marketerIndex: 0,
     chargers: [],
     organizationData: this.props.userJson,
-    marketersList: [{
-      name: "Respira",
-      price: 0.129
-    }, {
-      name: "HolaLuz",
-      price: 0.132
-    }, {
-      name: "SomEnergia",
-      price: 0.127
-    }, {
-      name: "Endesa",
-      price: 0.09
-    }].sort((a, b) => a.price < b.price)
+    consumerOffersList: [],
+    energyPrice: '',
+    fiatAmount: ''
   }
 
   // Add Web3 event watchers at ComponentDidMount lifecycle,
@@ -37,57 +28,51 @@ class Map extends Component {
   async componentDidMount() {
     // Get the SharedMap.sol instance
     try {
-      const sharedMapInstance = await this.props.sharedMapContract.deployed();
 
-      // Watch for NewLocation events, since this current block
-      sharedMapInstance.NewLocation(null, { fromBlock: 0}, (err, result) => {
-        if (err) {
-          console.error("Could not watch NewLocation event.", err)
-          return;
-        }
-        const currentLatestIndex = this.state.chargers.length - 1;
-        const { ipfsHash, index } = result.args
-        // If the index is greater than the current one, there is a new Location!
-        if (index > currentLatestIndex) {
-          return axios.get(`https://ipfs.io/ipfs/${ipfsHash}`)
-            .then(result => {
-              this.setState({
-                chargers: [...this.state.chargers, ...[result.data]]
-              });
-            })
-            .catch(error => {
-              console.error(error.response)
-            });
-        }
+      this.setState({
+        chargers: this.props.userJson.producerOffers
       });
-
-      // Retrieve the current charger locations length, to be able to retrieve the IPFS hashes
-      const locationsLengthRaw = await sharedMapInstance.getLocationsLength.call();
-      const locationsLength = locationsLengthRaw.toNumber();
-      // Retrieve all the current IPFS hashes, in parallel, and with concurrency 5
-      const storedIpfsHashes = await Promise.map(
-        // Create an array that contains a range of numbers from 0 to (locationsLength - 1) 
-        Array.from({ length: locationsLength }, (value, index) => index),
-        // Retrieve each IPFS hash by index
-        x => sharedMapInstance.locationsIpfsHashes.call(this.props.web3.toBigNumber(x)),
-        // Sets concurrency to 5, so it send requests in batches of 5.
-        { concurrency: 5 }
-      );
-      // Retrieve all the JSON chargers data from IPFS, in the same way than above, using axios to grab the JSON data.
-      const chargersJSON = await Promise.map(
-        // Map storedIpfsHashes to an axios request
-        storedIpfsHashes,
-        // Retrieve each JSON data via the ipfs gateway with each ipfsHash
-        ipfsHash => axios.get(`https://ipfs.io/ipfs/${ipfsHash}`)
-          .then(result => result.data)
-          .catch(error => ({ error: error.response })),
-        // Sets concurrency to 5, so it send requests in batches of 5.
-        { concurrency: 5 }
-      );
-      this.setState({ chargers: chargersJSON })
+      this.getConsumerOffers();
     } catch (err) {
       console.log(err);
     }
+
+  }
+
+  async getConsumerOffers() {
+
+    const shastaMarketInstance = await this.props.shastaMarketContract.deployed();
+    const userContractInstance = await this.props.userContract.deployed();
+
+    // Bids
+    let consumerOffersList = [];
+    //const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
+    const bidsLength = await shastaMarketInstance.getBidsLength.call({ from:this.props.address });
+
+    let auxArray = Array.from({ length: bidsLength.toNumber() }, (x, item) => item);
+
+    auxArray.forEach(async (item, i) => {
+
+      let userContract = await shastaMarketInstance.getBidFromIndex.call(i, { from: this.props.address });
+      let userAddress = userContract[1];
+
+      if (!checkedAddresses.includes(userAddress)) {
+
+        checkedAddresses.push(userAddress);
+        let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: this.props.address });
+        let ipfsHash = this.props.web3.toAscii(ipfsHashRaw);
+        console.log("ipfs rec: ", ipfsHash);
+
+        let rawContent = await this.props.ipfs.cat(ipfsHash);
+        let userData = JSON.parse(rawContent.toString("utf8"));
+        
+        for (let key in userData.consumerOffers) {
+          consumerOffersList.push(userData.consumerOffers[key])
+        }
+        this.setState(({
+          consumerOffersList: consumerOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
+        }));      }
+    })
 
   }
 
@@ -110,12 +95,6 @@ class Map extends Component {
     this.setState({ visible: false })
   }
 
-  handleChangeDropdown = (e, data) => {
-    this.setState({
-      chargerStatus: data.value
-    })
-  }
-
   handleChangeSource = (e, data) => {
     this.setState({
       providerSource: data.value
@@ -130,57 +109,52 @@ class Map extends Component {
 
   addLocation = async () => {
     // Get the SharedMap.sol instance
-    const sharedMapInstance = await this.props.sharedMapContract.deployed();
+    const userContract = await this.props.userContract.deployed();
     const currentAddress = this.props.address;
-    const web3 = this.props.web3;
-
     // Generate the location object, will be saved later in JSON.
-    const locationObject = {
+    const newProducerOffer = {
       chargerName: this.state.organizationData.organization.name,
       latitude: this.state.chargerLatitude,
       longitude: this.state.chargerLongitude,
       providerSource: this.state.providerSource,
       address: this.state.providerAddress,
-      marketerName: this.state.marketersList[this.state.marketerIndex].name,
-      marketerPrice: this.state.marketersList[this.state.marketerIndex].price
+      energyPrice: this.state.energyPrice,
+      fiatAmount: this.state.fiatAmount,
+      date: Date.now(),
+      pendingOffer: true,
+      ethAddress: currentAddress
     }
-    console.log("state:", this.state)
-    const priceBN = web3.toBigNumber(locationObject.marketerPrice)
-    const jsonBuffer = Buffer.from(JSON.stringify(locationObject));
+    this.props.userJson.producerOffers.push(newProducerOffer);
     try {
       // Show loader spinner
       this.setState({ loader: true })
       // Upload to IPFS and receive response
-      const ipfsResponse = await this.props.ipfs.add(jsonBuffer);
+      const ipfsResponse = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
       const ipfsHash = ipfsResponse[0].hash;
-      // Estimate gas
-      const estimatedGas = await sharedMapInstance.addLocation.estimateGas(priceBN, ipfsHash, { from: currentAddress });
-      // Send a transaction to addLocation method.
-      await sharedMapInstance.addLocation(priceBN, ipfsHash, { gas: estimatedGas, from: currentAddress })  //Call the transaction
-      this.setState({ chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, price: 0 })
+      console.log("ipfsHash: ", ipfsHash);
+      console.log("props: ", userContract)
+
+      const estimatedGas = await userContract.createOffer.estimateGas(newProducerOffer.energyPrice, ipfsHash, { from: currentAddress });
+      await userContract.createOffer(newProducerOffer.energyPrice, ipfsHash, { gas: estimatedGas, from: currentAddress })
+
+      this.setState({ chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, energyPrice: 0 })
     } catch (err) {
       console.error(err)
     }
-  }
-
-  handleChangeMarketer = (e, a) => {
-    e.preventDefault();
-    const marketerIndex = a.value;
-    this.setState({ marketerIndex })
   }
 
   setMarketer = (e) => {
     e.preventDefault();
     const marketerIndex = Number.parseInt(e.target.value);
     if (marketerIndex !== this.state.marketerIndex) {
-      this.setState({ marketerIndex, visible: true});
+      this.setState({ marketerIndex, visible: true });
     } else {
-      this.setState({ visible: true});
+      this.setState({ visible: true });
     }
   }
 
   render() {
-    const { visible, marketersList, marketerIndex, providerAddress, providerSource, price, chargerLatitude, chargerLongitude, chargers } = this.state;
+    const { visible, energyPrice, providerAddress, providerSource, fiatAmount, chargerLatitude, chargerLongitude, chargers } = this.state;
     let fieldErrors = []
     const providerSources = [{
       text: 'Solar',
@@ -198,20 +172,46 @@ class Map extends Component {
       text: 'Carbon',
       value: 'carbon',
     }]
-    const marketers = marketersList;
-    const marketerPrice = marketers[marketerIndex].price;
-    const marketerName = marketers[marketerIndex].name;
-    const marketersOptions = marketers.map((x, index) => ({text: x.name, value: index}))
-    const providers = marketers.map((marketer, index) => {
+    const consumerOffers = this.state.consumerOffersList.map((offer, index) => {
+      if (offer.ethAddress == this.props.address) {
+        return ''
+      }
       return (
         <List.Item key={index}>
           <List.Content>
             <List.Header>
-              <div style={{ float: 'left' }}><div>{marketer.name}</div><div>{marketer.price} €/kWh</div></div>
+              <div style={{ float: 'left' }}>
+                <div>{offer.firstName} {offer.lastName}</div>
+                <div>Is buying {offer.fiatAmount}€ at <b>{offer.energyPrice} €/kWh</b></div>
+                <div style={{color:"grey"}}>Source: {offer.source}</div>
+              </div>
+  
               <Button basic color='green' value={index} onClick={this.setMarketer} style={{ backgroundColor: 'white', float: 'right' }}>
                 Sell your energy
               </Button>
             </List.Header>
+            
+          </List.Content>
+        </List.Item>
+      )
+    });
+
+    const producerOffers = this.props.userJson.producerOffers.map((offer, index) => {
+      return (
+        <List.Item key={index}>
+          <List.Content>
+            <List.Header>
+              <div style={{ float: 'left' }}>
+                <div>{offer.firstName} {offer.lastName}</div>
+                <div>You are buying {offer.fiatAmount}€ at <b>{offer.energyPrice} €/kWh</b></div>
+                <div style={{color:"grey"}}>Source: {offer.providerSource}</div>
+              </div>
+  
+              <Button basic color='red' value={index} onClick={this.setMarketer} style={{ backgroundColor: 'white', float: 'right' }}>
+                Cancel Offer
+              </Button>
+            </List.Header>
+            
           </List.Content>
         </List.Item>
       )
@@ -226,6 +226,13 @@ class Map extends Component {
     if (chargerLatitude.length === 0 || chargerLatitude === 0) {
       fieldErrors.push("You must click in the map to select a location.")
     }
+    if (!energyPrice) {
+      fieldErrors.push("You must set a price for energy to sell");
+    }
+    if(!fiatAmount) {
+      fieldErrors.push("You must set an amount of money to sell");
+    }
+
     return (
       <div style={{ marginLeft: '375px', marginTop: '50px' }}>
         <Sidebar
@@ -258,15 +265,19 @@ class Map extends Component {
                 <Dropdown placeholder='Source of energy' value={providerSource} name='dropdownValue' fluid selection options={providerSources} onChange={this.handleChangeSource} />
               </Form.Field>
               <Form.Field>
-                <label>Marketer to sell your energy</label>
-                <Dropdown placeholder='Marketer' value={marketerIndex} name='marketerIndex' fluid selection options={marketersOptions} onChange={this.handleChangeMarketer} />
-              </Form.Field>
-              <Form.Field>
                 <label>Price per kWh</label>
                 <input type="text"
-                  disabled
-                  name='price'
-                  value={`${marketerPrice} €/kWh`}
+                  name='energyPrice'
+                  placeholder='Energy price'
+                  onChange={e => this.handleChange(e)}                
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Amount (€)</label>
+                <input type="text"
+                  name='fiatAmount'
+                  placeholder='Amount of energy' 
+                  onChange={e => this.handleChange(e)}               
                 />
               </Form.Field>
               <Form.Field>
@@ -294,13 +305,18 @@ class Map extends Component {
         </Sidebar>
 
         <span style={{ fontSize: '1.71428571rem', marginRight: 40 }}>Current providers</span>
-        <Button onClick={this.openForm}>Sell your energy</Button>
+        <Button>Sell your energy</Button>
         <SharedMap newLocation={{ chargerLatitude, chargerLongitude }} chargers={chargers} emitLocation={this.locationSelected} />
-        <div style={{ padding: 15 }}> <h3>Sell your energy directly: </h3></div>
-
+        <div style={{ padding: 15 }}> <h3>Your sell offers: </h3></div>
         <Segment style={{ width: '65%' }}>
           <List divided relaxed>
-            {providers}
+            {producerOffers}
+          </List>
+        </Segment>
+        <div style={{ padding: 15 }}> <h3>Sell energy: </h3></div>
+        <Segment style={{ width: '65%' }}>
+          <List divided relaxed>
+            {consumerOffers}
           </List>
         </Segment>
         <p></p>

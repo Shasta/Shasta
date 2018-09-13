@@ -27,14 +27,13 @@ class SharedMap extends Component {
       <Marker
         hover={true}
         name={chargerData.chargerName}
-        status={chargerData.chargerStatus}
         lat={chargerData.latitude}
         lng={chargerData.longitude}
         key={index}
       />
     )
     return (
-      <div style={{ marginTop:20, padding: "10px 20px 0px 20px", height: '600px', width: '100%', maxWidth: "980px", position: "relative" }}>
+      <div style={{ marginTop:20, padding: "10px 20px 0px 20px", height: '400px', width: '100%', maxWidth: "980px", position: "relative" }}>
         <SearchBox style={{zIndex: 100, fontSize: "1.2rem", height: 40, width: 260, position: "absolute", top: 20, left: 20}} onPlacesChanged={this.changeCurrentPlace}/>
         <GoogleMap
           bootstrapURLKeys={{

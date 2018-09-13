@@ -32,9 +32,12 @@ class CreateUser extends Component {
 
     var userJson = {
       organization: this.state.organization,
-      consumerContracts: [],
-      producerContracts: []
+      consumerOffers: [],
+      producerOffers: []
     }
+
+    //Set address
+    userJson.organization.address = this.props.account;
     var organizationName = userJson.organization.name;
 
     var ipfsHash = '';
