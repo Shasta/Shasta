@@ -83,7 +83,6 @@ class Consumer extends Component {
     var value = this.props.web3.toWei(result.data.ETH * newOffer.fiatAmount);
     value = Math.round(value);
     console.log("value: ", value);
-    var self = this;
 
     //Call the transaction
     const contractInstance = await contract.deployed();
@@ -124,7 +123,9 @@ class Consumer extends Component {
         let userData = JSON.parse(rawContent.toString("utf8"));
 
         for (let key in userData.producerOffers) {
-          producersOffersList.push(userData.producerOffers[key])
+          if (userData.producerOffers.hasOwnProperty(key)) {
+            producersOffersList.push(userData.producerOffers[key])
+          }
         }
         this.setState(({
           producersOffersList: producersOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
@@ -140,11 +141,11 @@ class Consumer extends Component {
     })
   }
 
-  handleChangeAmmount= (e) => {
-    let isNumeric = Number.isInteger(parseInt(e.target.value));
-    let totalToPay = (isNumeric) ? parseInt(e.target.value) * this.state.energyPrice : 0;
+  handleChangeAmmount = (e) => {
+    let isNumeric = Number.isInteger(Number(e.target.value));
+    let totalToPay = (isNumeric) ? Number(e.target.value) * this.state.energyPrice : 0;
     //Format number
-    totalToPay = Math.round(totalToPay * 100)/100;
+    totalToPay = Math.round(totalToPay * 100) / 100;
     this.setState({
       [e.target.name]: e.target.value,
       totalToPay: totalToPay
@@ -208,14 +209,14 @@ class Consumer extends Component {
     });
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
-      if (this.props.address == contract.ethAddress) {
+      if (this.props.address === contract.ethAddress) {
         return '';
       }
       return (
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
             <Card.Header>
-              {contract.fiatAmount}Shas at {contract.energyPrice}Shas/kWh
+              {contract.fiatAmount} Shas at {contract.energyPrice} Shas/kWh
             </Card.Header>
             <Card.Description>
               Ethereum account: {contract.ethAddress}

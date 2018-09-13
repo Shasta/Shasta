@@ -67,7 +67,9 @@ class Producer extends Component {
         let userData = JSON.parse(rawContent.toString("utf8"));
 
         for (let key in userData.consumerOffers) {
-          consumerOffersList.push(userData.consumerOffers[key])
+          if (userData.producerOffers.hasOwnProperty(key)) {
+            consumerOffersList.push(userData.consumerOffers[key])
+          }
         }
         this.setState(({
           consumerOffersList: consumerOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
@@ -146,10 +148,10 @@ class Producer extends Component {
   }
 
   handleChangeAmmount = (e) => {
-    let isNumeric = Number.isInteger(parseInt(e.target.value));
-    let totalToPay = (isNumeric) ? parseInt(e.target.value) * this.state.energyPrice : 0;
+    let isNumeric = Number.isInteger(Number(e.target.value));
+    let totalToPay = (isNumeric) ? Number(e.target.value) * this.state.energyPrice : 0;
     //Format number
-    totalToPay = Math.round(totalToPay * 100)/100;
+    totalToPay = Math.round(totalToPay * 100) / 100;
     this.setState({
       [e.target.name]: e.target.value,
       totalToPay: totalToPay
@@ -158,7 +160,7 @@ class Producer extends Component {
   }
 
   render() {
-    const { visible, energyPrice, providerAddress, providerSource, fiatAmount, chargerLatitude, chargerLongitude, chargers } = this.state;
+    const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers } = this.state;
     let fieldErrors = []
     const providerSources = [{
       text: 'Solar',
@@ -177,7 +179,7 @@ class Producer extends Component {
       value: 'carbon',
     }]
     const consumerOffers = this.state.consumerOffersList.map((offer, index) => {
-      if (offer.ethAddress == this.props.address) {
+      if (offer.ethAddress === this.props.address) {
         return ''
       }
       return (
@@ -186,7 +188,7 @@ class Producer extends Component {
             <List.Header>
               <div style={{ float: 'left' }}>
                 <div>{offer.firstName} {offer.lastName}</div>
-                <div>Is buying {offer.fiatAmount}€ at <b>{offer.energyPrice} €/kWh</b></div>
+                <div>Is buying {offer.fiatAmount} Shas at <b>{offer.energyPrice} Shas/kWh</b></div>
                 <div style={{ color: "grey" }}>Source: {offer.source}</div>
               </div>
 
@@ -230,7 +232,7 @@ class Producer extends Component {
     if (chargerLatitude.length === 0 || chargerLatitude === 0) {
       fieldErrors.push("You must click in the map to select a location.")
     }
-    if (this.state.totalToPay == 0) {
+    if (this.state.totalToPay === 0) {
       fieldErrors.push("You must set an amount of money to sell");
     }
 

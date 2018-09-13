@@ -32,7 +32,6 @@ class App extends React.Component {
       country: "Russia",
       source: "Nuclear",
       energyPrice: "0.15",
-      fiatAmount: "24",
       pendingOffer: true,
       ethAddress: this.props.address,
       address: faker.address.streetAddress(),
@@ -67,9 +66,6 @@ class App extends React.Component {
 
     await contractInstance.createBid(consumerOffer2.fiatAmount, ipfsH, { gas: 400000, from: this.props.address, value: consumerOffer2.fiatAmount })
 
-    // Get the SharedMap.sol instance
-    const sharedMapInstance = await this.props.sharedMapContract.deployed();
-
     // Generate the location object, will be saved later in JSON.
     const producerOffer = {
       chargerName: "charger-" + faker.random.number(),
@@ -81,7 +77,9 @@ class App extends React.Component {
       fiatAmount: "13",
       date: Date.now(),
       pendingOffer: true,
-      ethAddress: this.props.address
+      ethAddress: this.props.address,
+      ammountkWh: 108
+      
     }
     this.props.userJson.producerOffers.push(producerOffer);
 
