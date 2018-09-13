@@ -305,7 +305,7 @@ class Map extends Component {
         </Sidebar>
 
         <span style={{ fontSize: '1.71428571rem', marginRight: 40 }}>Current providers</span>
-        <Button>Sell your energy</Button>
+        <Button onClick={this.openForm}>Sell your energy</Button>
         <SharedMap newLocation={{ chargerLatitude, chargerLongitude }} chargers={chargers} emitLocation={this.locationSelected} />
         <div style={{ padding: 15 }}> <h3>Your sell offers: </h3></div>
         <Segment style={{ width: '65%' }}>
