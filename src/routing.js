@@ -7,7 +7,7 @@ import Tab from './components/Tab/Tab';
 import Home from './components/Home/Home';
 import Consumer from './components/Consumer/Consumer';
 import Producer from './components/Producer/Producer';
-import logo from './static/shasta-logo.png';
+import logo from './static/logo-shasta-02.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Settings from './components/Settings/Settings';
 

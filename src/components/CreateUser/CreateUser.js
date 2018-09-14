@@ -4,7 +4,7 @@ import Router from "../../routing.js";
 import { CountryDropdown } from 'react-country-region-selector';
 
 import './CreateUser.css';
-import shasta from './shasta.png'
+import shasta from './logo-shasta-02.png'
 var organizationData = {}
 
 class CreateUser extends Component {
