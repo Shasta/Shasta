@@ -8,9 +8,9 @@ import './index.css';
 import 'semantic-ui-css/semantic.min.css';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHome, faUsers, faMap, faCog, faBolt, faDigitalTachograph } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faUsers, faMap, faTimes, faCog, faBolt, faDigitalTachograph,faCheck } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHome, faUsers, faMap, faCog, faBolt, faDigitalTachograph)
+library.add(faHome, faUsers, faTimes, faCheck, faMap, faCog, faBolt, faDigitalTachograph)
 
 ReactDOM.render((
     <DrizzleContext.Provider drizzle={drizzle}>

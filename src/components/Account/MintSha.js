@@ -34,6 +34,7 @@ class MintSha extends Component {
         tx
       }));
 
+      this.props.afterClaim();
     }
   }
 
@@ -42,15 +43,14 @@ class MintSha extends Component {
   handleClose = () => this.setState({ modalOpen: false })
 
   async componentDidMount() {
-    const { drizzleState, drizzle} = this.props;
+    const { drizzleState, drizzle, openAtStart} = this.props;
     const { accounts } = drizzleState; 
     const currentAddress = accounts[0];
 
     const shaLedgerInstance = drizzle.contracts.ShaLedger;
 
     const currentBalanceCall = await shaLedgerInstance.methods.balanceOf(currentAddress).call(currentAddress, {from: currentAddress});
-    console.log('bal', currentBalanceCall);
-    if (currentBalanceCall === "0") {
+    if (openAtStart && currentBalanceCall === "0") {
       this.setState({
         modalOpen: true
       })
@@ -71,11 +71,10 @@ class MintSha extends Component {
       if (transactionStatus == "Error") {
         transactionMsg = parseDrizzleError(drizzleState.transactions[txHash].error.message);
       }
-      console.log(drizzleState.transactions[txHash])
     }
     return(
       <Modal
-        trigger={<Button onClick={this.handleOpen} color="purple" inverted>Get Sha tokens</Button>}
+        trigger={<div onClick={this.handleOpen}>{this.props.children}</div>}
         onClose={this.handleClose}
         open={this.state.modalOpen}
       >

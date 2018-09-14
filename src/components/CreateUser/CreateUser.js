@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
+import { Grid, Transition } from 'semantic-ui-react'
 import Router from "../../routing.js";
-import { CountryDropdown } from 'react-country-region-selector';
+import Requeriments from  './Requeriments';
+import Registry from './Registry';
 
 import './CreateUser.css';
 import shasta from './shasta.png'
@@ -101,42 +102,12 @@ class CreateUser extends Component {
       return (
         <div>
           <Grid>
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Image className='logo-image' src={shasta} />
+            <Grid.Row centered columns={2}>
+              <Grid.Column mobile={12} tablet={6} computer={6}>
+                <Requeriments />
               </Grid.Column>
-              <Grid.Column style={{ marginTop: '10%' }}>
-                <Grid.Row>
-                  <Grid.Column>
-                    <h1> Welcome to Shasta </h1>
-                  </Grid.Column>
-                  <Grid.Column style={{ marginTop: '20px' }}>
-                    <Transition visible={!this.state.formVisible} animation='scale' duration={500}>
-                      <Button type='submit' id="createOrgBtn" onClick={this.toggleVisibility}>Create a new organization</Button>
-                    </Transition>
-                    <Transition visible={this.state.formVisible} animation='scale' duration={500}>
-                      <Form>
-                        <Form.Field style={{ marginRight: '450px' }}>
-                          <label>Organization Name</label>
-                          <Input placeholder='Organization Name' onChange={this.handleOrgNameChange} />
-                          <label>First Name</label>
-                          <Input placeholder='First Name' onChange={this.handleFNameChange} />
-                          <label>Last Name</label>
-                          <Input placeholder='Last Name' onChange={this.handleLNameChange} />
-                          <label>Country</label>
-                          <CountryDropdown
-                            value={this.state.country}
-                            onChange={(val) => this.selectCountry(val)} />
-                        </Form.Field>
-                        <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
-                      </Form>
-                    </Transition>
-                  </Grid.Column>
-                  <Grid.Column style={{ marginTop: '100px' }}>
-                    <h2>{this.props.status}</h2>
-                  </Grid.Column>
-                  <Grid.Column></Grid.Column>
-                </Grid.Row>
+              <Grid.Column  mobile={12} tablet={6} computer={6} style={{ marginTop: '5%' }}>
+                <Registry />
               </Grid.Column>
             </Grid.Row>
           </Grid>
