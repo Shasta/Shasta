@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import styled, { css} from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { CountryDropdown } from 'react-country-region-selector';
-import withRawDrizzle from '../../utils/withRawDrizzle';
+import withRawDrizzle from '../../../utils/withRawDrizzle';
 import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
+import _  from 'lodash';
 
 class RegistryForm extends Component {
   state = {
@@ -22,13 +23,15 @@ class RegistryForm extends Component {
     if (initialized && !!drizzleState && tokenBalancePointer !== "") {
       const { accounts } = drizzleState; 
       const currentAddress = accounts[0];
-      const shaLedgerInstance = drizzle.contracts.ShaLedger;
-      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
-
-      this.setState({
-        tokenBalancePointer,
-        currentAddress
-      })
+      if (currentAddress) {
+        const shaLedgerInstance = drizzle.contracts.ShaLedger;
+        const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
+  
+        this.setState({
+          tokenBalancePointer,
+          currentAddress
+        })
+      }
     }
   }
 
@@ -72,6 +75,10 @@ class RegistryForm extends Component {
       if (!userCreationResponse) {
         console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
       }
+
+      if (userCreationResponse && _.has(this.props, 'isAuthenticated')) {
+        this.props.isAuthenticated();
+      }
     }
   }
 
@@ -96,7 +103,6 @@ class RegistryForm extends Component {
   }
 
   handleInputChange = (event) => {
-    console.log(event.target.name, event.target.value)
     this.setState({ [event.target.name]: event.target.value })
   }
 
