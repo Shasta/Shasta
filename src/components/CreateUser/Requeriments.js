@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import MintSha from '../Account/MintSha';
 import { Button } from 'semantic-ui-react'
+import _ from 'lodash';
 
 const RequerimentsBox = styled.div`
   margin-top: 60px;
@@ -53,53 +54,36 @@ const StepIcon = function(props) {
 }
 class Requeriments extends Component {
   state = {
-    shaBalancePointer: "",
+    tokenBalancePointer: "",
     currentAddress: ""
   }
 
-  componentDidMount() {
-    const { drizzleState, drizzle, initialized} = this.props;
-    const {tokenBalancePointer} = this.state;
-
-    if (initialized && !!drizzleState && tokenBalancePointer !== "") {
-      const { accounts } = drizzleState; 
-      const currentAddress = accounts[0];
+  async componentDidMount() {
+    const { initialized, drizzleState, drizzle} = this.props;
+    const { currentAddress, tokenBalancePointer } = this.state;
+    const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();
+    console.log("mount")
+    if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
+      console.log("setting at mount", newAddress)
       const shaLedgerInstance = drizzle.contracts.ShaLedger;
-      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
+      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress, {from: newAddress});
 
       this.setState({
         tokenBalancePointer,
-        currentAddress
+        currentAddress: newAddress
       })
     }
   }
 
-  refreshTokenBalance = () => {
-    console.log("refresh!")
-    const {drizzle, drizzleState} = this.props;
-    const { accounts } = drizzleState; 
-    const currentAddress = accounts[0];
-    const shaLedgerInstance = drizzle.contracts.ShaLedger;
-    const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
-
-    this.setState({
-      tokenBalancePointer,
-    })
-  }
-
   componentWillReceiveProps(nextProps) {
-    console.log("fired!")
-    const {drizzle, drizzleState, initialized} = nextProps;
-    if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length == 0) {
-      return;
-    }
-
+    const {initialized, drizzle, drizzleState} = nextProps;
     const { currentAddress } = this.state;
-    const newAddress = drizzleState.accounts[0];
-
-    if (newAddress !== currentAddress) {
+    const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();;
+    console.log("props", newAddress)
+    if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
       const shaLedgerInstance = drizzle.contracts.ShaLedger;
-      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress);
+      console.log("setting at props", newAddress)
+      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress, {from: newAddress});
 
       this.setState({
         tokenBalancePointer,
@@ -122,9 +106,11 @@ class Requeriments extends Component {
       if (tokenBalancePointer in drizzleState.contracts.ShaLedger.balanceOf) {
         const zeroBN = web3.utils.toBN("0");
         // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
-        const tokenBalance = web3.utils.toBN(drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value);
+        const rawBalance = drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value;
+        const tokenBalance = web3.utils.toBN(rawBalance);
+        console.log(drizzle)
         console.log(drizzleState)
-        console.log(tokenBalance)
+        console.log('bal', web3.utils.fromWei(tokenBalance, 'ether'));
         haveSha = tokenBalance.gt(zeroBN);
       }
     }
@@ -144,7 +130,7 @@ class Requeriments extends Component {
             </Step>
             <Step>
               <StepIcon fulfilled={haveSha} />
-              <MintSha afterClaim={this.refreshTokenBalance}>
+              <MintSha>
                 <StepDescription>Claim your 100 Shasta tokens!</StepDescription>
               </MintSha>
             </Step>
@@ -156,3 +142,92 @@ class Requeriments extends Component {
 }
 
 export default withRawDrizzle(Requeriments);
+
+
+
+
+/*
+import React, { Component } from 'react'
+import { Button } from 'semantic-ui-react'
+import withDrizzleContext from '../../utils/withDrizzleContext.js';
+import MintShaModal from './MintSha';
+import styled, { css } from 'styled-components';
+
+const EthAccount = styled.div`
+  display: flex;
+  align-items: center;
+  & > * {
+    font-size: 1rem;
+    margin-left: 20px !important;
+  }
+`;
+
+class AccountData extends Component {
+  constructor(props, context) {
+    super(props);
+
+    this.state = {
+      menu: null,
+      asked: false,
+      tokenBalancePointer: "",
+      currentAddress: null
+    }
+  }
+
+  precisionRound(number, precision) {
+    var factor = Math.pow(10, precision)
+    return Math.round(number * factor) / factor
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {drizzle, drizzleState} = nextProps;
+    const { accounts } = drizzleState;
+    const { currentAddress } = this.state;
+    const newAddress = accounts[0];
+    if (newAddress !== currentAddress) {
+      const shaLedgerInstance = drizzle.contracts.ShaLedger;
+      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress);
+
+      this.setState({
+        tokenBalancePointer,
+        currentAddress: newAddress
+      });
+    }
+  }
+
+  async componentDidMount() {
+    const { drizzleState, drizzle, accountIndex} = this.props;
+    const { accounts } = drizzleState; 
+    const currentAddress = accounts[accountIndex];
+
+    const shaLedgerInstance = drizzle.contracts.ShaLedger;
+    const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
+
+    this.setState({
+      tokenBalancePointer,
+      currentAddress
+    })
+  }
+
+  render() {
+    const { drizzleState, drizzle} = this.props;
+    const { tokenBalancePointer, asked } = this.state;
+    const { accounts, accountBalances } = drizzleState;
+    const { web3 } = drizzle;
+
+    let tokenBalance = 0;
+    const ShaLedgerState = drizzleState.contracts.ShaLedger;
+    if (tokenBalancePointer in ShaLedgerState.balanceOf) {
+      // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
+      tokenBalance = web3.utils.fromWei(ShaLedgerState.balanceOf[tokenBalancePointer].value, 'ether');
+    }
+
+    // No accounts found.
+    if(Object.keys(accounts).length === 0) {
+      return (
+        <span>Initializing...</span>
+      )
+    }
+
+
+*/

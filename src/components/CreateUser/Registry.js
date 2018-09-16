@@ -8,7 +8,11 @@ import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
 class RegistryForm extends Component {
   state = {
     shaBalancePointer: "",
-    currentAddress: ""
+    currentAddress: "",
+    organizationName: "",
+    firstName: "",
+    lastName: "",
+    country: "",
   }
 
   componentDidMount() {
@@ -40,8 +44,38 @@ class RegistryForm extends Component {
     })
   }
 
+  createUser = async () => {
+    const {initialized, drizzle, drizzleState} = this.props;
+    const {organizationName, firstName, lastName, country} = this.state;
+    const mainAccount = drizzleState && drizzleState.accounts && !!Object.keys(drizzleState.accounts).length ? drizzleState.accounts[0] : ""; 
+    if (initialized == true && mainAccount !== "") {
+      const contractInstance = drizzle.contracts.User;
+      const userJson = {
+        organization: {
+          name: organizationName,
+          address: mainAccount,
+          firstName,
+          lastName,
+          country,
+        },
+        consumerOffers: [],
+        producerOffers: []
+      }
+      const ipfsResponse = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
+
+      const rawOrgName = drizzle.web3.utils.utf8ToHex(organizationName);
+      const ipfsHash = drizzle.web3.utils.utf8ToHex(ipfsResponse[0].hash);
+
+      const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({from: mainAccount})
+      const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
+
+      if (!userCreationResponse) {
+        console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
+      }
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
-    console.log("fired!")
     const {drizzle, drizzleState, initialized} = nextProps;
     if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length == 0) {
       return;
@@ -61,9 +95,18 @@ class RegistryForm extends Component {
     }
   }
 
+  handleInputChange = (event) => {
+    console.log(event.target.name, event.target.value)
+    this.setState({ [event.target.name]: event.target.value })
+  }
+
+  selectCountry = (value) => {
+    this.setState({ country: value });
+  }
+
   render() {
     const { drizzle, drizzleState, initialized } = this.props;
-    const { tokenBalancePointer } = this.state;
+    const { tokenBalancePointer, organizationName, firstName, lastName, country } = this.state;
     const web3 = drizzle.web3;
 
     let isInstalled, isLogged, haveSha = false;
@@ -83,14 +126,14 @@ class RegistryForm extends Component {
       <Form>
         <Form.Field>
           <label>Organization Name</label>
-          <Input placeholder='Organization Name' onChange={this.handleOrgNameChange} />
+          <Input placeholder='Organization Name' value={organizationName} name="organizationName" onChange={this.handleInputChange} />
           <label>First Name</label>
-          <Input placeholder='First Name' onChange={this.handleFNameChange} />
+          <Input placeholder='First Name' value={firstName} name="firstName" onChange={this.handleInputChange} />
           <label>Last Name</label>
-          <Input placeholder='Last Name' onChange={this.handleLNameChange} />
+          <Input placeholder='Last Name' value={lastName} name="lastName" onChange={this.handleInputChange} />
           <label>Country</label>
           <CountryDropdown
-            value={this.state.country}
+            value={country}
             onChange={(val) => this.selectCountry(val)} />
         </Form.Field>
         <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>

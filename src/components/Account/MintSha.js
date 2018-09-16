@@ -3,7 +3,7 @@ import { Button,  Modal } from 'semantic-ui-react'
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import parseDrizzleError from '../../utils/parseDrizzleError.js';
 import stringHelpers from '../../utils/stringHelpers.js';
-
+import {has} from 'lodash';
 class MintSha extends Component {
   state = {
     shasToMint: "100",
@@ -31,10 +31,13 @@ class MintSha extends Component {
 
       console.log(tx)
       this.setState(() => ({
-        tx
+        tx,
+        modalOpen: false,
       }));
 
-      this.props.afterClaim();
+      if (has(this.props, 'afterClaim')) {
+        this.props.afterClaim();
+      }
     }
   }
 

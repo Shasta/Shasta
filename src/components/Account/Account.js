@@ -31,7 +31,6 @@ class AccountData extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("fired!")
     const {drizzle, drizzleState} = nextProps;
     const { accounts } = drizzleState;
     const { currentAddress } = this.state;
