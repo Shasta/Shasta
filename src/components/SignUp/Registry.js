@@ -2,9 +2,14 @@ import React, { Component } from 'react';
 import styled, { css} from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { CountryDropdown } from 'react-country-region-selector';
-import withRawDrizzle from '../../../utils/withRawDrizzle';
 import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
+import { Redirect } from 'react-router-dom';
+import withRawDrizzle from '../../utils/withRawDrizzle';
+import ipfs from '../../ipfs';
 import _  from 'lodash';
+
+import { connect} from 'react-redux';
+import {UserActions } from '../../redux/UserActions';
 
 class RegistryForm extends Component {
   state = {
@@ -14,6 +19,13 @@ class RegistryForm extends Component {
     firstName: "",
     lastName: "",
     country: "",
+    toDashboard: false
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.action = new UserActions(this.props.dispatch);
   }
 
   componentDidMount() {
@@ -64,7 +76,7 @@ class RegistryForm extends Component {
         consumerOffers: [],
         producerOffers: []
       }
-      const ipfsResponse = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
+      const ipfsResponse = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
       const rawOrgName = drizzle.web3.utils.utf8ToHex(organizationName);
       const ipfsHash = drizzle.web3.utils.utf8ToHex(ipfsResponse[0].hash);
@@ -76,8 +88,11 @@ class RegistryForm extends Component {
         console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
       }
 
-      if (userCreationResponse && _.has(this.props, 'isAuthenticated')) {
-        this.props.isAuthenticated();
+      if (userCreationResponse) {
+        this.action.login(organizationName)
+        this.setState({
+          toDashboard: true
+        })
       }
     }
   }
@@ -112,7 +127,11 @@ class RegistryForm extends Component {
 
   render() {
     const { drizzle, drizzleState, initialized } = this.props;
-    const { tokenBalancePointer, organizationName, firstName, lastName, country } = this.state;
+    const { tokenBalancePointer, organizationName, firstName, lastName, country, toDashboard } = this.state;
+    
+    if (toDashboard === true) {
+      return <Redirect to="/dashboard" />
+    }
     const web3 = drizzle.web3;
 
     let isInstalled, isLogged, haveSha = false;
@@ -148,4 +167,12 @@ class RegistryForm extends Component {
   }
 }
 
-export default withRawDrizzle(RegistryForm);
+function mapStateToProps(state, props) { return { user: state.user } }
+function mapDispatchToProps(dispatch) { return { dispatch }; }
+
+export default withRawDrizzle(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(RegistryForm)
+);

@@ -1,60 +1,82 @@
 import React, { Component } from 'react';
-import PrivateDashboard from './routing';
-import PublicHome from './components/PublicHome/PublicHome.js'
-import { Route } from 'react-router-dom';
+import { Route, BrowserRouter, Redirect, Switch} from 'react-router-dom';
+import _ from 'lodash';
+import { publicRoutes, privateRoutes} from './routes';
+import {connect} from 'react-redux';
+import {UserActions} from './redux/UserActions';
+
+import PublicLayout from './layouts/PublicLayout';
+import PrivateLayout from './layouts/PrivateLayout';
+
+const NotFound = () => (
+  <div>Not found 404</div>
+)
 
 class App extends Component {
   constructor(props) {
     super(props);
-
-    const username = localStorage.getItem("username");
-
-    this.state = {
-      username,
-      isLogged: false
-    }
+    
+    this.userActions = new UserActions(this.props.dispatch);
   }
 
-  saveUsernameToLocal = () => {
-    const { username } = this.state;
-    localStorage.setItem("username", username);
-  }
-
-  loginViaUsername = async (username) => {
-    const {initialized, drizzle, drizzleState, ipfs} = this.props;
-    if (initialized && drizzleState && !!drizzleState.accounts && !!drizzleState.accounts[0]) {
-      try {
-        const web3 = drizzle.web3;
-        const currentAccount = drizzleState.accounts[0];
-        const rawNickname = web3.utils.utf8ToHex(username);
-        const rawIpfsHash = await drizzle.contracts.User.methods.getIpfsHashByUsername.call(username);
-        const ipfsHash = web3.utils.hexToUtf8(rawIpfsHash);
-        const rawUserJson = await ipfs.cat(ipfsHash);
-        const userJson = JSON.parse(rawUserJson.toString("utf8"));
-        this.setState({
-          isLogged: true,
-          username
-        }, this.saveUsernameToLocal);
-      } catch (error) {
-        this.setState({
-          isLogged: false,
-        })
-      }
-    }
-  }
-
-  async componentDidMount() {
-    await this.loginViaUsername(this.state.username);
+  componentWillMount() {
+    this.userActions.verify();
   }
 
   render() {
-    const { isLogged } = this.state;
-
-    if (isLogged === true) {
-      return <PrivateDashboard />
-    }
-    return <PublicHome checkAuth={this.loginViaUsername} />
+    const user = this.props.user ? this.props.user : { logged: false };
+    return (
+      <Switch>
+        { _.map(publicRoutes, (publicRoute, key) => {
+          const { component, path } = publicRoute;
+          return (
+            <Route
+              exact
+              path={path}
+              key={key}
+              render={ (route) => 
+                  <PublicLayout 
+                    component={component}
+                    route={route} 
+                  /> 
+              }
+            />
+          )
+        })}
+        
+        { _.map(privateRoutes, (route, key) => {
+          const { component, path } = route;
+          return (
+            <Route
+              exact
+              path={path}
+              key={key}
+              render={ () => 
+                user.logged ? (
+                  <PrivateLayout 
+                      component={component}  
+                      route={route}
+                  />
+                ) : (
+                  <PublicLayout 
+                      component={publicRoutes["SignUp"].component} 
+                      route={route}
+                  />
+                )
+              }
+            />
+          )
+        })}
+        <Route component={ NotFound } />
+      </Switch>
+    );
   }
 }
 
-export default App;
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+function mapDispatchToProps(dispatch) { return { dispatch }; }
+
+export default  connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App);

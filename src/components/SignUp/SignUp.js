@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Transition, Image } from 'semantic-ui-react'
-import withRawDrizzle from '../../../utils/withRawDrizzle';
+import withRawDrizzle from '../../utils/withRawDrizzle';
 import _ from 'lodash';
 
 // SignUp components
@@ -78,7 +78,7 @@ class SignUp extends Component {
             {isInstalled === true && isLogged === false && <Login />}
             {isInstalled === true && isLogged === true && haveSha === false && <Claim />}
             {isInstalled === true && isLogged === true && haveSha === true &&
-              <Registry isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha}/>
+              <Registry isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} store={this.props.store}/>
             }
           </Grid.Column>
         </Grid.Row>

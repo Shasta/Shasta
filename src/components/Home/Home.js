@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import withDrizzleContext from '../../utils/withDrizzleContext';
+import ipfs from '../../ipfs';
 import { Feed } from 'semantic-ui-react'
 import _ from 'lodash';
-
 import D3 from './d3.js';
-
 
 class Home extends Component {
 
@@ -11,6 +12,11 @@ class Home extends Component {
     super(props);
 
     this.state = {
+      userJson: {
+        organization: {
+          firstName: ""
+        }
+      },
       notifications: [],
       lastestConsumerOfferIndex: -1,
       lastestProducerOfferIndex: -1,
@@ -18,10 +24,26 @@ class Home extends Component {
   }
 
   async componentDidMount() {
-    const web3 = this.props.web3;
-    const shastaUserInstance = await this.props.userContract.deployed();
-    const shastaMarketInstance = await this.props.shastaMarketContract.deployed();
-    const shastaMapInstance = await this.props.sharedMapContract.deployed();
+    const {drizzle, drizzleState,user} = this.props;
+    console.log(user)
+    const currentAccount = drizzleState.accounts[0]
+    const drizzleMarket = drizzle.contracts.ShastaMarket;
+    const drizzleMap = drizzle.contracts.SharedMapPrice;
+    const drizzleUser = drizzle.contracts.User;
+
+    const web3 = drizzle.web3;
+    const rawOrgName = web3.utils.utf8ToHex(user.organization);
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const ipfsHash = web3.utils.hexToUtf8(rawHash);
+    const rawJson = await ipfs.cat(ipfsHash);
+    console.log("aww",JSON.parse(rawJson))
+    this.setState({
+      userJson: JSON.parse(rawJson)
+    })
+
+    const shastaMarketInstance = window.web3.eth.contract(drizzleMarket.abi).at(drizzleMarket.address);
+    const shastaUserInstance = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
+    const shastaMapInstance = window.web3.eth.contract(drizzleMap.abi).at(drizzleMap.address);
 
     // Watch for NewLocation events, since this current block
     shastaMarketInstance.newOffer(null, {fromBlock: 0}, (err, result) => {
@@ -29,11 +51,11 @@ class Home extends Component {
         console.error("Could not watch newOffer event.", err)
         return;
       }
-      web3.eth.getBlock(result.blockNumber, false, async (err, blockInfo) => {
+      window.web3.eth.getBlock(result.blockNumber, false, async (err, blockInfo) => {
         const timestamp = new Date(blockInfo.timestamp * 1000);
         const { value, locationIndex} = result.args
         const providerHash = await shastaMapInstance.locationsIpfsHashes.call(locationIndex);
-        const rawProvider = await this.props.ipfs.cat(providerHash);
+        const rawProvider = await ipfs.cat(providerHash);
         const provider = JSON.parse(rawProvider.toString("utf8"));
         const notification = {
           type: 'newProvider',
@@ -58,9 +80,9 @@ class Home extends Component {
       }
       const rawIpfsHash = result.args.ipfsHash;
 
-      const userHash = this.props.web3.toAscii(rawIpfsHash);
+      const userHash = web3.hexToUtf8(rawIpfsHash);
 
-      const rawUser = await this.props.ipfs.cat(userHash);
+      const rawUser = await ipfs.cat(userHash);
       const user = JSON.parse(rawUser.toString("utf8"));
       const currentLatestOfferIndex = user.consumerOffers.length - 1;
       const currentLatestPOfferIndex = user.producerOffers.length - 1;
@@ -98,9 +120,13 @@ class Home extends Component {
   }
 
   render() {
+    const {drizzleState} = this.props;
+    const {userJson} = this.state;
+    const organization = userJson.organization;
+    const currentAccount = drizzleState.accounts[0];
     const notifications = this.state.notifications.map((notification, index) => {
       if (notification.type == "contract") {
-        var name = (notification.ethAddress == this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
+        const name = (notification.ethAddress == this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
             <Feed.Content date={notification.timestamp.toLocaleString()} summary={`${name} posted new offer to buy ${notification.fiatAmount}€ at ${notification.energyPrice} €/kWh`} />
@@ -120,7 +146,7 @@ class Home extends Component {
     return (
       // Menu with Bulma-React.
       <div style={{ marginLeft: '375px' }}>
-        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href='https://rinkeby.etherscan.io/address/{this.props.account}'>{this.props.userJson.organization.firstName}</a>,</h2>
+        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href={`https://rinkeby.etherscan.io/address/${currentAccount}`}>{organization.firstName}</a>,</h2>
         <h5 style={{ marginLeft: '30px', marginTop: '10px' }}>You have {this.state.notifications.length} notifications.</h5>
         <D3></D3>
         <Feed style={{ marginLeft: '40px', marginTop: '30px' }}>
@@ -131,4 +157,10 @@ class Home extends Component {
   }
 }
 
-export default Home;
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+  )(Home)
+);

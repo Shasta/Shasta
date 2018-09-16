@@ -29,7 +29,6 @@ class MintSha extends Component {
       const cacheSendParams = [...params, ...[options]];
       const tx = mint.cacheSend(...params, options);
 
-      console.log(tx)
       this.setState(() => ({
         tx,
         modalOpen: false,
@@ -47,17 +46,20 @@ class MintSha extends Component {
 
   async componentDidMount() {
     const { drizzleState, drizzle, openAtStart} = this.props;
-    const { accounts } = drizzleState; 
-    const currentAddress = accounts[0];
-
-    const shaLedgerInstance = drizzle.contracts.ShaLedger;
-
-    const currentBalanceCall = await shaLedgerInstance.methods.balanceOf(currentAddress).call(currentAddress, {from: currentAddress});
-    if (openAtStart && currentBalanceCall === "0") {
-      this.setState({
-        modalOpen: true
-      })
+    if (drizzleState && drizzleState.accounts) {
+      const { accounts } = drizzleState; 
+      const currentAddress = accounts[0];
+  
+      const shaLedgerInstance = drizzle.contracts.ShaLedger;
+  
+      const currentBalanceCall = await shaLedgerInstance.methods.balanceOf(currentAddress).call(currentAddress, {from: currentAddress});
+      if (openAtStart && currentBalanceCall === "0") {
+        this.setState({
+          modalOpen: true
+        })
+      }
     }
+    
   }
   render() {
     let transactionStatus;

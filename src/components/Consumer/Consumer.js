@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
 import './Consumer.css';
 import axios from 'axios';
+import ipfs from '../../ipfs'
+import withDrizzleContext from '../../utils/withDrizzleContext'
+import { connect } from 'react-redux';
+
 let checkedAddresses = [];
 
 class Consumer extends Component {
@@ -9,6 +13,10 @@ class Consumer extends Component {
     super(props)
 
     this.state = {
+      userJson: {
+        consumerOffers: [],
+        producerOffers: []
+      },
       visible: false,
       percent: 0,
       firstName: '',
@@ -40,10 +48,18 @@ class Consumer extends Component {
 
 
   async createConsumerOffer() {
+    const {drizzle, drizzleState, user} = this.props;
+    const web3 = drizzle.web3;
+    const currentAccount = drizzleState.accounts[0];
+    const rawOrgName = web3.utils.utf8ToHex(user.organization);
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const userIpfsHash = web3.utils.hexToUtf8(rawHash);
+    const rawJson = await ipfs.cat(userIpfsHash);
+    const userJson = JSON.parse(rawJson);
+    this.setState({
+      userJson
+    })
 
-    var userJson = this.props.userJson;
-
-    console.log("marketer", this.state.dropdownMarketer);
     var newOffer = {
       date: Date.now(),
       firstName: userJson.organization.firstName,
@@ -55,7 +71,7 @@ class Consumer extends Component {
       source: this.state.dropdownSource,
       description: this.state.description,
       pendingOffer: true,
-      ethAddress: this.props.address
+      ethAddress: currentAccount
     }
 
     console.log("New contract", newOffer);
@@ -65,13 +81,13 @@ class Consumer extends Component {
     userJson.consumerOffers.push(newOffer);
     console.log("Info to update: ", userJson);
 
-    var contract = this.props.contract;
-    var address = this.props.address;
-    var url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
+    const contract = this.props.contract;
+    const address = currentAccount;
+    const url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
 
-    let res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
+    const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-    var ipfsHash = res[0].hash;
+    const ipfsHash = res[0].hash;
 
     console.log("ipfs hash: ", ipfsHash);
 
@@ -79,15 +95,14 @@ class Consumer extends Component {
     let result = await axios.get(url);
 
     //Set the conversion from EUR to WEI
-    var value = this.props.web3.toWei(result.data.ETH * newOffer.fiatAmount);
+    let value = this.props.web3.toWei(result.data.ETH * newOffer.fiatAmount);
     value = Math.round(value);
     console.log("value: ", value);
-    var self = this;
 
     //Call the transaction
-    const contractInstance = await contract.deployed();
+    const contractInstance = drizzle.contracts.User;
 
-    let success = await contractInstance.createBid(self.state.fiatAmount, ipfsHash, { gas: 400000, from: address, value: value });
+    const success = await contractInstance.methods.createBid(self.state.fiatAmount, ipfsHash).send({ gas: 400000, from: address, value: value });
     if (success) {
       console.log('Updated user ' + userJson.organization.name + ' on ethereum!, and bid correctly created');
 
@@ -98,28 +113,31 @@ class Consumer extends Component {
   }
 
   async getProducerOffers() {
-
-    const shastaMarketInstance = await this.props.shastaMarketContract.deployed();
-    const userContractInstance = await this.props.userContract.deployed();
+    const {drizzle, drizzleState, user }= this.props;
+    const web3 = drizzle.web3;
+    const currentAccount = drizzleState.accounts[0];
+    const shastaMarketInstance = drizzle.contracts.ShastaMarket;
+    const userContractInstance = drizzle.contracts.User;
+    
 
     // Offers
     let producersOffersList = [];
-    const offersLength = await shastaMarketInstance.getOffersLength.call({ from:this.props.address });
-    console.log("Number of offers: ", offersLength.toNumber())
-    let auxArray = Array.from({ length: offersLength.toNumber() }, (x, item) => item);
+    const offersLength = await shastaMarketInstance.methods.getOffersLength().call({ from: currentAccount });
+    console.log("Number of offers: ", Number.parseInt(offersLength))
+    let auxArray = Array.from({ length: Number.parseInt(offersLength) }, (x, item) => item);
 
     auxArray.forEach(async (item, i) => {
 
-      let userContract = await shastaMarketInstance.getOfferFromIndex.call(i, { from: this.props.address });
+      let userContract = await shastaMarketInstance.methods.getOfferFromIndex.call(i, { from: currentAccount });
       let userAddress = userContract[1];
       if (!checkedAddresses.includes(userAddress)) {
 
         checkedAddresses.push(userAddress);
-        let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: this.props.address });
-        let ipfsHash = this.props.web3.toAscii(ipfsHashRaw);
+        let ipfsHashRaw = await userContractInstance.methods.getIpfsHashByAddress.call(userAddress, { from: currentAccount });
+        let ipfsHash = web3.hexToUtf8(ipfsHashRaw);
         console.log("ipfs rec: ", ipfsHash);
 
-        let rawContent = await this.props.ipfs.cat(ipfsHash);
+        let rawContent = await ipfs.cat(ipfsHash);
         let userData = JSON.parse(rawContent.toString("utf8"));
         
         for (let key in userData.producerOffers) {
@@ -145,7 +163,8 @@ class Consumer extends Component {
   }
 
   render() {
-
+    const {drizzleState} = this.props;
+    const currentAccount = drizzleState.accounts[0];
     const { visible } = this.state
 
     const sources = [
@@ -167,7 +186,7 @@ class Consumer extends Component {
       }
     ]
 
-    const consumerOffers = this.props.userJson.consumerOffers.map((contract) => {
+    const consumerOffers = this.state.userJson.consumerOffers.map((contract) => {
       return (
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
@@ -175,7 +194,7 @@ class Consumer extends Component {
               {contract.fiatAmount}€ at {contract.energyPrice}€/kWh
             </Card.Header>
             <Card.Description>
-              Ethereum account: {this.props.address}
+              Ethereum account: {currentAccount}
             </Card.Description>
             <Card.Description>
               Country: {contract.country}
@@ -195,7 +214,7 @@ class Consumer extends Component {
     });
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
-      if (this.props.address == contract.ethAddress) {
+      if (currentAccount == contract.ethAddress) {
         return '';
       }
       return (
@@ -272,7 +291,7 @@ class Consumer extends Component {
                 </div>
                 <Message icon>
                   <Message.Content>
-                    {this.props.address}
+                    {currentAccount}
                   </Message.Content>
                 </Message>
                 <Form.Field>
@@ -309,4 +328,11 @@ class Consumer extends Component {
     );
   }
 }
-export default Consumer
+
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+  )(Consumer)
+);

@@ -19,9 +19,24 @@ const options = {
   polls: {
     accounts: 4000
   },
+  events: {
+    User: [
+      {
+        eventName: 'UpdatedUser',
+        eventOptions: {
+          from: 0
+        }
+      },
+    ], 
+    ShastaMarket: [
+      {
+        eventName: 'newOffer',
+        eventOptions: {
+          from: 0
+        }
+      }
+    ]
+  }
 };
 
-const drizzleStore = generateStore(options);
-const drizzle = new Drizzle(options, drizzleStore);
-
-export default drizzle;
+export default options;
