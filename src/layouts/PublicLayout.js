@@ -53,14 +53,14 @@ class PublicHome extends Component {
         <Menu>
           <AppLogo as={Link} to="/">
             <img src={ShastaLogo} />
-            <h2>Shasta Platform</h2>
+            <h2>Shasta</h2>
           </AppLogo>
           <Responsive as={Menu.Menu} position='right' minWidth="1024">
             <Menu.Item as={Link} to="/sign-in">
-              Sign In
+             <Button color="purple">Sign In</Button>
             </Menu.Item>
             <Menu.Item as={Link} to="/">
-              Sign Up
+              <Button color="purple">Sign Up</Button>
             </Menu.Item>
           </Responsive>
           <Responsive as={Menu.Menu} position='right' maxWidth="1024">
@@ -90,7 +90,7 @@ class PublicHome extends Component {
         </Sidebar>
 
         {/* The rendered component */}
-        <Component  {...this.props} /> 
+        <Component  {...this.props} />
       </div>
     );
   }
