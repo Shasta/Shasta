@@ -120,7 +120,7 @@ class Dashboard extends React.Component {
             <FontAwesomeIcon icon="cog"></FontAwesomeIcon><h4>Settings</h4>
           </Menu.Item>
           <Menu.Item as={Link} to="/logout">
-            <FontAwesomeIcon icon="cog"></FontAwesomeIcon><h4>Settings</h4>
+            <FontAwesomeIcon></FontAwesomeIcon><h4>Logout</h4>
           </Menu.Item>
           <Button onClick={this.createDemo}>Create Demo</Button>
         </Sidebar>

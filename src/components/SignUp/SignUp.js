@@ -11,6 +11,7 @@ import Registry from './Registry';
 import Install from './Helpers/Install';
 import Login from './Helpers/Login';
 import Claim from './Helpers/Claim';
+import { runSaga } from 'redux-saga';
 
 class SignUp extends Component {
   state = {
@@ -67,6 +68,18 @@ class SignUp extends Component {
         haveSha = tokenBalance.gt(zeroBN);
       }
     }
+
+    let rightComponent = <Install />
+
+    if (isInstalled === true && isLogged === false) {
+      rightComponent = <Login />
+    }
+    if (isInstalled === true && isLogged === true && haveSha === false) {
+      rightComponent = <Claim />
+    }
+    if (isInstalled === true && isLogged === true && haveSha === true) {
+      rightComponent = <Registry isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} store={this.props.store}/>
+    }
     return (
       <Grid>
         <Grid.Row centered columns={2}>
@@ -74,12 +87,12 @@ class SignUp extends Component {
             <Requeriments isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} />
           </Grid.Column>
           <Grid.Column  mobile={12} tablet={6} computer={6}>
-            {isInstalled === false && <Install /> }
-            {isInstalled === true && isLogged === false && <Login />}
-            {isInstalled === true && isLogged === true && haveSha === false && <Claim />}
-            {isInstalled === true && isLogged === true && haveSha === true &&
-              <Registry isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} store={this.props.store}/>
-            }
+            <Transition.Group
+              animation='bounce'
+              duration={2000}
+            > 
+            { true && rightComponent}
+            </Transition.Group>
           </Grid.Column>
         </Grid.Row>
       </Grid>

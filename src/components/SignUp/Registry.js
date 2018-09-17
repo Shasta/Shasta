@@ -11,6 +11,13 @@ import _  from 'lodash';
 import { connect} from 'react-redux';
 import {UserActions } from '../../redux/UserActions';
 
+const RegistryBox = styled.div`
+  margin: 20px 0px;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14), 0 3px 3px -2px rgba(0, 0, 0, .2), 0 1px 8px 0 rgba(0, 0, 0, .12);
+  max-width: 400px !important;
+`
 class RegistryForm extends Component {
   state = {
     shaBalancePointer: "",
@@ -148,7 +155,8 @@ class RegistryForm extends Component {
       }
     }
     return (
-      <Form>
+      <Form as={RegistryBox}>
+        <h3 style={{textAlign: "center"}}>Sign up</h3>
         <Form.Field>
           <label>Organization Name</label>
           <Input placeholder='Organization Name' value={organizationName} name="organizationName" onChange={this.handleInputChange} />
