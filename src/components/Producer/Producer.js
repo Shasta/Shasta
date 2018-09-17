@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { Button, Form, Sidebar, Menu, Dropdown, Message, List, Segment, Input } from 'semantic-ui-react';
 import SharedMap from './SharedMap';
+import withDrizzleContext from '../../utils/withDrizzleContext';
+import { connect } from 'react-redux';
+import _ from 'lodash';
+
 let checkedAddresses = [];
+import ipfs from '../../ipfs';
 
 class Producer extends Component {
   state = {
@@ -15,22 +20,37 @@ class Producer extends Component {
     chargerLongitude: "",
     marketerIndex: 0,
     chargers: [],
-    organizationData: this.props.userJson,
     consumerOffersList: [],
     energyPrice: 0.112,
     fiatAmount: '',
     totalToPay: 0,
-    ammountkWh: 0
+    ammountkWh: 0,
+    userJson: {
+      producerOffers: [],
+      consumerOffers: []
+    }
   }
 
   // Add Web3 event watchers at ComponentDidMount lifecycle,
   // and load the current charger locations
   async componentDidMount() {
+    const { drizzle, drizzleState } = this.props;
+    const { organization } = this.props.user;
+    const currentAccount = drizzleState.accounts[0];
+
+    const web3 = drizzle.web3;
+    const rawOrgName = web3.utils.utf8ToHex(organization);
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const ipfsHash = web3.utils.hexToUtf8(rawHash);
+    const rawJson = await ipfs.cat(ipfsHash);
+    const userJson = JSON.parse(rawJson);
+
+
     // Get the SharedMap.sol instance
     try {
-
       this.setState({
-        chargers: this.props.userJson.producerOffers
+        userJson,
+        chargers: userJson.producerOffers
       });
       this.getConsumerOffers();
     } catch (err) {
@@ -40,30 +60,35 @@ class Producer extends Component {
   }
 
   async getConsumerOffers() {
+    const { userJson } = this.state;
+    const { drizzle, drizzleState } = this.props;
+    const web3 = drizzle.web3;
+    const currentAddress = drizzleState.accounts[0];
+    const drizzleShastaMarket = drizzle.contracts.ShastaMarket;
+    const drizzleUser = drizzle.contracts.User;
 
-    const shastaMarketInstance = await this.props.shastaMarketContract.deployed();
-    const userContractInstance = await this.props.userContract.deployed();
+    const shastaMarketInstance = window.web3.eth.contract(drizzleShastaMarket.abi).at(drizzleShastaMarket.address);
+    const userContractInstance = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
 
     // Bids
     let consumerOffersList = [];
     //const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
-    const bidsLength = await shastaMarketInstance.getBidsLength.call({ from: this.props.address });
+    const bidsLength = await shastaMarketInstance.getBidsLength.call({ from: currentAddress });
 
     let auxArray = Array.from({ length: bidsLength.toNumber() }, (x, item) => item);
 
     auxArray.forEach(async (item, i) => {
 
-      let userContract = await shastaMarketInstance.getBidFromIndex.call(i, { from: this.props.address });
+      let userContract = await shastaMarketInstance.getBidFromIndex.call(i, { from: currentAddress });
       let userAddress = userContract[1];
 
       if (!checkedAddresses.includes(userAddress)) {
 
         checkedAddresses.push(userAddress);
-        let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: this.props.address });
-        let ipfsHash = this.props.web3.toAscii(ipfsHashRaw);
-        console.log("ipfs rec: ", ipfsHash);
+        let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: currentAddress });
+        let ipfsHash = web3.hexToUtf(ipfsHashRaw);
 
-        let rawContent = await this.props.ipfs.cat(ipfsHash);
+        let rawContent = await ipfs.cat(ipfsHash);
         let userData = JSON.parse(rawContent.toString("utf8"));
 
         for (let key in userData.consumerOffers) {
@@ -112,11 +137,16 @@ class Producer extends Component {
 
   addLocation = async () => {
     // Get the SharedMap.sol instance
-    const userContract = await this.props.userContract.deployed();
-    const currentAddress = this.props.address;
-    // Generate the location object, will be saved later in JSON.
+    const { drizzle, drizzleState } = this.props;
+    const userJson = _.cloneDeep(this.state.userJson);
+    const web3 = drizzle.web3;
+    const currentAddress = drizzleState.accounts[0];
+    const drizzleUser = drizzle.contracts.User;
+    const userContract = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
+
+
     const newProducerOffer = {
-      chargerName: this.state.organizationData.organization.name,
+      chargerName: this.state.userJson.organization.name,
       latitude: this.state.chargerLatitude,
       longitude: this.state.chargerLongitude,
       providerSource: this.state.providerSource,
@@ -128,20 +158,25 @@ class Producer extends Component {
       ethAddress: currentAddress,
       ammountkWh: this.state.ammountkWh
     }
-    this.props.userJson.producerOffers.push(newProducerOffer);
+    userJson.producerOffers.push(newProducerOffer);
     try {
       // Show loader spinner
       this.setState({ loader: true })
       // Upload to IPFS and receive response
-      const ipfsResponse = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
+      const ipfsResponse = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
       const ipfsHash = ipfsResponse[0].hash;
       console.log("ipfsHash: ", ipfsHash);
       console.log("props: ", userContract)
 
-      const estimatedGas = await userContract.createOffer.estimateGas(newProducerOffer.energyPrice, ipfsHash, { from: currentAddress });
-      await userContract.createOffer(newProducerOffer.energyPrice, ipfsHash, { gas: estimatedGas, from: currentAddress })
+      console.log('gas params', newProducerOffer.energyPrice, ipfsHash, currentAddress);
+      console.log(userContract)
+      const rawEnergyPrice = web3.utils.toWei(newProducerOffer.energyPrice.toString(), 'ether');
+      const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash)
+      const estimatedGas = await drizzleUser.methods.createOffer(rawEnergyPrice, rawIpfsHash).estimateGas({ from: currentAddress });
+      console.log('estima', estimatedGas)
+      await drizzleUser.methods.createOffer(rawEnergyPrice, rawIpfsHash).send({ gas: estimatedGas, from: currentAddress });
 
-      this.setState({ chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, energyPrice: 0 })
+      this.setState({ chargers: userJson.producerOffers, userJson, chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, energyPrice: 0 })
     } catch (err) {
       console.error(err)
     }
@@ -160,7 +195,9 @@ class Producer extends Component {
   }
 
   render() {
-    const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers } = this.state;
+    const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers, userJson } = this.state;
+    const { drizzleState} = this.props;
+    const currentAddress = drizzleState.accounts[0];
     let fieldErrors = []
     const providerSources = [{
       text: 'Solar',
@@ -179,7 +216,7 @@ class Producer extends Component {
       value: 'carbon',
     }]
     const consumerOffers = this.state.consumerOffersList.map((offer, index) => {
-      if (offer.ethAddress === this.props.address) {
+      if (offer.ethAddress === currentAddress) {
         return ''
       }
       return (
@@ -202,7 +239,7 @@ class Producer extends Component {
       )
     });
 
-    const producerOffers = this.props.userJson.producerOffers.map((offer, index) => {
+    const producerOffers = userJson.producerOffers.map((offer, index) => {
       return (
         <List.Item key={index}>
           <List.Content>
@@ -335,4 +372,11 @@ class Producer extends Component {
   }
 }
 
-export default Producer;
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+  )(Producer)
+);
