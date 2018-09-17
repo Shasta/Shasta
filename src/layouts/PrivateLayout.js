@@ -6,6 +6,9 @@ import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import withDrizzleContext from '../utils/withDrizzleContext';
+import ipfs from '../ipfs';
+import { connect } from 'react-redux';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -15,11 +18,21 @@ class Dashboard extends React.Component {
   }
 
   async createDemo() {
+    const { drizzle, drizzleState } = this.props;
+    const { organization } = this.props.user;
+    const currentAccount = drizzleState.accounts[0];
+
+    const web3 = drizzle.web3;
+    const rawOrgName = web3.utils.utf8ToHex(organization);
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const ipfsHash = web3.utils.hexToUtf8(rawHash);
+    const rawJson = await ipfs.cat(ipfsHash);
+    const userJson = JSON.parse(rawJson);
 
     var faker = require('faker');
 
     const consumerOffer = {
-      fiatAmount: 40,
+      fiatAmount: "40",
       date: Date.now(),
       firstName: "Vitalik",
       lastName: "Buterin",
@@ -29,22 +42,23 @@ class Dashboard extends React.Component {
       fiatAmount: "24",
       description: "Real energy directly from mother Russia",
       pendingOffer: true,
-      ethAddress: this.props.address,
+      ethAddress: currentAccount,
       address: faker.address.streetAddress(),
     }
 
 
-    this.props.userJson.consumerOffers.push(consumerOffer);
+    userJson.consumerOffers.push(consumerOffer);
 
-    const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
+    const res = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-    let ipfsH = res[0].hash;
-    let contractInstance = await this.props.contract.deployed();
+    let ipfsH = web3.utils.utf8ToHex(res[0].hash);
 
-    await contractInstance.createBid(consumerOffer.fiatAmount, ipfsH, { gas: 400000, from: this.props.address, value: consumerOffer.fiatAmount })
+    let contractInstance = drizzle.contracts.User;
+    const rawFiat = web3.utils.toWei(consumerOffer.fiatAmount, 'ether');
+    await contractInstance.methods.createBid(rawFiat, ipfsH).send({ gas: 400000, from: currentAccount })
 
     const consumerOffer2 = {
-      fiatAmount: 20,
+      fiatAmount: "20",
       date: Date.now(),
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
@@ -56,15 +70,12 @@ class Dashboard extends React.Component {
       ethAddress: this.props.address,
       address: faker.address.streetAddress(),
     }
-    this.props.userJson.consumerOffers.push(consumerOffer2);
-    const res2 = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
+    userJson.consumerOffers.push(consumerOffer2);
+    const res2 = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-    ipfsH = res2[0].hash;
-
-    await contractInstance.createBid(consumerOffer2.fiatAmount, ipfsH, { gas: 400000, from: this.props.address, value: consumerOffer2.fiatAmount })
-
-    // Get the SharedMap.sol instance
-    const sharedMapInstance = await this.props.sharedMapContract.deployed();
+    const secondIpfsH = web3.utils.utf8ToHex(res2[0].hash);
+    const secondPrice = web3.utils.toWei(consumerOffer2.fiatAmount, 'ether');
+    await contractInstance.methods.createBid(secondPrice, secondIpfsH).send( { gas: 400000, from: currentAccount })
 
     // Generate the location object, will be saved later in JSON.
     const producerOffer = {
@@ -77,16 +88,16 @@ class Dashboard extends React.Component {
       fiatAmount: "13",
       date: Date.now(),
       pendingOffer: true,
-      ethAddress: this.props.address
+      ethAddress: currentAccount
     }
-    this.props.userJson.producerOffers.push(producerOffer);
+    userJson.producerOffers.push(producerOffer);
 
     // Upload to IPFS and receive response
-    const ipfsResponse = await this.props.ipfs.add(Buffer.from(JSON.stringify(this.props.userJson)));
-    const ipfsHash = ipfsResponse[0].hash;
-    const estimatedGas = await contractInstance.createOffer.estimateGas(producerOffer.energyPrice, ipfsHash, { from: this.props.address });
-    await contractInstance.createOffer(producerOffer.energyPrice, ipfsHash, { gas: estimatedGas, from: this.props.address })
-
+    const ipfsResponse = await ipfs.add(Buffer.from(JSON.stringify(userJson)));
+    const thirdIpfsHash = web3.utils.utf8ToHex(ipfsResponse[0].hash);
+    const thirdPrice = web3.utils.toWei(producerOffer.fiatAmount, 'ether');
+    const estimatedGas = await contractInstance.methods.createOffer(thirdPrice, thirdIpfsHash).estimateGas({ from: currentAccount });
+    await contractInstance.methods.createOffer(thirdPrice, thirdIpfsHash).send({ gas: estimatedGas, from: currentAccount })
   }
 
   render() {
@@ -125,4 +136,10 @@ class Dashboard extends React.Component {
   }
 }
 
-export default Dashboard;
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+  )(Dashboard)
+);

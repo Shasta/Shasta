@@ -80,7 +80,7 @@ class Home extends Component {
       }
       const rawIpfsHash = result.args.ipfsHash;
 
-      const userHash = web3.hexToUtf8(rawIpfsHash);
+      const userHash = web3.utils.hexToUtf8(rawIpfsHash);
 
       const rawUser = await ipfs.cat(userHash);
       const user = JSON.parse(rawUser.toString("utf8"));
