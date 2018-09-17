@@ -39,6 +39,17 @@ class Consumer extends Component {
   }
 
   async componentDidMount() {
+    const {drizzle, drizzleState,user} = this.props;
+    const currentAccount = drizzleState.accounts[0]
+
+    const web3 = drizzle.web3;
+    const rawOrgName = web3.utils.utf8ToHex(user.organization);
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const ipfsHash = web3.utils.hexToUtf8(rawHash);
+    const rawJson = await ipfs.cat(ipfsHash);
+    this.setState({
+      userJson: JSON.parse(rawJson)
+    })
     this.getProducerOffers();
   }
   toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
@@ -129,13 +140,14 @@ class Consumer extends Component {
 
     auxArray.forEach(async (item, i) => {
 
-      let userContract = await shastaMarketInstance.methods.getOfferFromIndex.call(i, { from: currentAccount });
+      let userContract = await shastaMarketInstance.methods.getOfferFromIndex(i).call({ from: currentAccount });
       let userAddress = userContract[1];
       if (!checkedAddresses.includes(userAddress)) {
+        console.log(userContract)
 
         checkedAddresses.push(userAddress);
-        let ipfsHashRaw = await userContractInstance.methods.getIpfsHashByAddress.call(userAddress, { from: currentAccount });
-        let ipfsHash = web3.hexToUtf8(ipfsHashRaw);
+        let ipfsHashRaw = await userContractInstance.methods.getIpfsHashByAddress(userAddress).call({ from: userAddress });
+        let ipfsHash = web3.utils.hexToUtf8(ipfsHashRaw);
         console.log("ipfs rec: ", ipfsHash);
 
         let rawContent = await ipfs.cat(ipfsHash);
@@ -146,6 +158,7 @@ class Consumer extends Component {
             producersOffersList.push(userData.producerOffers[key])
           }
         }
+        console.log(producersOffersList)
         this.setState(({
           producersOffersList: producersOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
         }));
@@ -200,6 +213,7 @@ class Consumer extends Component {
         value: "Other"
       }
     ]
+    console.log(this.state.userJson)
 
     const consumerOffers = this.state.userJson.consumerOffers.map((contract) => {
       return (
@@ -229,6 +243,7 @@ class Consumer extends Component {
     });
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
+      console.log(contract)
       if (currentAccount == contract.ethAddress) {
         return '';
       }
@@ -254,6 +269,7 @@ class Consumer extends Component {
         </Card>
       );
     });
+    console.log('cards', producerOffers)
     return (
       <div>
         <div>

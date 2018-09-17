@@ -25,7 +25,6 @@ class Home extends Component {
 
   async componentDidMount() {
     const {drizzle, drizzleState,user} = this.props;
-    console.log(user)
     const currentAccount = drizzleState.accounts[0]
     const drizzleMarket = drizzle.contracts.ShastaMarket;
     const drizzleMap = drizzle.contracts.SharedMapPrice;
@@ -36,7 +35,6 @@ class Home extends Component {
     const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
-    console.log("aww",JSON.parse(rawJson))
     this.setState({
       userJson: JSON.parse(rawJson)
     })
