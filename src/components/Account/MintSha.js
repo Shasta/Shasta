@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Button,  Modal } from 'semantic-ui-react'
-import withRawDrizzleContext from '../../utils/withRawDrizzle.js';
 import parseDrizzleError from '../../utils/parseDrizzleError.js';
 import stringHelpers from '../../utils/stringHelpers.js';
 import {has} from 'lodash';
@@ -104,4 +103,4 @@ class MintSha extends Component {
   }
 }
 
-export default withRawDrizzleContext(MintSha);
+export default MintSha;
