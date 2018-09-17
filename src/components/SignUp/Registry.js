@@ -137,7 +137,7 @@ class RegistryForm extends Component {
     const { tokenBalancePointer, organizationName, firstName, lastName, country, toDashboard } = this.state;
     
     if (toDashboard === true) {
-      return <Redirect to="/dashboard" />
+      return <Redirect to="/home" />
     }
     const web3 = drizzle.web3;
 

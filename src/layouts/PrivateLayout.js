@@ -1,11 +1,14 @@
 import React from 'react';
-
+import { privateRoutes } from '../routes';
 import { Image, Menu, Sidebar, Button } from 'semantic-ui-react'
 import { Route, Switch, Link } from "react-router-dom";
-
+import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import withDrizzleContext from '../utils/withDrizzleContext';
+import ipfs from '../ipfs';
+import { connect } from 'react-redux';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -15,11 +18,21 @@ class Dashboard extends React.Component {
   }
 
   async createDemo() {
+    const { drizzle, drizzleState } = this.props;
+    const { organization } = this.props.user;
+    const currentAccount = drizzleState.accounts[0];
+
+    const web3 = drizzle.web3;
+    const rawOrgName = web3.utils.utf8ToHex(organization);
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const ipfsHash = web3.utils.hexToUtf8(rawHash);
+    const rawJson = await ipfs.cat(ipfsHash);
+    const userJson = JSON.parse(rawJson);
 
     var faker = require('faker');
 
     const consumerOffer = {
-      fiatAmount: 40,
+      fiatAmount: "40",
       date: Date.now(),
       firstName: "Vitalik",
       lastName: "Buterin",
@@ -29,22 +42,23 @@ class Dashboard extends React.Component {
       fiatAmount: "24",
       description: "Real energy directly from mother Russia",
       pendingOffer: true,
-      ethAddress: this.props.address,
+      ethAddress: currentAccount,
       address: faker.address.streetAddress(),
     }
 
 
-    this.props.userJson.consumerOffers.push(consumerOffer);
+    userJson.consumerOffers.push(consumerOffer);
 
-    const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
+    const res = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-    let ipfsH = res[0].hash;
-    let contractInstance = await this.props.contract.deployed();
+    let ipfsH = web3.utils.utf8ToHex(res[0].hash);
 
-    await contractInstance.createBid(consumerOffer.fiatAmount, ipfsH, { gas: 400000, from: this.props.address, value: consumerOffer.fiatAmount })
+    let contractInstance = drizzle.contracts.User;
+    const rawFiat = web3.utils.toWei(consumerOffer.fiatAmount, 'ether');
+    await contractInstance.methods.createBid(rawFiat, ipfsH).send({ gas: 400000, from: currentAccount })
 
     const consumerOffer2 = {
-      fiatAmount: 20,
+      fiatAmount: "20",
       date: Date.now(),
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
@@ -56,15 +70,12 @@ class Dashboard extends React.Component {
       ethAddress: this.props.address,
       address: faker.address.streetAddress(),
     }
-    this.props.userJson.consumerOffers.push(consumerOffer2);
-    const res2 = await this.props.ipfs.add([Buffer.from(JSON.stringify(this.props.userJson))]);
+    userJson.consumerOffers.push(consumerOffer2);
+    const res2 = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
-    ipfsH = res2[0].hash;
-
-    await contractInstance.createBid(consumerOffer2.fiatAmount, ipfsH, { gas: 400000, from: this.props.address, value: consumerOffer2.fiatAmount })
-
-    // Get the SharedMap.sol instance
-    const sharedMapInstance = await this.props.sharedMapContract.deployed();
+    const secondIpfsH = web3.utils.utf8ToHex(res2[0].hash);
+    const secondPrice = web3.utils.toWei(consumerOffer2.fiatAmount, 'ether');
+    await contractInstance.methods.createBid(secondPrice, secondIpfsH).send( { gas: 400000, from: currentAccount })
 
     // Generate the location object, will be saved later in JSON.
     const producerOffer = {
@@ -77,16 +88,16 @@ class Dashboard extends React.Component {
       fiatAmount: "13",
       date: Date.now(),
       pendingOffer: true,
-      ethAddress: this.props.address
+      ethAddress: currentAccount
     }
-    this.props.userJson.producerOffers.push(producerOffer);
+    userJson.producerOffers.push(producerOffer);
 
     // Upload to IPFS and receive response
-    const ipfsResponse = await this.props.ipfs.add(Buffer.from(JSON.stringify(this.props.userJson)));
-    const ipfsHash = ipfsResponse[0].hash;
-    const estimatedGas = await contractInstance.createOffer.estimateGas(producerOffer.energyPrice, ipfsHash, { from: this.props.address });
-    await contractInstance.createOffer(producerOffer.energyPrice, ipfsHash, { gas: estimatedGas, from: this.props.address })
-
+    const ipfsResponse = await ipfs.add(Buffer.from(JSON.stringify(userJson)));
+    const thirdIpfsHash = web3.utils.utf8ToHex(ipfsResponse[0].hash);
+    const thirdPrice = web3.utils.toWei(producerOffer.fiatAmount, 'ether');
+    const estimatedGas = await contractInstance.methods.createOffer(thirdPrice, thirdIpfsHash).estimateGas({ from: currentAccount });
+    await contractInstance.methods.createOffer(thirdPrice, thirdIpfsHash).send({ gas: estimatedGas, from: currentAccount })
   }
 
   render() {
@@ -97,30 +108,23 @@ class Dashboard extends React.Component {
     } = this.props;
     const Component = this.props.component;
 
+    const Links = _.map(privateRoutes, (privRoute, key) => 
+      (
+        <Menu.Item as={Link} to={privRoute.path}>
+          <FontAwesomeIcon icon={privRoute.icon}></FontAwesomeIcon><h4>{privRoute.title}</h4>
+        </Menu.Item>
+      )
+    )
     return (
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
         <Sidebar as={Menu} animation='overlay' icon='labeled' vertical visible width='wide'>
-          <Menu.Item as={Link} to="/dashboard">
+          <Menu.Item as={Link} to="/home">
             <Image src={logo} size='small' style={{ marginLeft: '85px' }}></Image>
           </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard">
-            <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/consumer">
-            <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Consumer</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/map">
-            <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Providers</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/hardware">
-            <FontAwesomeIcon icon="digital-tachograph"></FontAwesomeIcon><h4>Hardware</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/settings">
-            <FontAwesomeIcon icon="cog"></FontAwesomeIcon><h4>Settings</h4>
-          </Menu.Item>
+          {Links}
           <Menu.Item as={Link} to="/logout">
-            <FontAwesomeIcon></FontAwesomeIcon><h4>Logout</h4>
+            <h4>Logout</h4>
           </Menu.Item>
           <Button onClick={this.createDemo}>Create Demo</Button>
         </Sidebar>
@@ -132,4 +136,10 @@ class Dashboard extends React.Component {
   }
 }
 
-export default Dashboard;
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+  )(Dashboard)
+);
