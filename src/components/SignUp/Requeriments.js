@@ -3,9 +3,11 @@ import styled, { css} from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import ShastaLogo from '../../static/logo-shasta-02.png';
-import MintSha from '../Account/MintSha';
+import MintShaComponent from '../Account/MintSha';
 import { Button, Image } from 'semantic-ui-react'
 import _ from 'lodash';
+
+const MintSha = withRawDrizzle(MintShaComponent);
 
 const RequerimentsBox = styled.div`
   margin-top: 60px;
