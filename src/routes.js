@@ -7,6 +7,7 @@ import Settings from './components/Settings/Settings';
 import Producer from './components/Producer/Producer';
 // Hardware
 import React from 'react';
+import Finance from './components/Finance/Finance';
 
 export const publicRoutes = {
   SignUp: {
@@ -32,6 +33,11 @@ export const privateRoutes = {
     component: DashboardHome,
     title: 'Home',
     icon: 'home',
+  },
+  Finances: {
+    path: '/dashboard/finances',
+    component: Finance,
+    title: 'Finances'
   },
   Consumer: {
     path: '/consumer',
