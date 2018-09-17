@@ -1,66 +1,68 @@
-import SignIn from './components/SignIn/SignIn';
-import SignUp from './components/SignUp/SignUp';
-import Logout from './components/Logout';
-import DashboardHome from './components/Home/Home';
-import Consumer from './components/Consumer/Consumer';
-import Settings from './components/Settings/Settings';
-import Producer from './components/Producer/Producer';
+import SignIn from "./components/SignIn/SignIn";
+import SignUp from "./components/SignUp/SignUp";
+import Logout from "./components/Logout";
+import DashboardHome from "./components/Home/Home";
+import Consumer from "./components/Consumer/Consumer";
+import Settings from "./components/Settings/Settings";
+import Producer from "./components/Producer/Producer";
+import Hardware from "./components/Hardware/Hardware";
+
 // Hardware
-import React from 'react';
-import Finance from './components/Finance/Finance';
+import React from "react";
+import Finance from "./components/Finance/Finance";
 
 export const publicRoutes = {
   SignUp: {
-    path: '/',
+    path: "/",
     component: SignUp,
-    title: 'Sign up'
+    title: "Sign up"
   },
   SignIn: {
-    path: '/sign-in',
+    path: "/sign-in",
     component: SignIn,
-    title: 'Sign In'
+    title: "Sign In"
   },
   Logout: {
-    path: '/logout',
+    path: "/logout",
     component: Logout,
-    title: 'Logout'
+    title: "Logout"
   }
 };
 
 export const privateRoutes = {
   DashboardHome: {
-    path: '/home',
+    path: "/home",
     component: DashboardHome,
-    title: 'Home',
-    icon: 'home',
+    title: "Home",
+    icon: "home"
   },
   Finances: {
-    path: '/dashboard/finances',
+    path: "/dashboard/finances",
     component: Finance,
-    title: 'Finances'
+    title: "Finances"
   },
   Consumer: {
-    path: '/consumer',
+    path: "/consumer",
     component: Consumer,
-    title: 'Consumer',
-    icon: 'users'
+    title: "Consumer",
+    icon: "users"
   },
   Producer: {
-    path: '/producer',
+    path: "/producer",
     component: Producer,
-    title: 'Producer',
-    icon: 'map'
+    title: "Producer",
+    icon: "map"
   },
   Hardware: {
-    path: '/hardware',
-    component: () => <div/>,
-    title: 'Hardware',
-    icon: 'digital-tachograph'
+    path: "/hardware",
+    component: Hardware,
+    title: "Hardware",
+    icon: "digital-tachograph"
   },
   Settings: {
-    path: '/settings',
+    path: "/settings",
     component: Settings,
-    title: 'Settings',
-    icon: 'cog'
+    title: "Settings",
+    icon: "cog"
   }
-}
+};
