@@ -4,7 +4,7 @@ import Logout from './components/Logout';
 import DashboardHome from './components/Home/Home';
 import Consumer from './components/Consumer/Consumer';
 import Settings from './components/Settings/Settings';
-import Map from './components/Map/Map';
+import Map from './components/Producer/Producer';
 
 export const publicRoutes = {
   SignUp: {
@@ -29,6 +29,10 @@ export const privateRoutes = {
   Consumer: {
     path: '/dashboard/consumer',
     component: Consumer
+  },
+  Producer: {
+    path: '/dashboard/Map',
+    component: Map
   },
   Settings: {
     path: '/dashboard/settings',

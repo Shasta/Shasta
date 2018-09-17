@@ -229,11 +229,7 @@ class Consumer extends Component {
     });
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
-<<<<<<< HEAD
       if (currentAccount == contract.ethAddress) {
-=======
-      if (this.props.address === contract.ethAddress) {
->>>>>>> develop
         return '';
       }
       return (
@@ -305,12 +301,8 @@ class Consumer extends Component {
                   <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={this.handleChangeDropdownSource} />
                 </Form.Field>                <Message icon>
                   <Message.Content>
-<<<<<<< HEAD
-                    {currentAccount}
-=======
                     <p>1 Shas = 1$</p>
                     Total shas to pay: {this.state.totalToPay}
->>>>>>> develop
                   </Message.Content>
                 </Message>
                 <Form.Field>
