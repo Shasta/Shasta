@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Statistic, Feed } from 'semantic-ui-react'
 import MainChart from './MainChart';
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
-import { Line } from 'react-chartjs-2';
+import { Line, Pie } from 'react-chartjs-2';
 
 class Finance extends Component {
 
@@ -76,22 +76,51 @@ class Finance extends Component {
             ]
         };
 
+        const pieData = {
+            labels: [
+                'Solar',
+                'Eolic',
+                'Nuclear'
+            ],
+            datasets: [{
+                data: [300, 50, 100],
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56'
+                ],
+                hoverBackgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56'
+                ]
+            }]
+        };
+
         return (
             <div style={{ marginLeft: '400px', marginTop: '20px' }}>
                 <div style={{ float: 'left' }}>
                     <MainChart totalSha={totalSha}></MainChart>
-                    <Statistic.Group>
-                        <Statistic color='pink'>
-                            <Statistic.Value>{totalSha}</Statistic.Value>
-                            <Statistic.Label>Sha</Statistic.Label>
-                        </Statistic>
-                        <Statistic color='green'>
-                            <Statistic.Value>{this.state.totalEth}</Statistic.Value>
-                            <Statistic.Label>Ether</Statistic.Label>
-                        </Statistic>
-                    </Statistic.Group>
+                    <div style={{ width: 500, height: 300 }}>
+                        <h2>Energy price</h2>
+                        <Line data={data} />
+                    </div>
                 </div>
                 <div style={{ padding: '50px', float: 'left' }}>
+                    <div style={{ paddingBottom: 80 }}>
+                        <p>Your balances: </p>
+                        <Statistic.Group>
+                            <Statistic color='pink'>
+                                <Statistic.Value>{totalSha}</Statistic.Value>
+                                <Statistic.Label>Sha</Statistic.Label>
+                            </Statistic>
+                            <Statistic color='green'>
+                                <Statistic.Value>{this.state.totalEth}</Statistic.Value>
+                                <Statistic.Label>Ether</Statistic.Label>
+                            </Statistic>
+                        </Statistic.Group>
+                    </div>
+
                     <p>Your actions:</p>
                     <Feed>
                         <Feed.Event style={{ marginTop: 10 }}>
@@ -101,11 +130,9 @@ class Finance extends Component {
                             <Feed.Content date="yesterday" summary="You earned 10 shas with your energy" />
                         </Feed.Event>
                     </Feed>
-                </div>
-                <div>
-                    <div style={{ width: 500, height: 300 }}>
-                        <h2>Energy price</h2>
-                        <Line data={data} />
+                    <div style={{ width: 500, height: 300, paddingTop: 40}}>
+                        <p>Source of energy sold:</p>
+                        <Pie data={pieData} />
                     </div>
                 </div>
             </div>
