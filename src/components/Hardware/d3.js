@@ -54,7 +54,7 @@ class D3 extends Component {
               scale={yScale}
               top={0}
               left={0}
-              label={"Close Price ($)"}
+              label={"Energy (KwH)"}
               stroke={"#1b1a1e"}
               tickTextFill={"#1b1a1e"}
             />
