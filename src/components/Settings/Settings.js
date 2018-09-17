@@ -1,23 +1,22 @@
 import React, { Component } from 'react';
 import { Button, Form } from 'semantic-ui-react'
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
+import withDrizzleContext from '../../utils/withDrizzleContext';
+import { connect } from 'react-redux';
+import ipfs from '../../ipfs';
+import _ from 'lodash';
+
 class Settings extends Component {
-
-    constructor(props) {
-        super(props);
-        
-        this.state = {
-            country: this.props.userJson.organization.country,
-            region: this.props.userJson.organization.region,
-            lastName: this.props.userJson.organization.lastName,
-            firstName: this.props.userJson.organization.firstName,
-            address: this.props.userJson.organization.address,
-            zipCode: this.props.userJson.organization.zipCode,
-            name: this.props.userJson.organization.name
-        };
-        this.updateOrganization = this.updateOrganization.bind(this);
-
-    }
+    state = {
+        country: '',
+        region: '',
+        lastName: '',
+        firstName: '',
+        address: '',
+        zipCode: '',
+        name: '',
+        userJson: {}
+    };
 
     selectCountry(val) {
         this.setState({ country: val });
@@ -34,10 +33,12 @@ class Settings extends Component {
       }
 
     //It should save a json file to ipfs and save the hash to the smart contract
-    async updateOrganization() {
+    updateOrganization = async () => {
+        const {drizzle, drizzleState} = this.props;
+        const currentAccount = drizzleState.accounts[0];
+        const web3 = drizzle.web3;
 
-        var orgData = this.props.userJson;
-        console.log("updating organization " + this.state.name);
+        const orgData = _.cloneDeep(this.state.userJson);
 
         orgData.organization.region = this.state.region;
         orgData.organization.firstName = this.state.firstName;
@@ -46,17 +47,13 @@ class Settings extends Component {
         orgData.organization.zipCode = this.state.zipCode;
         orgData.organization.country = this.state.country; 
         orgData.organization.name = this.state.name;
-        console.log("Org data: ", orgData);
-        var ipfsHash = '';
 
-        const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(orgData))]);
+        const res = await ipfs.add([Buffer.from(JSON.stringify(orgData))]);
 
-        ipfsHash = res[0].hash;
-        console.log("ipfs hash: ", ipfsHash);
-        const contractInstance = await this.props.userContract.deployed();
-
-        console.log("address:", this.props.address);
-        const success = await contractInstance.updateUser(ipfsHash, { gas: 400000, from: this.props.address });
+        const ipfsHash = res[0].hash;
+        const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash);
+        const estimateGas = await drizzle.contracts.User.methods.updateUser(rawIpfsHash).estimateGas({ from: currentAccount });
+        const success = await drizzle.contracts.User.methods.updateUser(rawIpfsHash).send({ gas: estimateGas, from: currentAccount });
         if (success) {
             console.log("self:", self)
             console.log('updated organization ' + orgData.organization.name + ' on ethereum!');
@@ -66,6 +63,37 @@ class Settings extends Component {
         }
     }
 
+    async componentDidMount() {
+        const { drizzle, drizzleState } = this.props;
+        const { organization } = this.props.user;
+        const currentAccount = drizzleState.accounts[0];
+    
+        const web3 = drizzle.web3;
+        const rawOrgName = web3.utils.utf8ToHex(organization);
+        const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+        const ipfsHash = web3.utils.hexToUtf8(rawHash);
+        const rawJson = await ipfs.cat(ipfsHash);
+        const userJson = JSON.parse(rawJson);
+    
+    
+        // Get the SharedMap.sol instance
+        try {
+          this.setState({
+            userJson,
+            country: userJson.organization.country,
+            region: userJson.organization.region,
+            lastName: userJson.organization.lastName,
+            firstName: userJson.organization.firstName,
+            address: userJson.organization.address,
+            zipCode: userJson.organization.zipCode,
+            name: userJson.organization.name,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+    
+      }
+    
     render() {
         const { country, region } = this.state;
         return (
@@ -110,4 +138,11 @@ class Settings extends Component {
     }
 }
 
-export default Settings;
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+  )(Settings)
+);

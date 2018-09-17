@@ -8,14 +8,11 @@ let getWeb3 = new Promise(function(resolve, reject) {
 
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== 'undefined') {
-      // Backup the good old injected Web3, for listening events:
-      window.web3old = window.web3;
       // Use Mist/MetaMask's provider.
       web3 = new Web3(web3.currentProvider)
       console.log("web3.version", web3.version)
 
       results = {
-        web3old: window.web3,
         web3: web3
       }
 
