@@ -4,38 +4,57 @@ import Logout from './components/Logout';
 import DashboardHome from './components/Home/Home';
 import Consumer from './components/Consumer/Consumer';
 import Settings from './components/Settings/Settings';
-import Map from './components/Producer/Producer';
+import Producer from './components/Producer/Producer';
+// Hardware
+import React from 'react';
 
 export const publicRoutes = {
   SignUp: {
     path: '/',
-    component: SignUp
+    component: SignUp,
+    title: 'Sign up'
   },
   SignIn: {
     path: '/sign-in',
-    component: SignIn
+    component: SignIn,
+    title: 'Sign In'
   },
   Logout: {
     path: '/logout',
-    component: Logout
+    component: Logout,
+    title: 'Logout'
   }
 };
 
 export const privateRoutes = {
   DashboardHome: {
-    path: '/dashboard',
+    path: '/home',
     component: DashboardHome,
+    title: 'Home',
+    icon: 'home',
   },
   Consumer: {
-    path: '/dashboard/consumer',
-    component: Consumer
+    path: '/consumer',
+    component: Consumer,
+    title: 'Consumer',
+    icon: 'users'
   },
   Producer: {
-    path: '/dashboard/Map',
-    component: Map
+    path: '/producer',
+    component: Producer,
+    title: 'Producer',
+    icon: 'map'
+  },
+  Hardware: {
+    path: '/hardware',
+    component: () => <div/>,
+    title: 'Hardware',
+    icon: 'digital-tachograph'
   },
   Settings: {
     path: '/dashboard/settings',
-    component: Settings
+    component: Settings,
+    title: 'Settings',
+    icon: 'cog'
   }
 }

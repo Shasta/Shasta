@@ -1,8 +1,8 @@
 import React from 'react';
-
+import { privateRoutes } from '../routes';
 import { Image, Menu, Sidebar, Button } from 'semantic-ui-react'
 import { Route, Switch, Link } from "react-router-dom";
-
+import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -97,30 +97,25 @@ class Dashboard extends React.Component {
     } = this.props;
     const Component = this.props.component;
 
+    const Links = _.map(privateRoutes, (privRoute, key) => {
+      console.log("link", privRoute)
+      return(
+        <Menu.Item as={Link} to={privRoute.path}>
+          <FontAwesomeIcon icon={privRoute.icon}></FontAwesomeIcon><h4>{privRoute.title}</h4>
+        </Menu.Item>
+      )
+    }
+    )
     return (
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
         <Sidebar as={Menu} animation='overlay' icon='labeled' vertical visible width='wide'>
-          <Menu.Item as={Link} to="/dashboard">
+          <Menu.Item as={Link} to="/main">
             <Image src={logo} size='small' style={{ marginLeft: '85px' }}></Image>
           </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard">
-            <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/consumer">
-            <FontAwesomeIcon icon="users"></FontAwesomeIcon><h4>Consumer</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/map">
-            <FontAwesomeIcon icon="map"></FontAwesomeIcon><h4>Providers</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/hardware">
-            <FontAwesomeIcon icon="digital-tachograph"></FontAwesomeIcon><h4>Hardware</h4>
-          </Menu.Item>
-          <Menu.Item as={Link} to="/dashboard/settings">
-            <FontAwesomeIcon icon="cog"></FontAwesomeIcon><h4>Settings</h4>
-          </Menu.Item>
+          {Links}
           <Menu.Item as={Link} to="/logout">
-            <FontAwesomeIcon></FontAwesomeIcon><h4>Logout</h4>
+            <h4>Logout</h4>
           </Menu.Item>
           <Button onClick={this.createDemo}>Create Demo</Button>
         </Sidebar>

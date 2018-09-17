@@ -75,7 +75,7 @@ class SignIn extends Component {
   render() {
     const { organization, toDashboard } = this.state;
     if (toDashboard == true) {
-      return <Redirect to="/dashboard" />
+      return <Redirect to="/home" />
     }
     return (
       <div>
