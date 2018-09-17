@@ -3,7 +3,7 @@ function genDateValue(n, low, high) {
     .fill(1)
     .map((d, i) => {
       return {
-        date: new Date(Date.now() - i * 3600000),
+        date: new Date(Date.now() - i * 3600000 * 24 * 30),
         value: randomIntInc(low, high)
       };
     });

@@ -16,8 +16,8 @@ server.post("/createAccount", (req, res) => {
 
 server.get("/accountInfo", (req, res) => {
   res.jsonp({
-    hardware_id: 0x4b9db3633e4c583bf660cc32bf523d8e10cb78de,
-    conected: true,
+    hardware_id: "0x4b9db3633e4c583bf660cc32bf523d8e10cb78de",
+    status: "conected",
     consumedEnergy: util.randomIntInc(30, 50),
     surplusEnergy: util.randomIntInc(10, 20),
     remainingSurplusEnergy: util.randomIntInc(1, 5)
@@ -26,13 +26,13 @@ server.get("/accountInfo", (req, res) => {
 
 server.get("/historyConsumedEnergy", (req, res) => {
   res.jsonp({
-    hardware_id: 0x4b9db3633e4c583bf660cc32bf523d8e10cb78de
+    data: util.genDateValue(6, 20, 120)
   });
 });
 
 server.get("/historySurplusEnergy", (req, res) => {
   res.jsonp({
-    hardware_id: 0x4b9db3633e4c583bf660cc32bf523d8e10cb78de
+    data: util.genDateValue(6, 20, 60)
   });
 });
 
