@@ -1,11 +1,11 @@
 import { Drizzle, generateStore } from 'drizzle'
 
-import SharedMapPrice from 'shasta-os/build/contracts/SharedMapPrice.json';
-import User from 'shasta-os/build/contracts/User.json';
-import ShastaMarket from 'shasta-os/build/contracts/ShastaMarket.json';
-import ShaLedger from 'shasta-os/build/contracts/ShaLedger.json';
-import ContractRegistry from 'shasta-os/build/contracts/ContractRegistry.json';
-import BillSystem from 'shasta-os/build/contracts/BillSystem.json';
+import SharedMapPrice from '../build/contracts/SharedMapPrice.json';
+import User from '../build/contracts/User.json';
+import ShastaMarket from '../build/contracts/ShastaMarket.json';
+import ShaLedger from '../build/contracts/ShaLedger.json';
+import ContractRegistry from '../build/contracts/ContractRegistry.json';
+import BillSystem from '../build/contracts/BillSystem.json';
 
 const options = {
   contracts: [
@@ -19,9 +19,24 @@ const options = {
   polls: {
     accounts: 4000
   },
+  events: {
+    User: [
+      {
+        eventName: 'UpdatedUser',
+        eventOptions: {
+          from: 0
+        }
+      },
+    ], 
+    ShastaMarket: [
+      {
+        eventName: 'newOffer',
+        eventOptions: {
+          from: 0
+        }
+      }
+    ]
+  }
 };
 
-const drizzleStore = generateStore(options);
-const drizzle = new Drizzle(options, drizzleStore);
-
-export default drizzle;
+export default options;

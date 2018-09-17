@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
+import { Button } from 'semantic-ui-react'
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
-import MintShaModal from './MintSha';
+import MintSha from './MintSha';
 import styled, { css } from 'styled-components';
+
+const MintShaModal = withDrizzleContext(MintSha);
 
 const EthAccount = styled.div`
   display: flex;
@@ -30,7 +33,6 @@ class AccountData extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("fired!")
     const {drizzle, drizzleState} = nextProps;
     const { accounts } = drizzleState;
     const { currentAddress } = this.state;
@@ -102,7 +104,9 @@ class AccountData extends Component {
       <EthAccount>
           <div>{balance} {units}</div>
           <div>{tokenBalance} Sha</div>
-          <MintShaModal />
+          <MintShaModal>
+            <Button color="purple">Get Sha</Button>
+          </MintShaModal>
       </EthAccount>
     )
   }
