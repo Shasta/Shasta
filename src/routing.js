@@ -10,7 +10,7 @@ import Producer from './components/Producer/Producer';
 import logo from './static/logo-shasta-02.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Settings from './components/Settings/Settings';
-
+import Finance from './components/Finance/Finance';
 
 class App extends React.Component {
   constructor(props) {
@@ -105,13 +105,18 @@ class App extends React.Component {
           <Tab web3={web3} account={account} balance={balance}></Tab>
           <Sidebar as={Menu} animation='overlay' icon='labeled' vertical visible width='wide'>
             <Link to="/">
-              <Menu.Item as='a'>
+              <Menu.Item>
                 <Image src={logo} size='small' style={{ marginLeft: '85px' }}></Image>
               </Menu.Item>
             </Link>
             <Link to="/">
               <Menu.Item as='a'>
                 <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Home</h4>
+              </Menu.Item>
+            </Link>
+            <Link to="/finances">
+              <Menu.Item as='a'>
+                <FontAwesomeIcon icon="home"></FontAwesomeIcon><h4>Finance</h4>
               </Menu.Item>
             </Link>
             <Link to="/consumer">
@@ -150,6 +155,12 @@ class App extends React.Component {
               ipfs={this.props.ipfs}
               web3={this.props.web3}
               sharedMapContract={this.props.sharedMapContract}
+              address={this.props.address}
+            />} />
+             <Route exact path="/finances" render={(props) => <Finance
+              userJson={this.props.userJson}
+              userContract={this.props.contract}
+              web3={this.props.web3}
               address={this.props.address}
             />} />
             {/* <Route exact path="/marketer" render={(props) => <Marketer

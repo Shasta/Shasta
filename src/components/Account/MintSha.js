@@ -49,7 +49,6 @@ class MintSha extends Component {
     const shaLedgerInstance = drizzle.contracts.ShaLedger;
 
     const currentBalanceCall = await shaLedgerInstance.methods.balanceOf(currentAddress).call(currentAddress, {from: currentAddress});
-    console.log('bal', currentBalanceCall);
     if (currentBalanceCall === "0") {
       this.setState({
         modalOpen: true
