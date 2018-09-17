@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Button,  Modal } from 'semantic-ui-react'
-import withDrizzleContext from '../../utils/withDrizzleContext.js';
+import withRawDrizzleContext from '../../utils/withRawDrizzle.js';
 import parseDrizzleError from '../../utils/parseDrizzleError.js';
 import stringHelpers from '../../utils/stringHelpers.js';
-
+import {has} from 'lodash';
 class MintSha extends Component {
   state = {
     shasToMint: "100",
@@ -29,11 +29,14 @@ class MintSha extends Component {
       const cacheSendParams = [...params, ...[options]];
       const tx = mint.cacheSend(...params, options);
 
-      console.log(tx)
       this.setState(() => ({
-        tx
+        tx,
+        modalOpen: false,
       }));
 
+      if (has(this.props, 'afterClaim')) {
+        this.props.afterClaim();
+      }
     }
   }
 
@@ -42,19 +45,21 @@ class MintSha extends Component {
   handleClose = () => this.setState({ modalOpen: false })
 
   async componentDidMount() {
-    const { drizzleState, drizzle} = this.props;
-    const { accounts } = drizzleState; 
-    const currentAddress = accounts[0];
-
-    const shaLedgerInstance = drizzle.contracts.ShaLedger;
-
-    const currentBalanceCall = await shaLedgerInstance.methods.balanceOf(currentAddress).call(currentAddress, {from: currentAddress});
-    console.log('bal', currentBalanceCall);
-    if (currentBalanceCall === "0") {
-      this.setState({
-        modalOpen: true
-      })
+    const { drizzleState, drizzle, openAtStart} = this.props;
+    if (drizzleState && drizzleState.accounts) {
+      const { accounts } = drizzleState; 
+      const currentAddress = accounts[0];
+  
+      const shaLedgerInstance = drizzle.contracts.ShaLedger;
+  
+      const currentBalanceCall = await shaLedgerInstance.methods.balanceOf(currentAddress).call(currentAddress, {from: currentAddress});
+      if (openAtStart && currentBalanceCall === "0") {
+        this.setState({
+          modalOpen: true
+        })
+      }
     }
+    
   }
   render() {
     let transactionStatus;
@@ -71,11 +76,10 @@ class MintSha extends Component {
       if (transactionStatus == "Error") {
         transactionMsg = parseDrizzleError(drizzleState.transactions[txHash].error.message);
       }
-      console.log(drizzleState.transactions[txHash])
     }
     return(
       <Modal
-        trigger={<Button onClick={this.handleOpen} color="purple" inverted>Get Sha tokens</Button>}
+        trigger={<div onClick={this.handleOpen}>{this.props.children}</div>}
         onClose={this.handleClose}
         open={this.state.modalOpen}
       >
@@ -100,4 +104,4 @@ class MintSha extends Component {
   }
 }
 
-export default withDrizzleContext(MintSha);
+export default withRawDrizzleContext(MintSha);
