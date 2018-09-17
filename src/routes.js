@@ -52,7 +52,7 @@ export const privateRoutes = {
     icon: 'digital-tachograph'
   },
   Settings: {
-    path: '/dashboard/settings',
+    path: '/settings',
     component: Settings,
     title: 'Settings',
     icon: 'cog'

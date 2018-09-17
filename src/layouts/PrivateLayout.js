@@ -97,20 +97,18 @@ class Dashboard extends React.Component {
     } = this.props;
     const Component = this.props.component;
 
-    const Links = _.map(privateRoutes, (privRoute, key) => {
-      console.log("link", privRoute)
-      return(
+    const Links = _.map(privateRoutes, (privRoute, key) => 
+      (
         <Menu.Item as={Link} to={privRoute.path}>
           <FontAwesomeIcon icon={privRoute.icon}></FontAwesomeIcon><h4>{privRoute.title}</h4>
         </Menu.Item>
       )
-    }
     )
     return (
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
         <Sidebar as={Menu} animation='overlay' icon='labeled' vertical visible width='wide'>
-          <Menu.Item as={Link} to="/main">
+          <Menu.Item as={Link} to="/home">
             <Image src={logo} size='small' style={{ marginLeft: '85px' }}></Image>
           </Menu.Item>
           {Links}
