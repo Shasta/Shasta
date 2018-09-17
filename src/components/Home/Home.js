@@ -133,7 +133,7 @@ class Home extends Component {
           </Feed.Event>
         );
       }
-      if (notification.type == "newProvider") {
+      if (notification.type === "newProvider") {
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
             <Feed.Content date={notification.timestamp.toLocaleString()} summary={`Provider ${notification.chargerName} offers energy at ${notification.energyPrice} kWh/€ from ${notification.providerSource} energy source.`} />

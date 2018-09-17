@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Progress, Form, Checkbox, Dropdown, Card, Message } from 'semantic-ui-react'
+import { Button, Grid, Sidebar, Menu, Form, Checkbox, Dropdown, Card, Message, Input } from 'semantic-ui-react'
 import './Consumer.css';
 import axios from 'axios';
 import ipfs from '../../ipfs'
@@ -27,11 +27,12 @@ class Consumer extends Component {
       ipfsFirstName: '',
       ipfsAddress: '',
       fiatAmount: '',
-      energyPrice: '',
       dropdownSource: '',
-      description: '',
       address: '',
-      producersOffersList: []
+      producersOffersList: [],
+      ammountkWh: '',
+      energyPrice: 0.132,
+      totalToPay: 0
     }
 
     this.createConsumerOffer = this.createConsumerOffer.bind(this);
@@ -66,10 +67,10 @@ class Consumer extends Component {
       lastName: userJson.organization.lastName,
       country: userJson.organization.country,
       address: this.state.address,
+      ammountkWh: this.state.ammountkWh,
       energyPrice: this.state.energyPrice,
-      fiatAmount: this.state.fiatAmount,
+      fiatAmount: this.state.totalToPay,
       source: this.state.dropdownSource,
-      description: this.state.description,
       pendingOffer: true,
       ethAddress: currentAccount
     }
@@ -139,23 +140,37 @@ class Consumer extends Component {
 
         let rawContent = await ipfs.cat(ipfsHash);
         let userData = JSON.parse(rawContent.toString("utf8"));
-        
+
         for (let key in userData.producerOffers) {
-          producersOffersList.push(userData.producerOffers[key])
+          if (userData.producerOffers.hasOwnProperty(key)) {
+            producersOffersList.push(userData.producerOffers[key])
+          }
         }
         this.setState(({
           producersOffersList: producersOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
-        }));      }
+        }));
+      }
     })
 
   }
 
   handleChange = (e) => {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
   }
 
+  handleChangeAmmount = (e) => {
+    let isNumeric = Number.isInteger(Number(e.target.value));
+    let totalToPay = (isNumeric) ? Number(e.target.value) * this.state.energyPrice : 0;
+    //Format number
+    totalToPay = Math.round(totalToPay * 100) / 100;
+    this.setState({
+      [e.target.name]: e.target.value,
+      totalToPay: totalToPay
+    })
+    console.log("state:", this.state)
+  }
   handleChangeDropdownSource = (e) => {
     this.setState({
       dropdownSource: e.target.textContent
@@ -191,7 +206,7 @@ class Consumer extends Component {
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
             <Card.Header>
-              {contract.fiatAmount}€ at {contract.energyPrice}€/kWh
+              {contract.fiatAmount} Shas at {contract.energyPrice} Shas/kWh
             </Card.Header>
             <Card.Description>
               Ethereum account: {currentAccount}
@@ -201,10 +216,10 @@ class Consumer extends Component {
             </Card.Description>
             <Card.Description>
               Address: {contract.address}
-            </Card.Description>            
+            </Card.Description>
           </Card.Content>
           <Card.Content extra>
-          <p>Source: {contract.source}</p>
+            <p>Source: {contract.source}</p>
             <Button basic color='purple'>
               Cancel Offer
               </Button>
@@ -214,24 +229,28 @@ class Consumer extends Component {
     });
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
+<<<<<<< HEAD
       if (currentAccount == contract.ethAddress) {
+=======
+      if (this.props.address === contract.ethAddress) {
+>>>>>>> develop
         return '';
       }
       return (
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
             <Card.Header>
-              {contract.fiatAmount}€ at {contract.energyPrice}€/kWh
+              {contract.fiatAmount} Shas at {contract.energyPrice} Shas/kWh
             </Card.Header>
             <Card.Description>
               Ethereum account: {contract.ethAddress}
             </Card.Description>
             <Card.Description>
               Address: {contract.address}
-            </Card.Description>            
+            </Card.Description>
           </Card.Content>
           <Card.Content extra>
-          <p>Source: {contract.providerSource}</p>
+            <p>Source: {contract.providerSource}</p>
             <Button basic color='purple'>
               Buy Energy
               </Button>
@@ -265,33 +284,33 @@ class Consumer extends Component {
                     onChange={e => this.handleChange(e)} />
                 </Form.Field>
                 <Form.Field>
-                  <label>Description</label>
-                  <input placeholder='description'
-                    name='description'
-                    value={this.state.description}
-                    onChange={e => this.handleChange(e)} />
+                  <label style={{ float: 'left', padding: 5 }}> Energy Price: {this.state.energyPrice} (Shas/kWh)</label>
+                  <Message icon>
+                    <Message.Content>
+                      The current price is decided every day through the governance system. Want to participate? Click here
+                    </Message.Content>
+                  </Message>
                 </Form.Field>
                 <Form.Field>
-                  <label> Energy Price (€/kWh)</label>
-                  <input placeholder='The price of the energy to buy'
-                    name='energyPrice'
-                    value={this.state.energyPrice}
-                    onChange={e => this.handleChange(e)} />
+                  <label >Amount kWh you want to buy for a month:</label>
+                  <Input placeholder='Amount'
+                    name='ammountkWh'
+                    value={this.state.ammountkWh}
+                    label={{ basic: true, content: 'kWh/month' }}
+                    labelPosition='right'
+                    onChange={e => this.handleChangeAmmount(e)} />
                 </Form.Field>
                 <Form.Field>
-                  <label>Amount (€)</label>
-                  <input placeholder='Currency amount to buy'
-                    name='fiatAmount'
-                    value={this.state.fiatAmount}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <div style={{ padding: '20' }}>
                   <label>Source</label>
                   <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={this.handleChangeDropdownSource} />
-                </div>
-                <Message icon>
+                </Form.Field>                <Message icon>
                   <Message.Content>
+<<<<<<< HEAD
                     {currentAccount}
+=======
+                    <p>1 Shas = 1$</p>
+                    Total shas to pay: {this.state.totalToPay}
+>>>>>>> develop
                   </Message.Content>
                 </Message>
                 <Form.Field>
@@ -299,9 +318,6 @@ class Consumer extends Component {
                 </Form.Field>
                 <Button onClick={this.createConsumerOffer} type='submit'>Submit</Button>
               </Form>
-            </Menu.Item>
-            <Menu.Item>
-              <Progress percent={this.state.percent} color='violet' active></Progress>
             </Menu.Item>
             <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
           </Sidebar>
