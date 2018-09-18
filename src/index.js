@@ -17,9 +17,9 @@ const drizzle = new Drizzle(drizzleOptions, store)
 
 // Icons
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHome, faBars, faUsers, faMap, faTimes, faCog, faBolt, faDigitalTachograph,faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faBars, faUsers, faMap, faTimes, faCog, faBolt, faShoppingCart,faCheck, faMoneyCheck, faFilter } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHome, faUsers, faTimes, faCheck, faBars, faMap, faCog, faBolt, faDigitalTachograph)
+library.add(faHome, faUsers, faTimes, faCheck, faBars, faMap, faCog, faBolt,faMoneyCheck, faFilter, faShoppingCart)
 
 ReactDOM.render((
     <DrizzleContext.Provider drizzle={drizzle} store={store}>

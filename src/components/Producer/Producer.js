@@ -20,11 +20,10 @@ class Producer extends Component {
     chargerLongitude: "",
     marketerIndex: 0,
     chargers: [],
-    consumerOffersList: [],
     energyPrice: 0.112,
     fiatAmount: '',
     totalToPay: 0,
-    ammountkWh: 0,
+    amountkWh: 0,
     userJson: {
       producerOffers: [],
       consumerOffers: []
@@ -40,7 +39,7 @@ class Producer extends Component {
 
     const web3 = drizzle.web3;
     const rawOrgName = web3.utils.utf8ToHex(organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
     const userJson = JSON.parse(rawJson);
@@ -52,55 +51,9 @@ class Producer extends Component {
         userJson,
         chargers: userJson.producerOffers
       });
-      this.getConsumerOffers();
     } catch (err) {
       console.log(err);
     }
-
-  }
-
-  async getConsumerOffers() {
-    const { userJson } = this.state;
-    const { drizzle, drizzleState } = this.props;
-    const web3 = drizzle.web3;
-    const currentAddress = drizzleState.accounts[0];
-    const drizzleShastaMarket = drizzle.contracts.ShastaMarket;
-    const drizzleUser = drizzle.contracts.User;
-
-    const shastaMarketInstance = window.web3.eth.contract(drizzleShastaMarket.abi).at(drizzleShastaMarket.address);
-    const userContractInstance = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
-
-    // Bids
-    let consumerOffersList = [];
-    //const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
-    const bidsLength = await shastaMarketInstance.getBidsLength.call({ from: currentAddress });
-
-    let auxArray = Array.from({ length: bidsLength.toNumber() }, (x, item) => item);
-
-    auxArray.forEach(async (item, i) => {
-
-      let userContract = await shastaMarketInstance.getBidFromIndex.call(i, { from: currentAddress });
-      let userAddress = userContract[1];
-
-      if (!checkedAddresses.includes(userAddress)) {
-
-        checkedAddresses.push(userAddress);
-        let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: currentAddress });
-        let ipfsHash = web3.hexToUtf(ipfsHashRaw);
-
-        let rawContent = await ipfs.cat(ipfsHash);
-        let userData = JSON.parse(rawContent.toString("utf8"));
-
-        for (let key in userData.consumerOffers) {
-          if (userData.producerOffers.hasOwnProperty(key)) {
-            consumerOffersList.push(userData.consumerOffers[key])
-          }
-        }
-        this.setState(({
-          consumerOffersList: consumerOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
-        }));
-      }
-    })
 
   }
 
@@ -135,15 +88,13 @@ class Producer extends Component {
     })
   }
 
-  addLocation = async () => {
+  addProducer = async () => {
     // Get the SharedMap.sol instance
     const { drizzle, drizzleState } = this.props;
     const userJson = _.cloneDeep(this.state.userJson);
     const web3 = drizzle.web3;
     const currentAddress = drizzleState.accounts[0];
     const drizzleUser = drizzle.contracts.User;
-    const userContract = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
-
 
     const newProducerOffer = {
       chargerName: this.state.userJson.organization.name,
@@ -156,7 +107,7 @@ class Producer extends Component {
       date: Date.now(),
       pendingOffer: true,
       ethAddress: currentAddress,
-      ammountkWh: this.state.ammountkWh
+      amountkWh: this.state.amountkWh
     }
     userJson.producerOffers.push(newProducerOffer);
     try {
@@ -166,14 +117,13 @@ class Producer extends Component {
       const ipfsResponse = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
       const ipfsHash = ipfsResponse[0].hash;
       console.log("ipfsHash: ", ipfsHash);
-      console.log("props: ", userContract)
 
-      console.log('gas params', newProducerOffer.energyPrice, ipfsHash, currentAddress);
-      console.log(userContract)
       const rawEnergyPrice = web3.utils.toWei(newProducerOffer.energyPrice.toString(), 'ether');
       const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash)
+      console.log("price", rawEnergyPrice)
+      console.log("raw", rawIpfsHash)
+      console.log("account", currentAddress)
       const estimatedGas = await drizzleUser.methods.createOffer(rawEnergyPrice, rawIpfsHash).estimateGas({ from: currentAddress });
-      console.log('estima', estimatedGas)
       await drizzleUser.methods.createOffer(rawEnergyPrice, rawIpfsHash).send({ gas: estimatedGas, from: currentAddress });
 
       this.setState({ chargers: userJson.producerOffers, userJson, chargerLatitude: "", chargerLongitude: "", chargerName: "", chargerStatus: "open", visible: false, energyPrice: 0 })
@@ -182,62 +132,38 @@ class Producer extends Component {
     }
   }
 
-  handleChangeAmmount = (e) => {
+  handleChangeAmount = (e) => {
     let isNumeric = Number.isInteger(Number(e.target.value));
     let totalToPay = (isNumeric) ? Number(e.target.value) * this.state.energyPrice : 0;
     //Format number
     totalToPay = Math.round(totalToPay * 100) / 100;
     this.setState({
-      [e.target.name]: e.target.value,
+      amountkWh: e.target.value,
       totalToPay: totalToPay
     })
-    console.log("state:", this.state)
   }
 
   render() {
+
     const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers, userJson } = this.state;
-    const { drizzleState} = this.props;
-    const currentAddress = drizzleState.accounts[0];
+    const { drizzleState } = this.props;
     let fieldErrors = []
     const providerSources = [{
-      text: 'Solar',
-      value: 'solar',
-    },
-    {
-      text: 'Wind',
-      value: 'wind',
-    },
-    {
-      text: 'Gas',
-      value: 'gas',
-    },
-    {
-      text: 'Carbon',
-      value: 'carbon',
+      text: "Solar",
+      value: "Solar"
+    }, {
+      text: "Nuclear",
+      value: "Nuclear"
+    }, {
+      text: "Eolic",
+      value: "Eolic"
+    }, {
+      text: "Biomass",
+      value: "Biomass"
+    }, {
+      text: "Other",
+      value: "Other"
     }]
-    const consumerOffers = this.state.consumerOffersList.map((offer, index) => {
-      if (offer.ethAddress === currentAddress) {
-        return ''
-      }
-      return (
-        <List.Item key={index}>
-          <List.Content>
-            <List.Header>
-              <div style={{ float: 'left' }}>
-                <div>{offer.firstName} {offer.lastName}</div>
-                <div>Is buying {offer.fiatAmount} Shas at <b>{offer.energyPrice} Shas/kWh</b></div>
-                <div style={{ color: "grey" }}>Source: {offer.source}</div>
-              </div>
-
-              <Button basic color='green' value={index} style={{ backgroundColor: 'white', float: 'right' }}>
-                Sell your energy
-              </Button>
-            </List.Header>
-
-          </List.Content>
-        </List.Item>
-      )
-    });
 
     const producerOffers = userJson.producerOffers.map((offer, index) => {
       return (
@@ -246,7 +172,7 @@ class Producer extends Component {
             <List.Header>
               <div style={{ float: 'left' }}>
                 <div>{offer.firstName} {offer.lastName}</div>
-                <div>You are selling {offer.ammountkWh} kWh at <b>{offer.energyPrice} Shas/kWh</b></div>
+                <div>You are selling {offer.amountkWh} kWh at <b>{offer.energyPrice} Shas/kWh</b></div>
                 <div style={{ color: "grey" }}>Source: {offer.providerSource}</div>
               </div>
 
@@ -315,11 +241,11 @@ class Producer extends Component {
               <Form.Field>
                 <label >Amount kWh you want to Sell for a month:</label>
                 <Input placeholder='Amount'
-                  name='ammountkWh'
-                  value={this.state.ammountkWh}
+                  name='amountkWh'
+                  value={this.state.amountkWh}
                   label={{ basic: true, content: 'kWh/month' }}
                   labelPosition='right'
-                  onChange={e => this.handleChangeAmmount(e)} />
+                  onChange={e => this.handleChangeAmount(e)} />
               </Form.Field>
               <Form.Field>
                 <label>Latitude</label>
@@ -346,11 +272,10 @@ class Producer extends Component {
               </Message>
               <Message warning header='Check the next fields' list={fieldErrors} />
               <Button onClick={this.closeForm} style={{ marginRight: 30 }}>Close</Button>
-              <Button disabled={!!fieldErrors.length} onClick={this.addLocation} type='submit'>Submit</Button>
+              <Button disabled={!!fieldErrors.length} onClick={this.addProducer} type='submit'>Submit</Button>
             </Form>
           </Menu.Item>
         </Sidebar>
-
         <span style={{ fontSize: '1.71428571rem', marginRight: 40 }}>Current providers</span>
         <Button onClick={this.openForm}>Sell your energy</Button>
         <SharedMap newLocation={{ chargerLatitude, chargerLongitude }} chargers={chargers} emitLocation={this.locationSelected} />
@@ -360,13 +285,6 @@ class Producer extends Component {
             {producerOffers}
           </List>
         </Segment>
-        <div style={{ padding: 15 }}> <h3>Sell energy: </h3></div>
-        <Segment style={{ width: '65%' }}>
-          <List divided relaxed>
-            {consumerOffers}
-          </List>
-        </Segment>
-        <p></p>
       </div>
     );
   }
