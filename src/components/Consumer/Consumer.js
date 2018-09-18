@@ -102,7 +102,6 @@ class Consumer extends Component {
     // Offers
     let producersOffersList = [];
     const offersLength = await shastaMarketInstance.methods.getOffersLength().call({ from: currentAccount });
-    console.log("Number of offers: ", Number.parseInt(offersLength))
     let auxArray = Array.from({ length: Number.parseInt(offersLength) }, (x, item) => item);
 
     auxArray.forEach(async (item, i) => {
@@ -123,7 +122,6 @@ class Consumer extends Component {
             producersOffersList.push(userData.producerOffers[key])
           }
         }
-        console.log(producersOffersList)
         this.setState(({
           producersOffersList: producersOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
         }));
@@ -140,6 +138,12 @@ class Consumer extends Component {
   handleChangeSource = (e, data) => {
     this.setState({
       filterSource: data.value
+    })
+  }
+
+  handleChangefilterAmount = (e, data) => {
+    this.setState({
+      filterAmount: data.value
     })
   }
 
@@ -249,7 +253,6 @@ class Consumer extends Component {
         </Card>
       );
     });
-    console.log("offers", producerOffers)
     return (
 
       <div style={{ marginLeft: 400, marginTop: 20 }}>

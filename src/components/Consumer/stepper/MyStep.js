@@ -30,7 +30,7 @@ class MyStep extends Component {
                         <Step>
                             <Icon icon='shopping-cart' />
                             <Step.Content style= {{paddingLeft:20 }}>
-                                <Step.Title>Chose offer</Step.Title>
+                                <Step.Title>Choose offer</Step.Title>
                             </Step.Content>
                         </Step>
                     </Step.Group>
@@ -57,7 +57,7 @@ class MyStep extends Component {
                         <Step>
                         <Icon icon='shopping-cart' />
                             <Step.Content style= {{paddingLeft:20 }}>
-                                <Step.Title>Chose offer</Step.Title>
+                                <Step.Title>Choose offer</Step.Title>
                             </Step.Content>
                         </Step>
                     </Step.Group>
@@ -84,7 +84,7 @@ class MyStep extends Component {
                         <Step active>
                         <Icon icon='shopping-cart' />
                             <Step.Content style= {{paddingLeft:20 }}>
-                                <Step.Title>Chose offer</Step.Title>
+                                <Step.Title>Choose offer</Step.Title>
                             </Step.Content>
                         </Step>
                     </Step.Group>
