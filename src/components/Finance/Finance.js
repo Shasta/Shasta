@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Statistic, Feed } from 'semantic-ui-react'
+import { Statistic, Feed, Sidebar, Menu } from 'semantic-ui-react'
 import MainChart from './MainChart';
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import { Line, Pie } from 'react-chartjs-2';
@@ -56,21 +56,22 @@ class Finance extends Component {
                     label: 'Shas',
                     fill: false,
                     lineTension: 0.1,
-                    backgroundColor: 'rgba(75,192,192,0.4)',
-                    borderColor: 'rgba(75,192,192,1)',
+                    backgroundColor: 'rgba(129,117,130,0.4)',
+                    borderColor: 'rgba(129,117,130,1)',
                     borderCapStyle: 'butt',
                     borderDash: [],
                     borderDashOffset: 0.0,
                     borderJoinStyle: 'miter',
-                    pointBorderColor: 'rgba(75,192,192,1)',
+                    pointBorderColor: 'rgba(129,117,130,1)',
                     pointBackgroundColor: '#fff',
                     pointBorderWidth: 1,
                     pointHoverRadius: 5,
-                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                    pointHoverBackgroundColor: 'rgba(129,117,130,1)',
                     pointHoverBorderColor: 'rgba(220,220,220,1)',
                     pointHoverBorderWidth: 2,
                     pointRadius: 1,
                     pointHitRadius: 10,
+                    fill: true,
                     data: [0.1325, 0.1298, 0.1301, 0.12845, 0.12902, 0.1302, 0.132]
                 }
             ]
@@ -85,27 +86,50 @@ class Finance extends Component {
             datasets: [{
                 data: [300, 50, 100],
                 backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56'
+                    '#402d41',
+                    '#ed77b9',
+                    '#922c66'
                 ],
                 hoverBackgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56'
+                    '#402d41',
+                    '#ed77b9',
+                    '#922c66'
                 ]
             }]
         };
+        const pieOptions = {
+            cutoutPercentage: 40,
+            legend:{
+                position: 'right',
+                labels: {
+                    usePointStyle: true
+                }
+            }
+        }
 
+        const chartOptions= {
+            legend: {
+                labels:{
+                    boxWidth: 0
+                }
+            }
+        }
         return (
             <div style={{ marginLeft: '400px', marginTop: '20px' }}>
                 <div style={{ float: 'left' }}>
                     <MainChart totalSha={totalSha}></MainChart>
                     <div style={{ width: 500, height: 300 }}>
                         <h2>Energy price</h2>
-                        <Line data={data} />
+                        <Line data={data} options={chartOptions}/>
                     </div>
                 </div>
+                <Sidebar as={Menu} 
+                animation='overlay' 
+                icon='labeled' 
+                vertical visible 
+                width='40%'
+                direction='right'
+                >
                 <div style={{ padding: '50px', float: 'left' }}>
                     <div style={{ paddingBottom: 80 }}>
                         <p>Your balances: </p>
@@ -132,9 +156,10 @@ class Finance extends Component {
                     </Feed>
                     <div style={{ width: 500, height: 300, paddingTop: 40}}>
                         <p>Source of energy sold:</p>
-                        <Pie data={pieData} />
+                        <Pie data={pieData} options={pieOptions}/>
                     </div>
                 </div>
+                </Sidebar>
             </div>
         );
 
