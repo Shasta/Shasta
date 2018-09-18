@@ -125,6 +125,9 @@ class Consumer extends Component {
       if (currentAccount == contract.ethAddress) {
         return '';
       }
+      if (this.state.filterSource.length > 0 && !this.state.filterSource.includes(contract.providerSource)) {
+        return '';
+      }
       return (
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>

@@ -40,7 +40,7 @@ class Producer extends Component {
 
     const web3 = drizzle.web3;
     const rawOrgName = web3.utils.utf8ToHex(organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
     const userJson = JSON.parse(rawJson);
@@ -196,24 +196,24 @@ class Producer extends Component {
 
   render() {
     const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers, userJson } = this.state;
-    const { drizzleState} = this.props;
+    const { drizzleState } = this.props;
     const currentAddress = drizzleState.accounts[0];
     let fieldErrors = []
     const providerSources = [{
-      text: 'Solar',
-      value: 'solar',
-    },
-    {
-      text: 'Wind',
-      value: 'wind',
-    },
-    {
-      text: 'Gas',
-      value: 'gas',
-    },
-    {
-      text: 'Carbon',
-      value: 'carbon',
+      text: "Solar",
+      value: "Solar"
+    }, {
+      text: "Nuclear",
+      value: "Nuclear"
+    }, {
+      text: "Eolic",
+      value: "Eolic"
+    }, {
+      text: "Biomass",
+      value: "Biomass"
+    }, {
+      text: "Other",
+      value: "Other"
     }]
     const consumerOffers = this.state.consumerOffersList.map((offer, index) => {
       if (offer.ethAddress === currentAddress) {
