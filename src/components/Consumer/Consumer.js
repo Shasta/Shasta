@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Button, Dropdown, Card } from 'semantic-ui-react'
+import { Button, Dropdown, Card, Icon, Step } from 'semantic-ui-react'
 import './Consumer.css';
-import axios from 'axios';
 import ipfs from '../../ipfs'
 import withDrizzleContext from '../../utils/withDrizzleContext'
 import { connect } from 'react-redux';
 import { countryOptions } from './common'
+import MyStep from './stepper/MyStep'
 
 let checkedAddresses = [];
 const sources = [
@@ -24,6 +24,9 @@ const sources = [
   }, {
     text: "Other",
     value: "Other"
+  }, {
+    text: "No filter",
+    value: "No filter"
   }
 ]
 
@@ -45,6 +48,7 @@ const pricesRanges = [
     value: 50
   }
 ]
+
 class Consumer extends Component {
   constructor(props) {
     super(props)
@@ -62,11 +66,14 @@ class Consumer extends Component {
       address: '',
       producersOffersList: [],
       totalToPay: 0,
-      filterSource: [],
+      filterSource: '',
       filterCountry: '',
-      filterAmount: ''
+      filterAmount: '',
+      currentStep: 0
     }
 
+    this.handleNextClick = this.handleNextClick.bind(this);
+    this.selectCountry = this.selectCountry.bind(this);
   }
 
   async componentDidMount() {
@@ -136,11 +143,71 @@ class Consumer extends Component {
     })
   }
 
-  handleChangefilterAmount = (e, data) => {
+  handleNextClick() {
+    let next = this.state.currentStep + 1;
     this.setState({
-      filterAmount: data.value
+      currentStep: next
     })
   }
+
+  getContent(producerOffers) {
+    switch (this.state.currentStep) {
+      case 0:
+        return (
+          <div style={{ width: "35%" }}>
+            <p>Ammount of Energy:</p>
+            <Dropdown
+              placeholder='Ammount of Energy'
+              fluid selection
+              options={pricesRanges}
+              onChange={this.handleChangefilterAmount} />
+            <div style={{ paddingTop: 20 }}>
+              <Button
+                color="purple"
+                onClick={this.handleNextClick}
+              >Choose filters</Button>
+            </div>
+          </div>
+        )
+      case 1:
+        return (
+          <div>
+            <div style={{ width: "35%", paddingBottom: 20 }}>
+              <p>Source of energy:</p>
+              <Dropdown
+                placeholder='Source of energy'
+                fluid selection
+                options={sources}
+                onChange={this.handleChangeSource} />
+            </div>
+            <div style={{ width: "35%" }}>
+              <p>Country:</p>
+              <Dropdown
+                placeholder='Select Country'
+                fluid search selection
+                onChange={this.selectCountry}
+                options={countryOptions} />
+            </div>
+            <div style={{ paddingTop: 20 }}>
+              <Button
+                color="purple"
+                onClick={this.handleNextClick}
+              >Choose offers</Button>
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h3>Offers: </h3>
+            <Card.Group>
+              {producerOffers}
+            </Card.Group>
+          </div>
+        );
+    }
+  }
+
   render() {
     const { drizzleState } = this.props;
     const currentAccount = drizzleState.accounts[0];
@@ -149,11 +216,15 @@ class Consumer extends Component {
       if (currentAccount == contract.ethAddress) {
         return '';
       }
-      if (this.state.filterSource.length > 0 && !this.state.filterSource.includes(contract.providerSource)) {
-        return '';
+      if (this.state.filterSource !== "No filter" && this.state.filterSource !== '') {
+        if (this.state.filterSource !== contract.providerSource) {
+          return '';
+        }
       }
-      if (this.state.filterAmount + 10 < Number(contract.amountkWh) || this.state.filterAmount >= Number(contract.amountkWh) + 10) {
-        return '';
+      if (this.state.filterAmount !== '') {
+        if (this.state.filterAmount + 10 < Number(contract.amountkWh) || this.state.filterAmount >= Number(contract.amountkWh) + 10) {
+          return '';
+        }
       }
       return (
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
@@ -178,44 +249,12 @@ class Consumer extends Component {
         </Card>
       );
     });
+    console.log("offers", producerOffers)
     return (
+
       <div style={{ marginLeft: 400, marginTop: 20 }}>
-        <h3>Buy energy:</h3>
-        <div style={{ width: "60%" }}>
-          <p>Filters: </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: "35%" }}>
-              <p>Ammount of Energy:</p>
-              <Dropdown
-                placeholder='Ammount of Energy'
-                fluid selection
-                options={pricesRanges}
-                onChange={this.handleChangefilterAmount} />
-            </div>
-            <div style={{ width: "35%" }}>
-              <p>Source of energy:</p>
-              <Dropdown
-                placeholder='Source of energy'
-                fluid multiple selection
-                options={sources}
-                onChange={this.handleChangeSource} />
-            </div>
-            <div style={{ width: "45%", paddingLeft: 10 }}>
-              <p>Country:</p>
-              <Dropdown
-                placeholder='Select Country'
-                fluid search selection
-                onChange={this.selectCountry}
-                options={countryOptions} />
-            </div>
-          </div>
-        </div>
-        <div style={{ paddingTop: 20 }}>
-          <h3>Offers: </h3>
-          <Card.Group>
-            {producerOffers}
-          </Card.Group>
-        </div>
+        <MyStep step={this.state.currentStep} />
+        {this.getContent(producerOffers)}
       </div>
     );
   }
