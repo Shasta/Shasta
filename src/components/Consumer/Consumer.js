@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Dropdown, Card, Icon, Step } from 'semantic-ui-react'
+import { Button, Dropdown, Card } from 'semantic-ui-react'
 import './Consumer.css';
 import ipfs from '../../ipfs'
 import withDrizzleContext from '../../utils/withDrizzleContext'
@@ -92,7 +92,7 @@ class Consumer extends Component {
   }
 
   async getProducerOffers() {
-    const { drizzle, drizzleState, user } = this.props;
+    const { drizzle, drizzleState } = this.props;
     const web3 = drizzle.web3;
     const currentAccount = drizzleState.accounts[0];
     const shastaMarketInstance = drizzle.contracts.ShastaMarket;
@@ -217,7 +217,7 @@ class Consumer extends Component {
     const currentAccount = drizzleState.accounts[0];
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
-      if (currentAccount == contract.ethAddress) {
+      if (currentAccount === contract.ethAddress) {
         return '';
       }
       if (this.state.filterSource !== "No filter" && this.state.filterSource !== '') {

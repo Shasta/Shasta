@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Grid, Transition, Menu, Image, Button, Responsive, Sidebar } from 'semantic-ui-react'
+import { Menu, Button, Responsive, Sidebar } from 'semantic-ui-react'
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
-import {Route, Link, Switch} from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import _ from 'lodash';
 

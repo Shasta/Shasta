@@ -25,7 +25,6 @@ class MintSha extends Component {
         gas: 100000
       }
 
-      const cacheSendParams = [...params, ...[options]];
       const tx = mint.cacheSend(...params, options);
 
       this.setState(() => ({
@@ -72,7 +71,7 @@ class MintSha extends Component {
         transactionStatus = stringHelpers.capitalize(drizzleState.transactions[txHash].status);
         transactionMsg = transactionStatus;
       }
-      if (transactionStatus == "Error") {
+      if (transactionStatus === "Error") {
         transactionMsg = parseDrizzleError(drizzleState.transactions[txHash].error.message);
       }
     }

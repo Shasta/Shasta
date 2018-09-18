@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, Image } from 'semantic-ui-react';
+import { Image } from 'semantic-ui-react';
 import InstallSrc from '../../../static/install.png';
 
 const FlexDiv = styled.div`

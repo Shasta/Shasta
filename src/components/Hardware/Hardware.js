@@ -1,17 +1,9 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import axios from "axios";
 
 import {
-  Button,
   Grid,
-  Sidebar,
-  Menu,
-  Form,
-  Checkbox,
-  Dropdown,
-  Card,
-  Message,
-  Input
+  Card
 } from "semantic-ui-react";
 
 import D3 from "./d3.js";

@@ -7,13 +7,12 @@ class Tab extends Component {
   render() {
 
     return (
-      <div>
         <Menu size='massive'>
           <Menu.Menu position='right'>
             <Account accountIndex={0} units="ether" precision="3"/>
           </Menu.Menu>
         </Menu>
-      </div>
+   
     );
   }
 }

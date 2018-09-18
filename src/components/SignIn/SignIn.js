@@ -3,7 +3,6 @@ import { Input, Image, Button } from 'semantic-ui-react';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import withRawDrizzle from '../../utils/withRawDrizzle';
-import ipfs from '../../ipfs';
 
 import { connect} from 'react-redux';
 import {UserActions } from '../../redux/UserActions';
@@ -46,17 +45,10 @@ class SignIn extends Component {
   }
 
   loginIn = async () => {
-    const {initialized, drizzle, drizzleState} = this.props;
+    const {initialized, drizzleState} = this.props;
     const username = this.state.organization;
     if (initialized && drizzleState && !!drizzleState.accounts && !!drizzleState.accounts[0]) {
       try {
-        const web3 = drizzle.web3;
-        const currentAccount = drizzleState.accounts[0];
-        const rawNickname = web3.utils.utf8ToHex(username);
-        const rawIpfsHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawNickname).call();
-        const ipfsHash = web3.utils.hexToUtf8(rawIpfsHash);
-        const rawUserJson = await ipfs.cat(ipfsHash);
-        const userJson = JSON.parse(rawUserJson.toString("utf8"));
         this.action.login(username)
         this.setState({
           toDashboard: true
@@ -74,7 +66,7 @@ class SignIn extends Component {
   }
   render() {
     const { organization, toDashboard } = this.state;
-    if (toDashboard == true) {
+    if (toDashboard === true) {
       return <Redirect to="/home" />
     }
     return (

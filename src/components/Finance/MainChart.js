@@ -2,10 +2,6 @@ import React, {Component} from 'react';
 import { Line } from 'react-chartjs-2';
 
 class MainChart extends Component {
-    constructor(props) {
-        super(props);
-
-    }
 
     render() {
         const data = {
@@ -13,7 +9,6 @@ class MainChart extends Component {
             datasets: [
                 {
                     label: 'Amount of shas',
-                    fill: false,
                     lineTension: 0.1,
                     backgroundColor: 'rgba(243,166,210,0.4)',
                     borderColor: 'rgba(243,166,210,1)',

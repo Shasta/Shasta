@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Transition, Image } from 'semantic-ui-react'
+import { Grid, Transition } from 'semantic-ui-react'
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import _ from 'lodash';
 
@@ -11,7 +11,6 @@ import Registry from './Registry';
 import Install from './Helpers/Install';
 import Login from './Helpers/Login';
 import Claim from './Helpers/Claim';
-import { runSaga } from 'redux-saga';
 
 class SignUp extends Component {
   state = {
@@ -21,7 +20,7 @@ class SignUp extends Component {
 
   async componentDidMount() {
     const { initialized, drizzleState, drizzle} = this.props;
-    const { currentAddress, tokenBalancePointer } = this.state;
+    const { currentAddress } = this.state;
     const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();
     if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
       const shaLedgerInstance = drizzle.contracts.ShaLedger;

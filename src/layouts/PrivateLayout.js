@@ -1,7 +1,7 @@
 import React from 'react';
 import { privateRoutes } from '../routes';
 import { Image, Menu, Sidebar, Button } from 'semantic-ui-react'
-import { Route, Switch, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
@@ -24,58 +24,12 @@ class Dashboard extends React.Component {
 
     const web3 = drizzle.web3;
     const rawOrgName = web3.utils.utf8ToHex(organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
     const userJson = JSON.parse(rawJson);
-
-    var faker = require('faker');
-
-    const consumerOffer = {
-      fiatAmount: "40",
-      date: Date.now(),
-      firstName: "Vitalik",
-      lastName: "Buterin",
-      country: "Russia",
-      source: "Nuclear",
-      energyPrice: "0.15",
-      fiatAmount: "24",
-      description: "Real energy directly from mother Russia",
-      pendingOffer: true,
-      ethAddress: currentAccount,
-      address: faker.address.streetAddress(),
-    }
-
-
-    userJson.consumerOffers.push(consumerOffer);
-
-    const res = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
-
-    let ipfsH = web3.utils.utf8ToHex(res[0].hash);
-
     let contractInstance = drizzle.contracts.User;
-    const rawFiat = web3.utils.toWei(consumerOffer.fiatAmount, 'ether');
-    await contractInstance.methods.createBid(rawFiat, ipfsH).send({ gas: 400000, from: currentAccount })
-
-    const consumerOffer2 = {
-      fiatAmount: "20",
-      date: Date.now(),
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      country: faker.address.country(),
-      source: "Solar",
-      energyPrice: "0.15",
-      description: "Lorem Ipsum",
-      pendingOffer: true,
-      ethAddress: this.props.address,
-      address: faker.address.streetAddress(),
-    }
-    userJson.consumerOffers.push(consumerOffer2);
-    const res2 = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
-
-    const secondIpfsH = web3.utils.utf8ToHex(res2[0].hash);
-    const secondPrice = web3.utils.toWei(consumerOffer2.fiatAmount, 'ether');
-    await contractInstance.methods.createBid(secondPrice, secondIpfsH).send( { gas: 400000, from: currentAccount })
+    var faker = require('faker');
 
     // Generate the location object, will be saved later in JSON.
     const producerOffer = {
@@ -108,7 +62,7 @@ class Dashboard extends React.Component {
     } = this.props;
     const Component = this.props.component;
 
-    const Links = _.map(privateRoutes, (privRoute, key) => 
+    const Links = _.map(privateRoutes, (privRoute, key) =>
       (
         <Menu.Item as={Link} to={privRoute.path}>
           <FontAwesomeIcon icon={privRoute.icon}></FontAwesomeIcon><h4>{privRoute.title}</h4>
@@ -131,7 +85,9 @@ class Dashboard extends React.Component {
 
         {/* Render component */}
         <Component {...this.props} />
+      <div style={{ width: "100%", height: "10%", backgroundColor: "#402d41", bottom: 0 }}>
       </div>
+      </div >
     );
   }
 }

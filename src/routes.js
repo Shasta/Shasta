@@ -6,9 +6,6 @@ import Consumer from "./components/Consumer/Consumer";
 import Settings from "./components/Settings/Settings";
 import Producer from "./components/Producer/Producer";
 import Hardware from "./components/Hardware/Hardware";
-
-// Hardware
-import React from "react";
 import Finance from "./components/Finance/Finance";
 
 export const publicRoutes = {

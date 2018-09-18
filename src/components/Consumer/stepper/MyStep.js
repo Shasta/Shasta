@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import {  Step } from 'semantic-ui-react'
-import { FontAwesomeIcon as Icon} from '@fortawesome/react-fontawesome'
+import { Step } from 'semantic-ui-react'
+import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
 
 class MyStep extends Component {
 
@@ -13,7 +13,7 @@ class MyStep extends Component {
                     <Step.Group>
                         <Step active>
                             <Icon icon='money-check' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Amount</Step.Title>
                                 <Step.Description>Choose the energy amount to buy</Step.Description>
                             </Step.Content>
@@ -21,7 +21,7 @@ class MyStep extends Component {
 
                         <Step>
                             <Icon icon='filter' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Filters</Step.Title>
                                 <Step.Description>Select filters (optional)</Step.Description>
                             </Step.Content>
@@ -29,7 +29,7 @@ class MyStep extends Component {
 
                         <Step>
                             <Icon icon='shopping-cart' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Choose offer</Step.Title>
                             </Step.Content>
                         </Step>
@@ -39,24 +39,24 @@ class MyStep extends Component {
                 return (
                     <Step.Group>
                         <Step>
-                        <Icon icon='money-check' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Icon icon='money-check' />
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Amount</Step.Title>
                                 <Step.Description>Choose the energy amount to buy</Step.Description>
                             </Step.Content>
                         </Step>
 
                         <Step active>
-                        <Icon icon='filter' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Icon icon='filter' />
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Filters</Step.Title>
                                 <Step.Description>Select filters (optional)</Step.Description>
                             </Step.Content>
                         </Step>
 
                         <Step>
-                        <Icon icon='shopping-cart' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Icon icon='shopping-cart' />
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Choose offer</Step.Title>
                             </Step.Content>
                         </Step>
@@ -66,29 +66,31 @@ class MyStep extends Component {
                 return (
                     <Step.Group>
                         <Step>
-                        <Icon icon='money-check' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Icon icon='money-check' />
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Amount</Step.Title>
                                 <Step.Description>Choose the energy amount to buy</Step.Description>
                             </Step.Content>
                         </Step>
 
                         <Step>
-                        <Icon icon='filter' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Icon icon='filter' />
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Filters</Step.Title>
                                 <Step.Description>Select filters (optional)</Step.Description>
                             </Step.Content>
                         </Step>
 
                         <Step active>
-                        <Icon icon='shopping-cart' />
-                            <Step.Content style= {{paddingLeft:20 }}>
+                            <Icon icon='shopping-cart' />
+                            <Step.Content style={{ paddingLeft: 20 }}>
                                 <Step.Title>Choose offer</Step.Title>
                             </Step.Content>
                         </Step>
                     </Step.Group>
                 );
+            default:
+                return ('')
         }
     }
 }

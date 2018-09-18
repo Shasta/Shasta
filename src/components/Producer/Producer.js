@@ -5,7 +5,6 @@ import withDrizzleContext from '../../utils/withDrizzleContext';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-let checkedAddresses = [];
 import ipfs from '../../ipfs';
 
 class Producer extends Component {
@@ -146,7 +145,6 @@ class Producer extends Component {
   render() {
 
     const { visible, providerAddress, providerSource, chargerLatitude, chargerLongitude, chargers, userJson } = this.state;
-    const { drizzleState } = this.props;
     let fieldErrors = []
     const providerSources = [{
       text: "Solar",

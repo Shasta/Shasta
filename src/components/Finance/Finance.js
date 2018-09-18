@@ -16,7 +16,7 @@ class Finance extends Component {
     }
 
     async componentDidMount() {
-        const { drizzleState, drizzle, accountIndex } = this.props;
+        const { drizzleState, drizzle } = this.props;
         const { accounts, accountBalances } = drizzleState;
         const { web3 } = drizzle;
 
@@ -54,7 +54,6 @@ class Finance extends Component {
             datasets: [
                 {
                     label: 'Shas',
-                    fill: false,
                     lineTension: 0.1,
                     backgroundColor: 'rgba(129,117,130,0.4)',
                     borderColor: 'rgba(129,117,130,1)',

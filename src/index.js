@@ -7,10 +7,10 @@ import 'semantic-ui-css/semantic.min.css';
 
 // Drizzle
 import { DrizzleContext } from "drizzle-react";
-import { Drizzle, generateStore } from "drizzle";
+import { Drizzle } from "drizzle";
 import drizzleOptions from './drizzleOptions';
 // Redux Store
-import { history, store } from './store'
+import { store } from './store'
 import {Provider} from 'react-redux';
 
 const drizzle = new Drizzle(drizzleOptions, store)

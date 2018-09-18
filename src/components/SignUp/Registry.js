@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import styled, { css} from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import styled from 'styled-components';
 import { CountryDropdown } from 'react-country-region-selector';
-import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
+import { Button, Form, Input } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import ipfs from '../../ipfs';
@@ -70,7 +69,7 @@ class RegistryForm extends Component {
     const {initialized, drizzle, drizzleState} = this.props;
     const {organizationName, firstName, lastName, country} = this.state;
     const mainAccount = drizzleState && drizzleState.accounts && !!Object.keys(drizzleState.accounts).length ? drizzleState.accounts[0] : ""; 
-    if (initialized == true && mainAccount !== "") {
+    if (initialized === true && mainAccount !== "") {
       const contractInstance = drizzle.contracts.User;
       const userJson = {
         organization: {
@@ -106,7 +105,7 @@ class RegistryForm extends Component {
 
   componentWillReceiveProps(nextProps) {
     const {drizzle, drizzleState, initialized} = nextProps;
-    if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length == 0) {
+    if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length === 0) {
       return;
     }
 
@@ -133,27 +132,12 @@ class RegistryForm extends Component {
   }
 
   render() {
-    const { drizzle, drizzleState, initialized } = this.props;
-    const { tokenBalancePointer, organizationName, firstName, lastName, country, toDashboard } = this.state;
+    const { organizationName, firstName, lastName, country, toDashboard } = this.state;
     
     if (toDashboard === true) {
       return <Redirect to="/home" />
     }
-    const web3 = drizzle.web3;
-
-    let isInstalled, isLogged, haveSha = false;
-
-    isInstalled = drizzle.web3.status !== 'failed';
-    isLogged = isInstalled && initialized && drizzleState && Object.keys(drizzleState.accounts).length > 0;
     
-    if (initialized) {
-      if (tokenBalancePointer in drizzleState.contracts.ShaLedger.balanceOf) {
-        const zeroBN = web3.utils.toBN("0");
-        // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
-        const tokenBalance = web3.utils.toBN(drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value);
-        haveSha = tokenBalance.gt(zeroBN);
-      }
-    }
     return (
       <Form as={RegistryBox}>
         <h3 style={{textAlign: "center"}}>Sign up</h3>

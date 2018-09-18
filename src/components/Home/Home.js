@@ -123,8 +123,8 @@ class Home extends Component {
     const organization = userJson.organization;
     const currentAccount = drizzleState.accounts[0];
     const notifications = this.state.notifications.map((notification, index) => {
-      if (notification.type == "contract") {
-        const name = (notification.ethAddress == this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
+      if (notification.type === "contract") {
+        const name = (notification.ethAddress === this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
         return (
           <Feed.Event key={index} style={{marginTop: 10}}>
             <Feed.Content date={notification.timestamp.toLocaleString()} summary={`${name} posted new offer to buy ${notification.fiatAmount}€ at ${notification.energyPrice} €/kWh`} />
