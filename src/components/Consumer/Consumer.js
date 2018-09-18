@@ -8,7 +8,43 @@ import { connect } from 'react-redux';
 import { countryOptions } from './common'
 
 let checkedAddresses = [];
+const sources = [
+  {
+    text: "Solar",
+    value: "Solar"
+  }, {
+    text: "Nuclear",
+    value: "Nuclear"
+  }, {
+    text: "Eolic",
+    value: "Eolic"
+  }, {
+    text: "Biomass",
+    value: "Biomass"
+  }, {
+    text: "Other",
+    value: "Other"
+  }
+]
 
+const pricesRanges = [
+  {
+    text: "10-20 kWh",
+    value: 10
+  }, {
+    text: "20-30 kWh",
+    value: 20
+  }, {
+    text: "30-40 kWh",
+    value: 30
+  }, {
+    text: "40-50 kWh",
+    value: 40
+  }, {
+    text: "50-60 kWh",
+    value: 50
+  }
+]
 class Consumer extends Component {
   constructor(props) {
     super(props)
@@ -27,7 +63,8 @@ class Consumer extends Component {
       producersOffersList: [],
       totalToPay: 0,
       filterSource: [],
-      filterCountry: ''
+      filterCountry: '',
+      filterAmount: ''
     }
 
   }
@@ -99,27 +136,14 @@ class Consumer extends Component {
     })
   }
 
+  handleChangefilterAmount = (e, data) => {
+    this.setState({
+      filterAmount: data.value
+    })
+  }
   render() {
     const { drizzleState } = this.props;
     const currentAccount = drizzleState.accounts[0];
-    const sources = [
-      {
-        text: "Solar",
-        value: "Solar"
-      }, {
-        text: "Nuclear",
-        value: "Nuclear"
-      }, {
-        text: "Eolic",
-        value: "Eolic"
-      }, {
-        text: "Biomass",
-        value: "Biomass"
-      }, {
-        text: "Other",
-        value: "Other"
-      }
-    ]
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
       if (currentAccount == contract.ethAddress) {
@@ -128,11 +152,14 @@ class Consumer extends Component {
       if (this.state.filterSource.length > 0 && !this.state.filterSource.includes(contract.providerSource)) {
         return '';
       }
+      if (this.state.filterAmount + 10 < Number(contract.amountkWh) || this.state.filterAmount >= Number(contract.amountkWh) + 10) {
+        return '';
+      }
       return (
         <Card fluid style={{ maxWidth: '800px' }} color='purple'>
           <Card.Content>
             <Card.Header>
-              {contract.fiatAmount} Shas at {contract.energyPrice} Shas/kWh
+              {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
             </Card.Header>
             <Card.Description>
               Ethereum account: {contract.ethAddress}
@@ -143,6 +170,7 @@ class Consumer extends Component {
           </Card.Content>
           <Card.Content extra>
             <p>Source: {contract.providerSource}</p>
+            <p>Total Price: {contract.fiatAmount} Shas</p>
             <Button basic color='purple'>
               Buy Energy
               </Button>
@@ -155,12 +183,19 @@ class Consumer extends Component {
         <h3>Buy energy:</h3>
         <div style={{ width: "60%" }}>
           <p>Filters: </p>
-          <div style={{ display: 'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: "35%" }}>
+              <p>Ammount of Energy:</p>
+              <Dropdown
+                placeholder='Ammount of Energy'
+                fluid selection
+                options={pricesRanges}
+                onChange={this.handleChangefilterAmount} />
+            </div>
             <div style={{ width: "35%" }}>
               <p>Source of energy:</p>
               <Dropdown
                 placeholder='Source of energy'
-                name='dropdownValue'
                 fluid multiple selection
                 options={sources}
                 onChange={this.handleChangeSource} />
