@@ -26,49 +26,51 @@ class App extends Component {
   render() {
     const user = this.props.user ? this.props.user : { logged: false };
     return (
-      <Switch>
-        { _.map(publicRoutes, (publicRoute, key) => {
-          const { component, path } = publicRoute;
-          return (
-            <Route
-              exact
-              path={path}
-              key={key}
-              render={ (route) => 
-                  <PublicLayout 
-                    component={component}
-                    route={route} 
-                  /> 
-              }
-            />
-          )
-        })}
-        
-        { _.map(privateRoutes, (route, key) => {
-          const { component, path } = route;
-          return (
-            <Route
-              exact
-              path={path}
-              key={key}
-              render={ () => 
-                user.logged ? (
-                  <PrivateLayout 
-                      component={component}  
-                      route={route}
-                  />
-                ) : (
-                  <PublicLayout 
-                      component={publicRoutes["SignUp"].component} 
-                      route={route}
-                  />
-                )
-              }
-            />
-          )
-        })}
-        <Route component={ NotFound } />
-      </Switch>
+      <BrowserRouter>
+        <Switch>
+          { _.map(publicRoutes, (publicRoute, key) => {
+            const { component, path } = publicRoute;
+            return (
+              <Route
+                exact
+                path={path}
+                key={key}
+                render={ (route) => 
+                    <PublicLayout 
+                      component={component}
+                      route={route} 
+                    /> 
+                }
+              />
+            )
+          })}
+          
+          { _.map(privateRoutes, (route, key) => {
+            const { component, path } = route;
+            return (
+              <Route
+                exact
+                path={path}
+                key={key}
+                render={ () => 
+                  user.logged ? (
+                    <PrivateLayout 
+                        component={component}  
+                        route={route}
+                    />
+                  ) : (
+                    <PublicLayout 
+                        component={publicRoutes["SignUp"].component} 
+                        route={route}
+                    />
+                  )
+                }
+              />
+            )
+          })}
+          <Route component={ NotFound } />
+        </Switch>
+      </BrowserRouter>
     );
   }
 }

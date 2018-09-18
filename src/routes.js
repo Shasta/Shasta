@@ -37,7 +37,7 @@ export const privateRoutes = {
     icon: "home"
   },
   Finances: {
-    path: "/dashboard/finances",
+    path: "/finances",
     component: Finance,
     title: 'Finances',
     icon: 'home',

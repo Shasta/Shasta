@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './app.js'
+
 import './index.css';
-import { Router } from 'react-router'
 import 'semantic-ui-css/semantic.min.css';
 
 // Drizzle
@@ -22,11 +22,9 @@ import { faHome, faBars, faUsers, faMap, faTimes, faCog, faBolt, faShoppingCart,
 library.add(faHome, faUsers, faTimes, faCheck, faBars, faMap, faCog, faBolt,faMoneyCheck, faFilter, faShoppingCart)
 
 ReactDOM.render((
-    <DrizzleContext.Provider drizzle={drizzle} store={store}>
+    <DrizzleContext.Provider drizzle={drizzle}>
       <Provider store={store}>
-        <Router history={history} store={store}>
-          <App />
-        </Router>
+        <App />
       </Provider>
     </DrizzleContext.Provider>
   ),
