@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Button } from 'semantic-ui-react';
-import MintSha from '../../Account/MintSha';
+import MintShaComponent from '../../Account/MintSha';
+import withRawDrizzle from '../../../utils/withRawDrizzle';
+
+const MintSha = withRawDrizzle(MintShaComponent);
 
 const FlexDiv = styled.div`
   display: flex;

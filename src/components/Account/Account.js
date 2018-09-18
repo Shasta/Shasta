@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { Button } from 'semantic-ui-react'
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
-import MintShaModal from './MintSha';
+import MintSha from './MintSha';
 import styled, { css } from 'styled-components';
+
+const MintShaModal = withDrizzleContext(MintSha);
 
 const EthAccount = styled.div`
   display: flex;
