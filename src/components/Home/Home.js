@@ -35,42 +35,13 @@ class Home extends Component {
     const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
+
     this.setState({
       userJson: JSON.parse(rawJson)
     })
 
-    const shastaMarketInstance = window.web3.eth.contract(drizzleMarket.abi).at(drizzleMarket.address);
     const shastaUserInstance = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
-    const shastaMapInstance = window.web3.eth.contract(drizzleMap.abi).at(drizzleMap.address);
 
-    // Watch for NewLocation events, since this current block
-    shastaMarketInstance.newOffer(null, {fromBlock: 0}, (err, result) => {
-      if (err) {
-        console.error("Could not watch newOffer event.", err)
-        return;
-      }
-      window.web3.eth.getBlock(result.blockNumber, false, async (err, blockInfo) => {
-        const timestamp = new Date(blockInfo.timestamp * 1000);
-        const { value, locationIndex} = result.args
-        const providerHash = await shastaMapInstance.locationsIpfsHashes.call(locationIndex);
-        const rawProvider = await ipfs.cat(providerHash);
-        const provider = JSON.parse(rawProvider.toString("utf8"));
-        const notification = {
-          type: 'newProvider',
-          timestamp: timestamp,
-          price: value,
-          provider
-        }
-        this.setState( prevState => ({
-          notifications: _([...prevState.notifications, ...[notification]])
-            .orderBy('timestamp', 'desc')
-            .slice(0, 5)
-            .value()
-        }))
-      })
-    });
-    
-    // Watch for new UpdatedUser notifications
     shastaUserInstance.UpdatedUser({owner: this.props.address}, {fromBlock: 0}, async (err, result) => {
       if (err) {
         console.error("Could not watch UpdatedUser event.", err)
