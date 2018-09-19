@@ -6,6 +6,18 @@ import withDrizzleContext from '../../utils/withDrizzleContext'
 import { connect } from 'react-redux';
 import { countryOptions } from './common'
 import MyStep from './stepper/MyStep'
+import styled from 'styled-components';
+
+//Styled components
+const ShastaButton = styled.Button`
+  background-color: #402d41;
+  text-align: center;
+  color:white;
+  border-radius: 8px;
+  padding:12px 25px;
+  border:0;
+  cursor:pointer;
+`;
 
 let checkedAddresses = [];
 const sources = [
@@ -166,10 +178,10 @@ class Consumer extends Component {
               options={pricesRanges}
               onChange={this.handleChangefilterAmount} />
             <div style={{ paddingTop: 20 }}>
-              <Button
+              <ShastaButton
                 color="purple"
                 onClick={this.handleNextClick}
-              >Choose filters</Button>
+              >Choose filters</ShastaButton>
             </div>
           </div>
         )
@@ -193,10 +205,10 @@ class Consumer extends Component {
                 options={countryOptions} />
             </div>
             <div style={{ paddingTop: 20 }}>
-              <Button
+              <ShastaButton
                 color="purple"
                 onClick={this.handleNextClick}
-              >Choose offers</Button>
+              >Choose offers</ShastaButton>
             </div>
           </div>
         );

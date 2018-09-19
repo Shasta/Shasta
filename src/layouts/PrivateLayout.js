@@ -1,6 +1,6 @@
 import React from 'react';
 import { privateRoutes } from '../routes';
-import { Image, Menu, Sidebar, Button } from 'semantic-ui-react'
+import { Image, Menu, Sidebar, Button, MenuItem } from 'semantic-ui-react'
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withDrizzleContext from '../utils/withDrizzleContext';
 import ipfs from '../ipfs';
 import { connect } from 'react-redux';
+import "./PrivateLayout.less"
+import shastaFooter from '../static/marca-shasta.png';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -64,29 +66,37 @@ class Dashboard extends React.Component {
 
     const Links = _.map(privateRoutes, (privRoute, key) =>
       (
-        <Menu.Item as={Link} to={privRoute.path}>
-          <FontAwesomeIcon icon={privRoute.icon}></FontAwesomeIcon><h4>{privRoute.title}</h4>
-        </Menu.Item>
+        <MenuItem as={Link} to={privRoute.path} style={{width:"60%"}}>
+          <div className="itemDiv">
+            <Image style={{width:35, height:30}} src={privRoute.icon}/><div className="itemNameDiv">{privRoute.title}</div>
+          </div>
+        </MenuItem>
       )
     )
     return (
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
-        <Sidebar as={Menu} animation='overlay' icon='labeled' vertical visible width='wide'>
-          <Menu.Item as={Link} to="/home">
-            <Image src={logo} size='small' style={{ marginLeft: '85px' }}></Image>
-          </Menu.Item>
+        <Sidebar as={Menu}
+        animation='overlay' 
+        icon='labeled' 
+        vertical visible 
+        width='wide'
+        style={{ display: "flex", alignItems: "center", paddingTop: 40 }}
+        >
+            <Image src={logo} size='small' style={{paddingBottom:20}}></Image>
           {Links}
           <Menu.Item as={Link} to="/logout">
             <h4>Logout</h4>
           </Menu.Item>
-          <Button onClick={this.createDemo}>Create Demo</Button>
+          <Image src={shastaFooter} style={{bottom:60, position:'absolute'}}></Image>
+          <div className="bottomDiv">
+          </div>
         </Sidebar>
 
         {/* Render component */}
         <Component {...this.props} />
-      <div style={{ width: "100%", height: "10%", backgroundColor: "#402d41", bottom: 0 }}>
-      </div>
+        <div className="bottomDiv">
+        </div>
       </div >
     );
   }

@@ -7,6 +7,12 @@ import Settings from "./components/Settings/Settings";
 import Producer from "./components/Producer/Producer";
 import Hardware from "./components/Hardware/Hardware";
 import Finance from "./components/Finance/Finance";
+import homeIcon from './static/home_icon.png';
+import consumerIcon from './static/consumer_icon.png';
+import hardwareIcon from './static/hardware_icon.png';
+import settingsIcon from './static/settings_icon.png';
+import financeIcon from './static/finance_icon.png';
+
 
 export const publicRoutes = {
   SignUp: {
@@ -31,36 +37,36 @@ export const privateRoutes = {
     path: "/home",
     component: DashboardHome,
     title: "Home",
-    icon: "home"
+    icon: homeIcon
   },
   Finances: {
     path: "/finances",
     component: Finance,
     title: 'Finances',
-    icon: 'home',
+    icon: financeIcon,
   },
   Consumer: {
     path: "/consumer",
     component: Consumer,
     title: "Consumer",
-    icon: "users"
+    icon: consumerIcon
   },
   Producer: {
     path: "/producer",
     component: Producer,
     title: "Producer",
-    icon: "map"
+    icon: financeIcon
   },
   Hardware: {
     path: "/hardware",
     component: Hardware,
     title: "Hardware",
-    icon: "digital-tachograph"
+    icon: hardwareIcon
   },
   Settings: {
     path: "/settings",
     component: Settings,
     title: "Settings",
-    icon: "cog"
+    icon: settingsIcon
   }
 };
