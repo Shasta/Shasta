@@ -2,8 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './app.js'
 
-import './index.css';
-import 'semantic-ui-css/semantic.min.css';
+import './index.css'; 
+import "semantic-ui-less/semantic.less";
 
 // Drizzle
 import { DrizzleContext } from "drizzle-react";
@@ -12,12 +12,12 @@ import drizzleOptions from './drizzleOptions';
 // Redux Store
 import { store } from './store'
 import {Provider} from 'react-redux';
-
-const drizzle = new Drizzle(drizzleOptions, store)
-
 // Icons
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faHome, faBars, faUsers, faMap, faTimes, faCog, faBolt, faShoppingCart,faCheck, faMoneyCheck, faFilter, faDigitalTachograph } from '@fortawesome/free-solid-svg-icons'
+
+const drizzle = new Drizzle(drizzleOptions, store)
+
 
 library.add(faHome, faUsers, faTimes, faCheck, faBars, faMap, faCog, faBolt,faMoneyCheck, faFilter, faShoppingCart, faDigitalTachograph)
 ReactDOM.render((

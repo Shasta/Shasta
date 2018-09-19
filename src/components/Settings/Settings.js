@@ -55,7 +55,7 @@ class Settings extends Component {
         const estimateGas = await drizzle.contracts.User.methods.updateUser(rawIpfsHash).estimateGas({ from: currentAccount });
         const success = await drizzle.contracts.User.methods.updateUser(rawIpfsHash).send({ gas: estimateGas, from: currentAccount });
         if (success) {
-            console.log("self:", self)
+            console.log("self:", this)
             console.log('updated organization ' + orgData.organization.name + ' on ethereum!');
             //this.setState({ isLoged: true })
         } else {

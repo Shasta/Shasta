@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 
 import ipfs from '../../ipfs';
+let checkedAddresses = [];
 
 class Producer extends Component {
   state = {

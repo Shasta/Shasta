@@ -27,8 +27,7 @@ const store = createStore(
 )
 
 sagaMiddleware.run(rootSaga)
-
-export { history }
+ 
 export { store }
 
 export default store

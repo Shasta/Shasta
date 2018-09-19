@@ -90,7 +90,7 @@ class PublicHome extends Component {
         </Sidebar>
 
         {/* The rendered component */}
-        <Component  {...this.props} />
+        <Component  {...this.props} /> 
       </div>
     );
   }
