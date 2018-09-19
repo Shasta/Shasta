@@ -32,6 +32,8 @@ class MainChart extends Component {
         };
         
         const options = {
+            responsive:true,
+            maintainAspectRatio: false,
             legend: {
                 labels:{
                     boxWidth: 0,
@@ -39,7 +41,7 @@ class MainChart extends Component {
             }
         }
         return (
-            <div style={{ width: 500, height: 300 }}>
+            <div className="chartsDiv">
                 <h2>Sha historic</h2>
                 <Line data={data} options={options}/>
             </div>

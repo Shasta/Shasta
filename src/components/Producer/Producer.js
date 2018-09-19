@@ -209,11 +209,12 @@ class Producer extends Component {
           direction='right'
           visible={visible}
           width='very wide'
+
         >
-          <Menu.Item>
+          <Menu.Item style={{width:"80%"}}>
             <h3 style={{ position: 'relative' }}>New provider location</h3>
           </Menu.Item>
-          <Menu.Item>
+          <Menu.Item style={{width:"80%"}}>
             <Form warning={!!fieldErrors.length}>
               <Form.Field>
                 <p style={{ textAlign: "start" }}>You can click in the map to select the charger location. Add your address, your energy source and select the marketer that you want to sell your energy. Once the form is complete, click on Submit button.</p>

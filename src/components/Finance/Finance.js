@@ -3,7 +3,7 @@ import { Feed, Sidebar, Menu } from 'semantic-ui-react'
 import MainChart from './MainChart';
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import { Line, Pie } from 'react-chartjs-2';
-import "./Finance.css"
+import "./Finance.less"
 
 class Finance extends Component {
 
@@ -108,6 +108,8 @@ class Finance extends Component {
         }
 
         const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
             legend: {
                 labels: {
                     boxWidth: 0
@@ -115,10 +117,10 @@ class Finance extends Component {
             }
         }
         return (
-            <div style={{ marginLeft: '400px', marginTop: '20px' }}>
-                <div style={{ float: 'left' }}>
+            <div style={{ marginLeft: '400px'}}>
+                <div style={{ float: 'left', width:"55%", height: "80%" }}>
                     <MainChart totalSha={totalSha}></MainChart>
-                    <div style={{ width: "100%", height: 300 }}>
+                    <div className="chartsDiv">
                         <h2>Energy price</h2>
                         <Line data={data} options={chartOptions} />
                     </div>
