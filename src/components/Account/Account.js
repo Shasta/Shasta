@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Button } from 'semantic-ui-react'
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import MintSha from './MintSha';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 const MintShaModal = withDrizzleContext(MintSha);
 
@@ -64,7 +64,7 @@ class AccountData extends Component {
 
   render() {
     const { drizzleState, drizzle} = this.props;
-    const { tokenBalancePointer, asked } = this.state;
+    const { tokenBalancePointer } = this.state;
     const { accounts, accountBalances } = drizzleState;
     const { web3 } = drizzle;
 

@@ -7,10 +7,10 @@ import "semantic-ui-less/semantic.less";
 
 // Drizzle
 import { DrizzleContext } from "drizzle-react";
-import { Drizzle, generateStore } from "drizzle";
+import { Drizzle } from "drizzle";
 import drizzleOptions from './drizzleOptions';
 // Redux Store
-import { history, store } from './store'
+import { store } from './store'
 import {Provider} from 'react-redux';
 // Icons
 import { library } from '@fortawesome/fontawesome-svg-core'

@@ -1,11 +1,23 @@
 import React, { Component } from 'react';
-import { Button, Dropdown, Card, Icon, Step } from 'semantic-ui-react'
+import { Button, Dropdown, Card } from 'semantic-ui-react'
 import './Consumer.css';
 import ipfs from '../../ipfs'
 import withDrizzleContext from '../../utils/withDrizzleContext'
 import { connect } from 'react-redux';
 import { countryOptions } from './common'
 import MyStep from './stepper/MyStep'
+import styled from 'styled-components';
+
+//Styled components
+const ShastaButton = styled.Button`
+  background-color: #402d41;
+  text-align: center;
+  color:white;
+  border-radius: 8px;
+  padding:12px 25px;
+  border:0;
+  cursor:pointer;
+`;
 
 let checkedAddresses = [];
 const sources = [
@@ -92,7 +104,7 @@ class Consumer extends Component {
   }
 
   async getProducerOffers() {
-    const { drizzle, drizzleState, user } = this.props;
+    const { drizzle, drizzleState } = this.props;
     const web3 = drizzle.web3;
     const currentAccount = drizzleState.accounts[0];
     const shastaMarketInstance = drizzle.contracts.ShastaMarket;
@@ -166,10 +178,10 @@ class Consumer extends Component {
               options={pricesRanges}
               onChange={this.handleChangefilterAmount} />
             <div style={{ paddingTop: 20 }}>
-              <Button
+              <ShastaButton
                 color="purple"
                 onClick={this.handleNextClick}
-              >Choose filters</Button>
+              >Choose filters</ShastaButton>
             </div>
           </div>
         )
@@ -193,10 +205,10 @@ class Consumer extends Component {
                 options={countryOptions} />
             </div>
             <div style={{ paddingTop: 20 }}>
-              <Button
+              <ShastaButton
                 color="purple"
                 onClick={this.handleNextClick}
-              >Choose offers</Button>
+              >Choose offers</ShastaButton>
             </div>
           </div>
         );
@@ -217,7 +229,7 @@ class Consumer extends Component {
     const currentAccount = drizzleState.accounts[0];
 
     const producerOffers = this.state.producersOffersList.map((contract) => {
-      if (currentAccount == contract.ethAddress) {
+      if (currentAccount === contract.ethAddress) {
         return '';
       }
       if (this.state.filterSource !== "No filter" && this.state.filterSource !== '') {

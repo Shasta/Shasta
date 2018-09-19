@@ -1,5 +1,3 @@
-import { Drizzle, generateStore } from 'drizzle'
-
 import SharedMapPrice from '../build/contracts/SharedMapPrice.json';
 import User from '../build/contracts/User.json';
 import ShastaMarket from '../build/contracts/ShastaMarket.json';
