@@ -1,0 +1,9 @@
+@primaryColor   : @purpleLight;
+@secondaryColor : @grey;
+
+@purpleDark     : #3e2a40;
+@purpleLight    : #9b347b;
+@gray           : #878c8f;
+@blue           : #3e2a40;
+@turquoise      : #3e2a40;
+@orange         : #3e2a40;
