@@ -129,7 +129,6 @@
     "react-dom": "^16.4.2",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
-    "react-router-redux": "^4.0.8",
     "redux-thunk": "^2.3.0",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.5",
@@ -137,7 +136,7 @@
     "styled-components": "^3.4.6",
     "topojson-client": "^3.0.0",
     "truffle": "^5.0.0-gnosis.1",
-    "truffle-hdwallet-provider": "0.0.6",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.0",
     "vx": "0.0.1",
     "web3": "^0.20.7"
   },
