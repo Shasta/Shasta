@@ -90,9 +90,7 @@ class PublicHome extends Component {
         </Sidebar>
 
         {/* The rendered component */}
-        <Component  {...this.props} />
-
-        <Button primary >Botonaco </Button>
+        <Component  {...this.props} /> 
       </div>
     );
   }
