@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Statistic, Feed, Sidebar, Menu } from 'semantic-ui-react'
+import { Feed, Sidebar, Menu } from 'semantic-ui-react'
 import MainChart from './MainChart';
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import { Line, Pie } from 'react-chartjs-2';
+import "./Finance.css"
 
 class Finance extends Component {
 
@@ -98,7 +99,7 @@ class Finance extends Component {
         };
         const pieOptions = {
             cutoutPercentage: 40,
-            legend:{
+            legend: {
                 position: 'right',
                 labels: {
                     usePointStyle: true
@@ -106,9 +107,9 @@ class Finance extends Component {
             }
         }
 
-        const chartOptions= {
+        const chartOptions = {
             legend: {
-                labels:{
+                labels: {
                     boxWidth: 0
                 }
             }
@@ -117,47 +118,45 @@ class Finance extends Component {
             <div style={{ marginLeft: '400px', marginTop: '20px' }}>
                 <div style={{ float: 'left' }}>
                     <MainChart totalSha={totalSha}></MainChart>
-                    <div style={{ width: 500, height: 300 }}>
+                    <div style={{ width: "100%", height: 300 }}>
                         <h2>Energy price</h2>
-                        <Line data={data} options={chartOptions}/>
+                        <Line data={data} options={chartOptions} />
                     </div>
                 </div>
-                <Sidebar as={Menu} 
-                animation='overlay' 
-                icon='labeled' 
-                vertical visible 
-                width='40%'
-                direction='right'
+                <Sidebar as={Menu}
+                    animation='overlay'
+                    icon='labeled'
+                    vertical visible
+                    width='40%'
+                    direction='right'
                 >
-                <div style={{ padding: '50px', float: 'left' }}>
-                    <div style={{ paddingBottom: 80 }}>
-                        <p>Your balances: </p>
-                        <Statistic.Group>
-                            <Statistic color='pink'>
-                                <Statistic.Value>{totalSha}</Statistic.Value>
-                                <Statistic.Label>Sha</Statistic.Label>
-                            </Statistic>
-                            <Statistic color='green'>
-                                <Statistic.Value>{this.state.totalEth}</Statistic.Value>
-                                <Statistic.Label>Ether</Statistic.Label>
-                            </Statistic>
-                        </Statistic.Group>
-                    </div>
+                    <div style={{ padding: '50px', float: 'left' }}>
+                        <h3 className="titles">Your balances: </h3>
+                        <div className="currencyDiv">
+                            <div className="divBorderCurrencySha">
+                                <div className="divTagCurrencySha"><p>SHA</p></div>
+                                <h1 className="displaySha">{totalSha}</h1>
+                            </div>
+                            <div className="divBorderCurrencyEther">
+                                <div className="divTagCurrencyEther">ETH</div>
+                                <h1 className="displayEther">{this.state.totalEth}</h1>
+                            </div>
+                        </div>
 
-                    <p>Your actions:</p>
-                    <Feed>
-                        <Feed.Event style={{ marginTop: 10 }}>
-                            <Feed.Content date="today" summary="You bought 30kWh for 5 Shas" />
-                        </Feed.Event>
-                        <Feed.Event style={{ marginTop: 10 }}>
-                            <Feed.Content date="yesterday" summary="You earned 10 shas with your energy" />
-                        </Feed.Event>
-                    </Feed>
-                    <div style={{ width: 500, height: 300, paddingTop: 40}}>
-                        <p>Source of energy sold:</p>
-                        <Pie data={pieData} options={pieOptions}/>
+                        <h3 className="titles">Your actions:</h3>
+                        <Feed>
+                            <Feed.Event className="feedTitle">
+                                <Feed.Content date="● today" summary="You bought 30kWh for 5 Shas" />
+                            </Feed.Event>
+                            <Feed.Event className="feedTitle">
+                                <Feed.Content date="● yesterday" summary="You earned 10 shas with your energy" />
+                            </Feed.Event>
+                        </Feed>
+                        <div style={{ width: 500, height: 300, paddingTop: 40 }}>
+                        <h3 className="titles">Source of energy sold:</h3>
+                            <Pie data={pieData} options={pieOptions} />
+                        </div>
                     </div>
-                </div>
                 </Sidebar>
             </div>
         );
