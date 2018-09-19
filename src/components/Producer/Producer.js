@@ -5,8 +5,8 @@ import withDrizzleContext from '../../utils/withDrizzleContext';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-let checkedAddresses = [];
 import ipfs from '../../ipfs';
+let checkedAddresses = [];
 
 class Producer extends Component {
   state = {
