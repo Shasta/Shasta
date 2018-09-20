@@ -77,9 +77,9 @@ class Dashboard extends React.Component {
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
         <Sidebar as={Menu}
-        animation='overlay' 
-        icon='labeled' 
-        vertical visible 
+        animation='overlay'
+        icon='labeled'
+        vertical visible
         width='wide'
         style={{ display: "flex", alignItems: "center", paddingTop: 40 }}
         >
@@ -88,15 +88,12 @@ class Dashboard extends React.Component {
           <Menu.Item as={Link} to="/logout">
             <h4>Logout</h4>
           </Menu.Item>
-          <Image src={shastaFooter} style={{bottom:60, position:'absolute'}}></Image>
           <div className="bottomDiv">
           </div>
         </Sidebar>
 
         {/* Render component */}
         <Component {...this.props} />
-        <div className="bottomDiv">
-        </div>
       </div >
     );
   }
