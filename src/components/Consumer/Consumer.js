@@ -12,7 +12,10 @@ import styled from 'styled-components';
 
 //Styled components
 const ShastaButton = styled(Button)`
-  color: white;
+  background-color: #f076b6 !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  border:0 !important;
 `;
 
 let checkedAddresses = [];
