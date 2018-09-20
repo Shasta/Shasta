@@ -100,7 +100,7 @@ class Finance extends Component {
         const pieOptions = {
             cutoutPercentage: 40,
             legend: {
-                position: 'right',
+                position: 'top',
                 labels: {
                     usePointStyle: true
                 }
@@ -109,7 +109,6 @@ class Finance extends Component {
 
         const chartOptions = {
             responsive: true,
-            maintainAspectRatio: false,
             legend: {
                 labels: {
                     boxWidth: 0
@@ -122,17 +121,17 @@ class Finance extends Component {
                     <MainChart totalSha={totalSha}></MainChart>
                     <div className="chartsDiv">
                         <h2>Energy price</h2>
-                        <Line data={data} options={chartOptions} />
+                        <Line data={data} options={chartOptions} height={100}/>
                     </div>
                 </div>
                 <Sidebar as={Menu}
                     animation='overlay'
                     icon='labeled'
                     vertical visible
-                    width='40%'
                     direction='right'
+                    style={{ display: "flex", alignItems: "center", paddingTop: 40, width:"30%" }}
                 >
-                    <div style={{ padding: '50px', float: 'left' }}>
+                    <div style={{ padding: '50px', float: 'left', width:"100%" }}>
                         <h3 className="titles">Your balances: </h3>
                         <div className="currencyDiv">
                             <div className="divBorderCurrencySha">
@@ -154,7 +153,7 @@ class Finance extends Component {
                                 <Feed.Content date="● yesterday" summary="You earned 10 shas with your energy" />
                             </Feed.Event>
                         </Feed>
-                        <div style={{ width: 500, height: 300, paddingTop: 40 }}>
+                        <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
                         <h3 className="titles">Source of energy sold:</h3>
                             <Pie data={pieData} options={pieOptions} />
                         </div>

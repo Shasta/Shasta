@@ -5,12 +5,10 @@ import { Link } from "react-router-dom";
 import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withDrizzleContext from '../utils/withDrizzleContext';
 import ipfs from '../ipfs';
 import { connect } from 'react-redux';
 import "./PrivateLayout.less"
-import shastaFooter from '../static/marca-shasta.png';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -88,15 +86,10 @@ class Dashboard extends React.Component {
           <Menu.Item as={Link} to="/logout">
             <h4>Logout</h4>
           </Menu.Item>
-          <Image src={shastaFooter} style={{bottom:60, position:'absolute'}}></Image>
-          <div className="bottomDiv">
-          </div>
         </Sidebar>
 
         {/* Render component */}
         <Component {...this.props} />
-        <div className="bottomDiv">
-        </div>
       </div >
     );
   }
