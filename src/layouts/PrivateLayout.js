@@ -94,8 +94,6 @@ class Dashboard extends React.Component {
 
         {/* Render component */}
         <Component {...this.props} />
-        <div className="bottomDiv">
-        </div>
       </div >
     );
   }
