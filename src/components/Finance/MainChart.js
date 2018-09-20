@@ -40,7 +40,7 @@ class MainChart extends Component {
             }
         }
         return (
-            <div className="chartsDiv">
+            <div>
                 <h2>Sha historic</h2>
                 <Line data={data} options={options} height={100}/>
             </div>

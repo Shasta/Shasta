@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Feed, Sidebar, Menu } from 'semantic-ui-react'
+import { Feed, Sidebar, Responsive, Segment, Grid } from 'semantic-ui-react'
 import MainChart from './MainChart';
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import { Line, Pie } from 'react-chartjs-2';
@@ -116,50 +116,134 @@ class Finance extends Component {
             }
         }
         return (
-            <div style={{ marginLeft: '400px'}}>
-                <div style={{ float: 'left', width:"55%", height: "80%" }}>
-                    <MainChart totalSha={totalSha}></MainChart>
-                    <div className="chartsDiv">
+            <Grid style={{ marginLeft: '25%' }}>
+                <Responsive 
+                    as={Grid.Column} 
+                    style={{ float: 'left', width: "100%", height: "80%" }}
+                    maxWidth={1200}>                    
+                    <Grid.Row>
+                        <MainChart totalSha={totalSha}></MainChart>
+                    </Grid.Row>
+                    <Grid.Row>
                         <h2>Energy price</h2>
-                        <Line data={data} options={chartOptions} height={100}/>
-                    </div>
-                </div>
-                <Sidebar as={Menu}
-                    animation='overlay'
-                    icon='labeled'
-                    vertical visible
-                    direction='right'
-                    style={{ display: "flex", alignItems: "center", paddingTop: 40, width:"30%" }}
-                >
-                    <div style={{ padding: '50px', float: 'left', width:"100%" }}>
-                        <h3 className="titles">Your balances: </h3>
-                        <div className="currencyDiv">
-                            <div className="divBorderCurrencySha">
-                                <div className="divTagCurrencySha"><p>SHA</p></div>
-                                <h1 className="displaySha">{totalSha}</h1>
+                        <Line data={data} options={chartOptions} height={100} />
+                    </Grid.Row>
+                    <Responsive as={Grid.Row}
+                        maxWidth={1200}
+                        >
+                        <div style={{ padding: '70px', float: 'left', width: "100%" }}>
+                            <h3 className="titles">Your balances: </h3>
+                            <div className="currencyDiv">
+                                <div className="divBorderCurrencySha">
+                                    <div className="divTagCurrencySha"><p>SHA</p></div>
+                                    <h1 className="displaySha">{totalSha}</h1>
+                                </div>
+                                <div className="divBorderCurrencyEther">
+                                    <div className="divTagCurrencyEther">ETH</div>
+                                    <h1 className="displayEther">{this.state.totalEth}</h1>
+                                </div>
                             </div>
-                            <div className="divBorderCurrencyEther">
-                                <div className="divTagCurrencyEther">ETH</div>
-                                <h1 className="displayEther">{this.state.totalEth}</h1>
+
+                            <h3 className="titles">Your actions:</h3>
+                            <Feed>
+                                <Feed.Event>
+                                    <Feed.Content date="● today" summary="You bought 30kWh for 5 Shas" />
+                                </Feed.Event>
+                                <Feed.Event className="feedTitle">
+                                    <Feed.Content date="● yesterday" summary="You earned 10 shas with your energy" />
+                                </Feed.Event>
+                            </Feed>
+                            <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
+                                <h3 className="titles">Source of energy sold:</h3>
+                                <Pie data={pieData} options={pieOptions} />
+                            </div>
+                        </div>
+                    </Responsive>
+                </Responsive>
+                <Responsive 
+                    as={Grid.Column} 
+                    style={{ float: 'left', width: "55%", height: "80%" }}
+                    minWidth={1200}>
+                    
+                    <Grid.Row>
+                        <MainChart totalSha={totalSha}></MainChart>
+                    </Grid.Row>
+                    <Grid.Row>
+                        <h2>Energy price</h2>
+                        <Line data={data} options={chartOptions} height={100} />
+                    </Grid.Row>
+                    <Responsive as={Grid.Row}
+                        maxWidth={1200}
+                        >
+                        <div style={{ padding: '70px', float: 'left', width: "100%" }}>
+                            <h3 className="titles">Your balances: </h3>
+                            <div className="currencyDiv">
+                                <div className="divBorderCurrencySha">
+                                    <div className="divTagCurrencySha"><p>SHA</p></div>
+                                    <h1 className="displaySha">{totalSha}</h1>
+                                </div>
+                                <div className="divBorderCurrencyEther">
+                                    <div className="divTagCurrencyEther">ETH</div>
+                                    <h1 className="displayEther">{this.state.totalEth}</h1>
+                                </div>
+                            </div>
+
+                            <h3 className="titles">Your actions:</h3>
+                            <Feed>
+                                <Feed.Event>
+                                    <Feed.Content date="● today" summary="You bought 30kWh for 5 Shas" />
+                                </Feed.Event>
+                                <Feed.Event className="feedTitle">
+                                    <Feed.Content date="● yesterday" summary="You earned 10 shas with your energy" />
+                                </Feed.Event>
+                            </Feed>
+                            <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
+                                <h3 className="titles">Source of energy sold:</h3>
+                                <Pie data={pieData} options={pieOptions} />
                             </div>
                         </div>
 
-                        <h3 className="titles">Your actions:</h3>
-                        <Feed>
-                            <Feed.Event className="feedTitle">
-                                <Feed.Content date="● today" summary="You bought 30kWh for 5 Shas" />
-                            </Feed.Event>
-                            <Feed.Event className="feedTitle">
-                                <Feed.Content date="● yesterday" summary="You earned 10 shas with your energy" />
-                            </Feed.Event>
-                        </Feed>
-                        <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
-                        <h3 className="titles">Source of energy sold:</h3>
-                            <Pie data={pieData} options={pieOptions} />
+                    </Responsive>
+                </Responsive>
+                <Grid.Column>
+                    <Responsive as={Sidebar}
+                        minWidth={1200}
+                        animation='overlay'
+                        icon='labeled'
+                        vertical visible
+                        direction='right'
+                        style={{ display: "flex", width: "30%" }}
+                    >
+                        <div style={{ padding: '70px', float: 'left', width: "100%" }}>
+                            <h3 className="titles">Your balances: </h3>
+                            <div className="currencyDiv">
+                                <div className="divBorderCurrencySha">
+                                    <div className="divTagCurrencySha"><p>SHA</p></div>
+                                    <h1 className="displaySha">{totalSha}</h1>
+                                </div>
+                                <div className="divBorderCurrencyEther">
+                                    <div className="divTagCurrencyEther">ETH</div>
+                                    <h1 className="displayEther">{this.state.totalEth}</h1>
+                                </div>
+                            </div>
+
+                            <h3 className="titles">Your actions:</h3>
+                            <Feed>
+                                <Feed.Event className="feedTitle">
+                                    <Feed.Content date="● today" summary="You bought 30kWh for 5 Shas" />
+                                </Feed.Event>
+                                <Feed.Event className="feedTitle">
+                                    <Feed.Content date="● yesterday" summary="You earned 10 shas with your energy" />
+                                </Feed.Event>
+                            </Feed>
+                            <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
+                                <h3 className="titles">Source of energy sold:</h3>
+                                <Pie data={pieData} options={pieOptions} />
+                            </div>
                         </div>
-                    </div>
-                </Sidebar>
-            </div>
+                    </Responsive>
+                </Grid.Column>
+            </Grid>
         );
 
     }
