@@ -3,7 +3,9 @@ import { Button } from 'semantic-ui-react'
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import MintSha from './MintSha';
 import styled from 'styled-components';
-
+import { connect } from 'react-redux';
+import { UserActions } from '../../redux/UserActions';
+import { Redirect } from 'react-router-dom';
 const MintShaModal = withDrizzleContext(MintSha);
 
 const EthAccount = styled.div`
@@ -25,6 +27,8 @@ class AccountData extends Component {
       tokenBalancePointer: "",
       currentAddress: null
     }
+
+    this.action = new UserActions(this.props.dispatch);
   }
 
   precisionRound(number, precision) {
@@ -33,18 +37,12 @@ class AccountData extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {drizzle, drizzleState} = nextProps;
+    const {drizzleState} = nextProps;
     const { accounts } = drizzleState;
     const { currentAddress } = this.state;
     const newAddress = accounts[0];
-    if (newAddress !== currentAddress) {
-      const shaLedgerInstance = drizzle.contracts.ShaLedger;
-      const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress);
-
-      this.setState({
-        tokenBalancePointer,
-        currentAddress: newAddress
-      });
+    if (newAddress !== currentAddress && !!currentAddress) {
+      this.action.logout();
     }
   }
 
@@ -68,6 +66,9 @@ class AccountData extends Component {
     const { accounts, accountBalances } = drizzleState;
     const { web3 } = drizzle;
 
+    if (!this.props.user.logged) {
+      return <Redirect to="/" />
+    }
     let tokenBalance = 0;
     const ShaLedgerState = drizzleState.contracts.ShaLedger;
     if (tokenBalancePointer in ShaLedgerState.balanceOf) {
@@ -112,4 +113,12 @@ class AccountData extends Component {
   }
 }
 
-export default withDrizzleContext(AccountData);
+function mapStateToProps(state, props) { return { user: state.userReducer } }
+function mapDispatchToProps(dispatch) { return { dispatch }; }
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(AccountData)
+);
