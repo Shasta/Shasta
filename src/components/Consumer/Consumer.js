@@ -241,7 +241,7 @@ class Consumer extends Component {
       case 0:
         return (
           <div style={{ width: "35%" }}>
-            <p>Ammount of Energy:</p>
+            <p>Amount of Energy:</p>
             <Dropdown
               placeholder='Ammount of Energy'
               fluid selection
