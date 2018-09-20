@@ -1,97 +1,83 @@
 import React, { Component } from 'react'
 import { Step } from 'semantic-ui-react'
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
+import styled from 'styled-components';
+
+const StepContent = styled(Step.Content)`
+  padding-left: 20px;
+`
+
+const ShastaStepDescription = styled(Step.Description)`
+    color: #f076b6 !important;
+`;
+
+const ShastaStepTitle = styled(Step.Title)`
+    color: #f076b6 !important;
+`;
+
+const ShastaStep = styled(Step)`
+    background-color: #f2f2f2 !important;
+    &:after {
+        background-color: #f2f2f2 !important;
+    };
+    &.active {
+        background-color: #402d41 !important;
+        &:after {
+            background-color: #402d41 !important;
+        };
+        color:white !important;
+        ${ShastaStepDescription} {
+            color:white !important;
+        }
+        ${ShastaStepTitle} {
+            color:white !important;
+        }
+    }
+    color:#f076b6 !important;
+    
+`;
+
+const ShastaStepGroup = styled(Step.Group)`
+    height="5vw" !important;
+`;
 
 class MyStep extends Component {
 
     render() {
+        const step = this.props.step;
 
-        switch (this.props.step) {
+        return (
+            <ShastaStepGroup>
+                <ShastaStep active={step === 0}>
+                    <Icon icon='money-check' />
+                    <StepContent>
+                        <ShastaStepTitle>Amount</ShastaStepTitle>
+                        <ShastaStepDescription active={step === 0}>Choose the energy amount to buy</ShastaStepDescription>
+                    </StepContent>
+                </ShastaStep>
 
-            case 0:
-                return (
-                    <Step.Group>
-                        <Step active>
-                            <Icon icon='money-check' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Amount</Step.Title>
-                                <Step.Description>Choose the energy amount to buy</Step.Description>
-                            </Step.Content>
-                        </Step>
+                <ShastaStep active={step === 1}>
+                    <Icon icon='filter' />
+                    <StepContent>
+                        <ShastaStepTitle>Filters</ShastaStepTitle>
+                        <ShastaStepDescription active={step === 1}>Select filters (optional)</ShastaStepDescription>
+                    </StepContent>
+                </ShastaStep>
 
-                        <Step>
-                            <Icon icon='filter' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Filters</Step.Title>
-                                <Step.Description>Select filters (optional)</Step.Description>
-                            </Step.Content>
-                        </Step>
-
-                        <Step>
-                            <Icon icon='shopping-cart' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Choose offer</Step.Title>
-                            </Step.Content>
-                        </Step>
-                    </Step.Group>
-                );
-            case 1:
-                return (
-                    <Step.Group>
-                        <Step>
-                            <Icon icon='money-check' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Amount</Step.Title>
-                                <Step.Description>Choose the energy amount to buy</Step.Description>
-                            </Step.Content>
-                        </Step>
-
-                        <Step active>
-                            <Icon icon='filter' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Filters</Step.Title>
-                                <Step.Description>Select filters (optional)</Step.Description>
-                            </Step.Content>
-                        </Step>
-
-                        <Step>
-                            <Icon icon='shopping-cart' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Choose offer</Step.Title>
-                            </Step.Content>
-                        </Step>
-                    </Step.Group>
-                );
-            case 2:
-                return (
-                    <Step.Group>
-                        <Step>
-                            <Icon icon='money-check' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Amount</Step.Title>
-                                <Step.Description>Choose the energy amount to buy</Step.Description>
-                            </Step.Content>
-                        </Step>
-
-                        <Step>
-                            <Icon icon='filter' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Filters</Step.Title>
-                                <Step.Description>Select filters (optional)</Step.Description>
-                            </Step.Content>
-                        </Step>
-
-                        <Step active>
-                            <Icon icon='shopping-cart' />
-                            <Step.Content style={{ paddingLeft: 20 }}>
-                                <Step.Title>Choose offer</Step.Title>
-                            </Step.Content>
-                        </Step>
-                    </Step.Group>
-                );
-            default:
-                return ('')
-        }
+                <ShastaStep active={step === 2}>
+                    <Icon icon='shopping-cart' />
+                    <StepContent>
+                        <ShastaStepTitle>Choose offer</ShastaStepTitle>
+                    </StepContent>
+                </ShastaStep>
+                <ShastaStep active={step === 3}>
+                    <Icon icon='file-signature' />
+                    <StepContent>
+                        <ShastaStepTitle>Confirm contract</ShastaStepTitle>
+                    </StepContent>
+                </ShastaStep>
+            </ShastaStepGroup>
+        );
     }
 }
 

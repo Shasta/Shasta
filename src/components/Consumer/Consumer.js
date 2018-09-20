@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 //Styled components
 const ShastaButton = styled.Button`
-  background-color: #402d41;
+  background-color: #f076b6;
   text-align: center;
   color:white;
   border-radius: 8px;
@@ -258,7 +258,7 @@ class Consumer extends Component {
           <Card.Content extra>
             <p>Source: {contract.providerSource}</p>
             <p>Total Price: {contract.fiatAmount} Shas</p>
-            <Button basic color='purple'>
+            <Button basic color='gray'>
               Buy Energy
               </Button>
           </Card.Content>
@@ -268,7 +268,7 @@ class Consumer extends Component {
     return (
 
       <div style={{ marginLeft: 400, marginTop: 20 }}>
-        <MyStep step={this.state.currentStep} />
+        <MyStep step={this.state.currentStep}/>
         {this.getContent(producerOffers)}
       </div>
     );
