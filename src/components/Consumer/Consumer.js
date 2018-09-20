@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Dropdown, Card } from 'semantic-ui-react'
+import { Button, Dropdown, Card, Loader, Segment } from 'semantic-ui-react'
+import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
+
 import './Consumer.css';
 import ipfs from '../../ipfs'
 import withDrizzleContext from '../../utils/withDrizzleContext'
@@ -9,14 +11,8 @@ import MyStep from './stepper/MyStep'
 import styled from 'styled-components';
 
 //Styled components
-const ShastaButton = styled.Button`
-  background-color: #f076b6;
-  text-align: center;
-  color:white;
-  border-radius: 8px;
-  padding:12px 25px;
-  border:0;
-  cursor:pointer;
+const ShastaButton = styled(Button)`
+  color: white;
 `;
 
 let checkedAddresses = [];
@@ -44,20 +40,24 @@ const sources = [
 
 const pricesRanges = [
   {
-    text: "10-20 kWh",
-    value: 10
+    text: "100 kWh",
+    value: 100
+  },
+  {
+    text: "200 kWh",
+    value: 200
   }, {
-    text: "20-30 kWh",
-    value: 20
+    text: "300 kWh",
+    value: 300
   }, {
-    text: "30-40 kWh",
-    value: 30
+    text: "400 kWh",
+    value: 400
   }, {
-    text: "40-50 kWh",
-    value: 40
+    text: "500 kWh",
+    value: 500
   }, {
-    text: "50-60 kWh",
-    value: 50
+    text: "600 kWh",
+    value: 600
   }
 ]
 
@@ -70,6 +70,7 @@ class Consumer extends Component {
         consumerOffers: [],
         producerOffers: [],
       },
+      selectedContract: null,
       visible: false,
       percent: 0,
       ipfsHash: '',
@@ -81,11 +82,9 @@ class Consumer extends Component {
       filterSource: '',
       filterCountry: '',
       filterAmount: '',
-      currentStep: 0
+      currentStep: 0,
+      tx: null
     }
-
-    this.handleNextClick = this.handleNextClick.bind(this);
-    this.selectCountry = this.selectCountry.bind(this);
   }
 
   async componentDidMount() {
@@ -139,11 +138,9 @@ class Consumer extends Component {
         }));
       }
     })
-
   }
 
-  selectCountry(e, val) {
-
+  selectCountry = (e, val) => {
     this.setState({ filterCountry: val.value });
   }
 
@@ -159,14 +156,66 @@ class Consumer extends Component {
     })
   }
 
-  handleNextClick() {
-    let next = this.state.currentStep + 1;
-    this.setState({
-      currentStep: next
-    })
+  handleNextClick = () => {
+    const current = this.state.currentStep;
+
+    if (current < 2) {
+      this.setState({
+        currentStep: current + 1
+      });
+    }
   }
 
-  getContent(producerOffers) {
+  handleBackClick = () => {
+    const current = this.state.currentStep;
+
+    if (current > 0) {
+      this.setState({
+        currentStep: current - 1
+      });
+    }
+  }
+
+  handleOfferSelection = (con) => {
+    if (con && con.ethAddress) {
+      console.log(con)
+      this.setState({
+        selectedContract: con,
+        currentStep: 3
+      });
+    }
+  }
+
+  handleConfirmation = (con, avg, price, total) => {
+    const ipfsContractMetadata = "";
+    const ipfsBillMetadata = "";
+    const { drizzle, drizzleState } = this.props;
+    const web3 = drizzle.web3;
+    const consumerAddress = drizzleState.accounts[0];
+    const producerAddress = con.ethAddress;
+    const tokenInstance = drizzle.contracts.ShaLedger;
+    const billInstance = drizzle.contracts.BillSystem;
+    const billInstanceWeb3 = new web3.eth.Contract(billInstance.abi, billInstance.address);
+    const confirmContractAbi = billInstanceWeb3.methods.newPrepaidContract(
+      tokenInstance.address,
+      producerAddress,
+      consumerAddress,
+      price.toString(),
+      avg.toString(),
+      true,
+      ipfsContractMetadata,
+      ipfsBillMetadata
+    ).encodeABI();
+    const tx = tokenInstance.methods.approveAndCall.cacheSend(billInstance.address, total.toString(), confirmContractAbi, { from: consumerAddress });
+
+    this.setState({
+      tx
+    });
+  }
+
+  getContent = (producerOffers) => {
+    const contract = this.state.selectedContract;
+    const averageConsumerEnergy = this.state.filterAmount;
     switch (this.state.currentStep) {
       case 0:
         return (
@@ -176,12 +225,12 @@ class Consumer extends Component {
               placeholder='Ammount of Energy'
               fluid selection
               options={pricesRanges}
-              onChange={this.handleChangefilterAmount} />
+              onChange={this.handleChangefilterAmount}
+            />
             <div style={{ paddingTop: 20 }}>
-              <ShastaButton
-                color="purple"
-                onClick={this.handleNextClick}
-              >Choose filters</ShastaButton>
+              <ShastaButton primary onClick={this.handleNextClick}>
+                Next
+              </ShastaButton>
             </div>
           </div>
         )
@@ -194,7 +243,8 @@ class Consumer extends Component {
                 placeholder='Source of energy'
                 fluid selection
                 options={sources}
-                onChange={this.handleChangeSource} />
+                onChange={this.handleChangeSource}
+              />
             </div>
             <div style={{ width: "35%" }}>
               <p>Country:</p>
@@ -202,13 +252,16 @@ class Consumer extends Component {
                 placeholder='Select Country'
                 fluid search selection
                 onChange={this.selectCountry}
-                options={countryOptions} />
+                options={countryOptions}
+              />
             </div>
             <div style={{ paddingTop: 20 }}>
-              <ShastaButton
-                color="purple"
-                onClick={this.handleNextClick}
-              >Choose offers</ShastaButton>
+              <ShastaButton secondary onClick={this.handleBackClick}>
+                Back
+              </ShastaButton>
+              <ShastaButton primary onClick={this.handleNextClick}>
+                Next
+              </ShastaButton>
             </div>
           </div>
         );
@@ -219,6 +272,61 @@ class Consumer extends Component {
             <Card.Group>
               {producerOffers}
             </Card.Group>
+          </div>
+        );
+      case 3:
+        const { tx } = this.state;
+        const { drizzle, drizzleState} = this.props;
+        const web3 = drizzle.web3;
+        const energyPrice = contract.energyPrice;
+        const priceRaw = web3.utils.toBN(web3.utils.toWei(energyPrice.toString(), 'ether'));
+        const avgRaw = web3.utils.toBN(averageConsumerEnergy);
+        const totalRaw = priceRaw.mul(avgRaw)
+        const totalPrice = web3.utils.fromWei(totalRaw, 'ether');
+
+        let txStatus = "";
+        if (drizzleState.transactionStack[tx]) {
+          const txHash = drizzleState.transactionStack[tx];
+          if (txHash && txHash in drizzleState.transactions) {
+            const transaction = drizzleState.transactions[txHash];
+            txStatus = transaction.status;
+            if (txStatus == "error") {
+              console.error(transaction.error);
+            }
+          }
+        }
+        console.log("tx status", txStatus)
+        return (
+          <div>
+            <h3>Confirm contract</h3>
+            <div>
+              <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} Sha per kWh.</p>
+              <p>Energy source: {contract.providerSource}</p> 
+              <p>Total monthly cost with your average energy usage: {totalPrice} Sha for {averageConsumerEnergy} kWh</p>
+              <p>Confirm below to accept the energy contract with Shasta, paying the first month beforehand in Sha token.</p>
+            </div>
+            <div style={{ paddingTop: 20, display: 'flex' }}>
+              <Button onClick={this.handleBackClick}>
+                Back
+              </Button>
+              <Button primary disabled={txStatus !== ""} onClick={() => this.handleConfirmation(contract, avgRaw, priceRaw, totalRaw)}>
+                Confirm contract
+              </Button>
+              {txStatus === 'pending' && (
+                <Loader active={true} >Pending transaction</Loader>
+              )}
+              {txStatus === 'success' && (
+                <Segment color='green' style={{ margin: 0, padding: 5, width: 140, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <Icon icon='check' color='green' size='lg' style={{marginRight: 10}}/>
+                  Success
+                </Segment>
+              )}
+               {txStatus === 'error' && (
+                <Segment color='red' style={{width: 140}}>
+                  Some error ocurred while making the transaction. Please contact with Shasta team if you consider that is a bug, via email at  hello@shasta.world
+                </Segment>
+              )}
+            </div>
           </div>
         );
     }
@@ -238,7 +346,7 @@ class Consumer extends Component {
         }
       }
       if (this.state.filterAmount !== '') {
-        if (this.state.filterAmount + 10 < Number(contract.amountkWh) || this.state.filterAmount >= Number(contract.amountkWh) + 10) {
+        if (Number(contract.amountkWh) < this.state.filterAmount) {
           return '';
         }
       }
@@ -257,16 +365,15 @@ class Consumer extends Component {
           </Card.Content>
           <Card.Content extra>
             <p>Source: {contract.providerSource}</p>
-            <p>Total Price: {contract.fiatAmount} Shas</p>
-            <Button basic color='gray'>
+            <p>Total Price: {contract.fiatAmount} Sha</p>
+            <ShastaButton primary onClick={() => this.handleOfferSelection(contract)}>
               Buy Energy
-              </Button>
+            </ShastaButton>
           </Card.Content>
         </Card>
       );
     });
     return (
-
       <div style={{ marginLeft: 400, marginTop: 20 }}>
         <MyStep step={this.state.currentStep}/>
         {this.getContent(producerOffers)}
