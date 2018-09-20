@@ -1,7 +1,7 @@
 import React from 'react';
 import { privateRoutes } from '../routes';
 import { Image, Menu, Sidebar, MenuItem } from 'semantic-ui-react'
-import { Link } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
@@ -64,10 +64,10 @@ class Dashboard extends React.Component {
 
     const Links = _.map(privateRoutes, (privRoute, key) =>
       (
-        <MenuItem as={Link} to={privRoute.path} style={{ width: "60%" }}>
+        <MenuItem as={NavLink} to={privRoute.path} activeClassName="nav-active-link" style={{ width: "60%" }}>
           <div className="itemDiv">
             { privRoute.icon && <Image style={{width:35, height:30}} src={privRoute.icon}/> }
-            <div className="itemNameDiv">{privRoute.title}</div>
+            <div className="itemNameDiv"><span>{privRoute.title}</span></div>
           </div>
         </MenuItem>
       )
