@@ -1,12 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
-
-import {
-  Grid,
-  Card
-} from "semantic-ui-react";
-
-import D3 from "./d3.js";
+import HardwareCharts from "./HardwareCharts";
+import {Grid} from "semantic-ui-react";
+import "./Hardware.less";
 
 class Hardware extends Component {
   constructor(props) {
@@ -52,10 +48,10 @@ class Hardware extends Component {
     return (
       <div>
         <div style={{ marginLeft: 400, marginTop: 20 }}>
-          <Grid>
-            <Grid.Row columns={2}>
-              <Grid.Column>
+          <Grid style={{width:"90%"}}>
+              <Grid.Column style={{width:"50%"}}>
                 <h3>Hardware: </h3>
+                <div className="pinkBorder">
                 <p>ID: {this.state.accountInfo.hardware_id}</p>
                 <p>
                   Status:{" "}
@@ -63,12 +59,9 @@ class Hardware extends Component {
                     {this.state.accountInfo.status}
                   </span>
                 </p>
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Card.Group />
+                </div>
                 <h3>Energy:</h3>
+                <div className="pinkBorder">
                 <p>
                   Consumed this month: {this.state.accountInfo.consumedEnergy}
                   KwH
@@ -81,19 +74,18 @@ class Hardware extends Component {
                   Remaining surplus to sell:{" "}
                   {this.state.accountInfo.remainingSurplusEnergy} KwH
                 </p>
-                <Card.Group />
+                </div>
               </Grid.Column>
-              <Grid.Column>
-                <h4>Your consumition: (KwH)</h4>
+              <Grid.Column style={{width:"50%"}}>
+                <h4>your consumption: (KwH)</h4>
                 <p>
-                  <D3 data={this.state.historyConsumedEnergy} />
+                  <HardwareCharts color={"rgba(129,117,130,1)"} color2={"rgba(129,117,130,0.4)"} data={this.state.historyConsumedEnergy} />
                 </p>
                 <h4>Your surplus: (KwH)</h4>
                 <p>
-                  <D3 data={this.state.historySurplusEnergy} />
+                  <HardwareCharts color={"rgba(243,166,210,1)"} color2={"rgba(243,166,210,0.4)"} data={this.state.historySurplusEnergy} />
                 </p>
               </Grid.Column>
-            </Grid.Row>
           </Grid>
         </div>
       </div>

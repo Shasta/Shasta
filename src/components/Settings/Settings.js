@@ -124,7 +124,7 @@ class Settings extends Component {
                     </Form.Field>
                     <Form.Field>
                         <label>Address</label>
-                        <input placeholder='Address' name='address' onChange={e => this.handleChange(e)} value={this.state.address} />
+                        <input placeholder='Address' name='address' disabled onChange={e => this.handleChange(e)} value={this.state.address} />
                     </Form.Field>
                     <Form.Field>
                         <label>Zip Code</label>

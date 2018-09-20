@@ -5,6 +5,16 @@ import styled from 'styled-components';
 
 const StepContent = styled(Step.Content)`
   padding-left: 20px;
+  @media only screen and (max-width: 1200px) {
+    &&&& {
+        display: -ms-inline-flexbox ;
+        display: inline-flex;
+        overflow: visible;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        padding-top:10px;
+    }
+}
 `
 
 const ShastaStepDescription = styled(Step.Description)`
@@ -34,11 +44,33 @@ const ShastaStep = styled(Step)`
         }
     }
     color:#f076b6 !important;
+        @media only screen and (max-width: 1200px) {
+        &&&& {
+            display: -ms-inline-flexbox ;
+            display: inline-flex;
+            overflow: visible;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            border: 0.5px solid gray !important;
+
+        }
+    }
     
 `;
 
 const ShastaStepGroup = styled(Step.Group)`
     height="5vw" !important;
+    display:flex;
+    @media only screen and (max-width: 1200px) {
+        &&&& {
+            display: -ms-inline-flexbox ;
+            display: inline-flex;
+            overflow: visible;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            width:80%;
+        }
+    }
 `;
 
 class MyStep extends Component {
@@ -52,7 +84,6 @@ class MyStep extends Component {
                     <Icon icon='money-check' />
                     <StepContent>
                         <ShastaStepTitle>Amount</ShastaStepTitle>
-                        <ShastaStepDescription active={step === 0}>Choose the energy amount to buy</ShastaStepDescription>
                     </StepContent>
                 </ShastaStep>
 
@@ -60,7 +91,6 @@ class MyStep extends Component {
                     <Icon icon='filter' />
                     <StepContent>
                         <ShastaStepTitle>Filters</ShastaStepTitle>
-                        <ShastaStepDescription active={step === 1}>Select filters (optional)</ShastaStepDescription>
                     </StepContent>
                 </ShastaStep>
 
