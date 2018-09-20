@@ -75,9 +75,9 @@ class Dashboard extends React.Component {
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
         <Sidebar as={Menu}
-        animation='overlay' 
-        icon='labeled' 
-        vertical visible 
+        animation='overlay'
+        icon='labeled'
+        vertical visible
         width='wide'
         style={{ display: "flex", alignItems: "center", paddingTop: 40 }}
         >
