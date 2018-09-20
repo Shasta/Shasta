@@ -1,16 +1,14 @@
 import React from 'react';
 import { privateRoutes } from '../routes';
-import { Image, Menu, Sidebar, Button, MenuItem } from 'semantic-ui-react'
+import { Image, Menu, Sidebar, MenuItem } from 'semantic-ui-react'
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 import Tab from '../components/Tab/Tab';
 import logo from '../static/logo-shasta-02.png';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withDrizzleContext from '../utils/withDrizzleContext';
 import ipfs from '../ipfs';
 import { connect } from 'react-redux';
 import "./PrivateLayout.less"
-import shastaFooter from '../static/marca-shasta.png';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -66,9 +64,9 @@ class Dashboard extends React.Component {
 
     const Links = _.map(privateRoutes, (privRoute, key) =>
       (
-        <MenuItem as={Link} to={privRoute.path} style={{width:"60%"}}>
+        <MenuItem as={Link} to={privRoute.path} style={{ width: "60%" }}>
           <div className="itemDiv">
-            <Image style={{width:35, height:30}} src={privRoute.icon}/><div className="itemNameDiv">{privRoute.title}</div>
+            <Image style={{ width: 35, height: 30 }} src={privRoute.icon} /><div className="itemNameDiv">{privRoute.title}</div>
           </div>
         </MenuItem>
       )
@@ -77,19 +75,16 @@ class Dashboard extends React.Component {
       <div>
         <Tab web3={web3} account={account} balance={balance}></Tab>
         <Sidebar as={Menu}
-        animation='overlay'
-        icon='labeled'
-        vertical visible
-        width='wide'
-        style={{ display: "flex", alignItems: "center", paddingTop: 40 }}
+          animation='overlay'
+          icon='labeled'
+          vertical visible
+          style={{ display: "flex", alignItems: "center", paddingTop: 40, width: "20%" }}
         >
-            <Image src={logo} size='small' style={{paddingBottom:20}}></Image>
+          <Image src={logo} size='small' style={{ paddingBottom: 20 }}></Image>
           {Links}
           <Menu.Item as={Link} to="/logout">
             <h4>Logout</h4>
           </Menu.Item>
-          <div className="bottomDiv">
-          </div>
         </Sidebar>
 
         {/* Render component */}

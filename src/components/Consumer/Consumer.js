@@ -12,7 +12,28 @@ import styled from 'styled-components';
 
 //Styled components
 const ShastaButton = styled(Button)`
-  color: white;
+  background-color: #f076b6 !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  border:0 !important;
+`;
+
+const ShastaBuyButton = styled(Button)`
+  background-color: white !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  border-style: solid !important;
+  border-color: gray !important;
+  border-width: thin !important;
+`;
+
+const ShastaCard = styled(Card)`
+
+  width: 80% !important;
+  margin:0px !important;
+  border-radius: 0px 20px 20px 0px !important;
+  border-left: 10px solid #f076b6 !important;
+  box-shadow: 0px 1px 1px 1px #D4D4D5 !important;
 `;
 
 let checkedAddresses = [];
@@ -82,7 +103,7 @@ class Consumer extends Component {
       filterSource: '',
       filterCountry: '',
       filterAmount: '',
-      currentStep: 0,
+      currentStep: 2,
       tx: null
     }
   }
@@ -276,7 +297,7 @@ class Consumer extends Component {
         );
       case 3:
         const { tx } = this.state;
-        const { drizzle, drizzleState} = this.props;
+        const { drizzle, drizzleState } = this.props;
         const web3 = drizzle.web3;
         const energyPrice = contract.energyPrice;
         const priceRaw = web3.utils.toBN(web3.utils.toWei(energyPrice.toString(), 'ether'));
@@ -301,7 +322,7 @@ class Consumer extends Component {
             <h3>Confirm contract</h3>
             <div>
               <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} Sha per kWh.</p>
-              <p>Energy source: {contract.providerSource}</p> 
+              <p>Energy source: {contract.providerSource}</p>
               <p>Total monthly cost with your average energy usage: {totalPrice} Sha for {averageConsumerEnergy} kWh</p>
               <p>Confirm below to accept the energy contract with Shasta, paying the first month beforehand in Sha token.</p>
             </div>
@@ -316,13 +337,13 @@ class Consumer extends Component {
                 <Loader active={true} >Pending transaction</Loader>
               )}
               {txStatus === 'success' && (
-                <Segment color='green' style={{ margin: 0, padding: 5, width: 140, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <Icon icon='check' color='green' size='lg' style={{marginRight: 10}}/>
+                <Segment color='green' style={{ margin: 0, padding: 5, width: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon icon='check' color='green' size='lg' style={{ marginRight: 10 }} />
                   Success
                 </Segment>
               )}
-               {txStatus === 'error' && (
-                <Segment color='red' style={{width: 140}}>
+              {txStatus === 'error' && (
+                <Segment color='red' style={{ width: 140 }}>
                   Some error ocurred while making the transaction. Please contact with Shasta team if you consider that is a bug, via email at  hello@shasta.world
                 </Segment>
               )}
@@ -351,30 +372,30 @@ class Consumer extends Component {
         }
       }
       return (
-        <Card fluid style={{ maxWidth: '800px' }} color='purple'>
-          <Card.Content>
-            <Card.Header>
-              {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
+          <ShastaCard fluid color='purple'>
+            <Card.Content>
+              <Card.Header>
+                {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
             </Card.Header>
-            <Card.Description>
-              Ethereum account: {contract.ethAddress}
-            </Card.Description>
-            <Card.Description>
-              Address: {contract.address}
-            </Card.Description>
-          </Card.Content>
-          <Card.Content extra>
-            <p>Source: {contract.providerSource}</p>
-            <p>Total Price: {contract.fiatAmount} Sha</p>
-            <ShastaButton primary onClick={() => this.handleOfferSelection(contract)}>
-              Buy Energy
-            </ShastaButton>
-          </Card.Content>
-        </Card>
+              <Card.Description>
+                Ethereum account: {contract.ethAddress}
+              </Card.Description>
+              <Card.Description>
+                Address: {contract.address}
+              </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              <p>Source: {contract.providerSource}</p>
+              <p>Total Price: {contract.fiatAmount} Sha</p>
+              <ShastaBuyButton  onClick={() => this.handleOfferSelection(contract)}>
+                Buy Energy
+            </ShastaBuyButton>
+            </Card.Content>
+          </ShastaCard>
       );
     });
     return (
-      <div style={{ marginLeft: 400, marginTop: 20 }}>
+      <div style={{ marginLeft: '25%', marginTop: 20 }}>
         <MyStep step={this.state.currentStep} />
         {this.getContent(producerOffers)}
       </div>
