@@ -66,7 +66,8 @@ class Dashboard extends React.Component {
       (
         <MenuItem as={Link} to={privRoute.path} style={{ width: "60%" }}>
           <div className="itemDiv">
-            <Image style={{ width: 35, height: 30 }} src={privRoute.icon} /><div className="itemNameDiv">{privRoute.title}</div>
+            { privRoute.icon && <Image style={{width:35, height:30}} src={privRoute.icon}/> }
+            <div className="itemNameDiv">{privRoute.title}</div>
           </div>
         </MenuItem>
       )
@@ -82,9 +83,6 @@ class Dashboard extends React.Component {
         >
           <Image src={logo} size='small' style={{ paddingBottom: 20 }}></Image>
           {Links}
-          <Menu.Item as={Link} to="/logout">
-            <h4>Logout</h4>
-          </Menu.Item>
         </Sidebar>
 
         {/* Render component */}

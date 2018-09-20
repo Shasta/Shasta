@@ -24,11 +24,6 @@ export const publicRoutes = {
     path: "/sign-in",
     component: SignIn,
     title: "Sign In"
-  },
-  Logout: {
-    path: "/logout",
-    component: Logout,
-    title: "Logout"
   }
 };
 
@@ -68,5 +63,10 @@ export const privateRoutes = {
     component: Settings,
     title: "Settings",
     icon: settingsIcon
+  },
+  Logout: {
+    path: "/logout",
+    component: Logout,
+    title: "Logout"
   }
 };

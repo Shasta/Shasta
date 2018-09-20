@@ -5,6 +5,8 @@ import App from './app.js'
 import './index.css'; 
 import "semantic-ui-less/semantic.less";
 
+import { BrowserRouter } from 'react-router-dom';
+
 // Drizzle
 import { DrizzleContext } from "drizzle-react";
 import { Drizzle } from "drizzle";
@@ -23,7 +25,9 @@ library.add(faHome, faUsers, faTimes, faCheck, faBars, faFileSignature, faMap, f
 ReactDOM.render((
     <DrizzleContext.Provider drizzle={drizzle}>
       <Provider store={store}>
-        <App />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </Provider>
     </DrizzleContext.Provider>
   ),
