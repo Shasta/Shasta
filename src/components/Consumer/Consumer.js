@@ -103,7 +103,7 @@ class Consumer extends Component {
       filterSource: '',
       filterCountry: '',
       filterAmount: '',
-      currentStep: 2,
+      currentStep: 0,
       tx: null
     }
   }
