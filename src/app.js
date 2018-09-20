@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Route, BrowserRouter, Switch} from 'react-router-dom';
+import { Route, BrowserRouter, Switch, Redirect} from 'react-router-dom';
+import { withRouter } from 'react-router';
 import _ from 'lodash';
 import { publicRoutes, privateRoutes} from './routes';
 import {connect} from 'react-redux';
@@ -17,6 +18,10 @@ class App extends Component {
     super(props);
     
     this.userActions = new UserActions(this.props.dispatch);
+
+    this.props.history.listen((location, action) => {
+      this.userActions.verify();
+    });
   }
 
   componentWillMount() {
@@ -26,7 +31,6 @@ class App extends Component {
   render() {
     const user = this.props.user ? this.props.user : { logged: false };
     return (
-      <BrowserRouter>
         <Switch>
           { _.map(publicRoutes, (publicRoute, key) => {
             const { component, path } = publicRoute;
@@ -36,6 +40,8 @@ class App extends Component {
                 path={path}
                 key={key}
                 render={ (route) => 
+                  user.logged ?
+                    <Redirect to='/home' /> :
                     <PublicLayout 
                       component={component}
                       route={route} 
@@ -58,19 +64,13 @@ class App extends Component {
                         component={component}  
                         route={route}
                     />
-                  ) : (
-                    <PublicLayout 
-                        component={publicRoutes["SignUp"].component} 
-                        route={route}
-                    />
-                  )
+                  ) : <Redirect to="/" />
                 }
               />
             )
           })}
           <Route component={ NotFound } />
         </Switch>
-      </BrowserRouter>
     );
   }
 }
@@ -78,7 +78,7 @@ class App extends Component {
 function mapStateToProps(state, props) { return { user: state.userReducer } }
 function mapDispatchToProps(dispatch) { return { dispatch }; }
 
-export default  connect(
+export default  withRouter(connect(
     mapStateToProps,
     mapDispatchToProps
-)(App);
+)(App));

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Input, Image, Button } from 'semantic-ui-react';
-import { Redirect } from 'react-router-dom';
+import { Input, Image, Button, Message } from 'semantic-ui-react';
+import { Redirect, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 
@@ -18,6 +18,12 @@ const LoginInput = styled(Input)`
   margin: 0 auto;
   width: 100%;
 `
+const LoginButton = styled(Button)`
+  &&&& {
+    width: 100%;
+    margin-top: 20px !important;
+  }
+`
 const LoginBox = styled.div`
   margin: 60px auto;
   padding: 20px;
@@ -27,11 +33,15 @@ const LoginBox = styled.div`
   border-radius: 7px;
   background: white;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
-`
 
-const LoginButton = styled(Button)`
-  margin-top: 20px !important;
-  width: 100%;
+  .ui.warning.message + ${LoginButton} {
+    margin-top: 0px !important;
+  }
+`
+const MessageHeader = styled(Message.Header)`
+  &&&&&&& {
+    font-size: 1rem;
+  }
 `
 
 class SignIn extends Component {
@@ -41,20 +51,42 @@ class SignIn extends Component {
   }
   state = {
     organization: "",
-    toDashboard: false
+    notFound: false
   }
 
   loginIn = async () => {
-    const {initialized, drizzleState} = this.props;
+    const {initialized, drizzle, drizzleState} = this.props;
+    this.setState({
+      notFound: false,
+      notSameUser: false
+    });
     const username = this.state.organization;
     if (initialized && drizzleState && !!drizzleState.accounts && !!drizzleState.accounts[0]) {
       try {
-        this.action.login(username)
-        this.setState({
-          toDashboard: true
-        })
+        const web3 = drizzle.web3;
+        const rawNickname = web3.utils.utf8ToHex(username);
+        const currentAddress = drizzleState.accounts[0];
+        const orgAddress = await drizzle.contracts.User.methods.getAddressByUsername(rawNickname).call();
+        const doesExist = await drizzle.contracts.User.methods.usernameTaken(rawNickname).call();
+        if (!doesExist) {
+          throw 'org-not-found';
+        }
+        if (orgAddress !== currentAddress) {
+          throw 'org-not-same-address';
+        }
+        // Org exists and current user is org owner
+        this.action.login(username);
       } catch (error) {
-        console.log(error)
+        if (error == 'org-not-same-address') {
+          this.setState({
+            notSameUser: true
+          });
+          return;
+        }
+        this.setState({
+          notFound: true
+        });
+        return;
       }
     }
   }
@@ -65,9 +97,30 @@ class SignIn extends Component {
     })
   }
   render() {
-    const { organization, toDashboard } = this.state;
-    if (toDashboard === true) {
+    const { organization, notFound, notSameUser } = this.state;
+    const { user } = this.props;
+
+    if (user.logged === true) {
       return <Redirect to="/home" />
+    }
+
+    let WarningMessage = null;
+
+    if (notSameUser === true) {
+      WarningMessage = (
+        <Message warning>
+          <MessageHeader>You don't have access to this existing organization.</MessageHeader>
+          <span>Do you want to create a<Link to="/"> new organization?</Link></span>
+        </Message>
+      );
+    }
+    if (notFound === true) {
+      WarningMessage = (
+        <Message warning>
+          <MessageHeader>Organization not found</MessageHeader>
+          <span>Do you want to create a<Link to="/"> new organization?</Link></span>
+        </Message>
+      )
     }
     return (
       <div>
@@ -75,6 +128,7 @@ class SignIn extends Component {
           <Image centered src={ShastaLogo} size="small" />
           <Title>Welcome to Shasta</Title>
           <LoginInput value={organization} name="organization" placeholder="Your organization name" onChange={this.handleChange}/>
+          {WarningMessage}
           <LoginButton onClick={this.loginIn}>
             Sign in
           </LoginButton>
