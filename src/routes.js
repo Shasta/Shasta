@@ -11,8 +11,8 @@ import homeIcon from './static/home_icon.png';
 import consumerIcon from './static/consumer_icon.png';
 import hardwareIcon from './static/hardware_icon.png';
 import settingsIcon from './static/settings_icon.png';
-import financeIcon from './static/finance_icon.png';
-
+import producerIcon from './static/finance_icon.png';
+import financeIcon from './static/marketer_icon.png';
 
 export const publicRoutes = {
   SignUp: {
@@ -50,7 +50,7 @@ export const privateRoutes = {
     path: "/producer",
     component: Producer,
     title: "Producer",
-    icon: financeIcon
+    icon: producerIcon
   },
   Hardware: {
     path: "/hardware",
