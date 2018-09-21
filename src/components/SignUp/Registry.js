@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { CountryDropdown } from 'react-country-region-selector';
-import { Button, Form, Input } from 'semantic-ui-react'
+import { Button, Form, Input, Checkbox } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import ipfs from '../../ipfs';
@@ -11,11 +11,48 @@ import { connect} from 'react-redux';
 import {UserActions } from '../../redux/UserActions';
 
 const RegistryBox = styled.div`
-  margin: 20px 0px;
-  padding: 20px;
   border-radius: 6px;
-  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14), 0 3px 3px -2px rgba(0, 0, 0, .2), 0 1px 8px 0 rgba(0, 0, 0, .12);
-  max-width: 400px !important;
+  max-width: 530px !important;
+  &&&& label {
+    font-weight: normal;
+    font-size: 1.4rem !important;
+  }
+  &&&& .ui.input > input {
+    margin-bottom: 20px;
+    border-radius: 0px;
+    border: 1px solid #777;
+  }
+  &&&& select {
+    border-radius: 0px;
+    border: 1px solid #777;
+  }
+  
+  media only screen && (max-width)
+`
+const Terms = styled.div`
+  background: #fceef7;
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0px;
+  font-size: 1.2rem;
+  &&&&& a {
+    color: black;
+    text-decoration: underline;
+  }
+`
+
+const SubmitButton = styled(Button)`
+&&&& {
+  background-color: #3e2a40;
+  border-radius: 10px;
+  font-size: 1.18rem;
+  color: white;
+  padding: 15px 39px;
+  font-weight: normal;
+}
 `
 class RegistryForm extends Component {
   state = {
@@ -25,6 +62,8 @@ class RegistryForm extends Component {
     firstName: "",
     lastName: "",
     country: "",
+    use: false,
+    privacy: false,
     toDashboard: false
   }
 
@@ -131,29 +170,50 @@ class RegistryForm extends Component {
     this.setState({ country: value });
   }
 
+  togglePrivacyTerms = () => {
+    this.setState((prevState) => ({
+      privacy: !prevState.privacy
+    }));
+  }
+
+  toggleUseTerms = () => {
+    this.setState((prevState) => ({
+      use: !prevState.use
+    }));
+  }
   render() {
-    const { organizationName, firstName, lastName, country, toDashboard } = this.state;
+    const { organizationName, firstName, lastName, country, toDashboard, use, privacy } = this.state;
     
     if (toDashboard === true) {
       return <Redirect to="/home" />
     }
     
+    console.log(this.state);
+    const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
+
     return (
       <Form as={RegistryBox}>
-        <h3 style={{textAlign: "center"}}>Sign up</h3>
         <Form.Field>
           <label>Organization Name</label>
-          <Input placeholder='Organization Name' value={organizationName} name="organizationName" onChange={this.handleInputChange} />
+          <Input placeholder='' value={organizationName} name="organizationName" onChange={this.handleInputChange} />
           <label>First Name</label>
-          <Input placeholder='First Name' value={firstName} name="firstName" onChange={this.handleInputChange} />
+          <Input placeholder='' value={firstName} name="firstName" onChange={this.handleInputChange} />
           <label>Last Name</label>
-          <Input placeholder='Last Name' value={lastName} name="lastName" onChange={this.handleInputChange} />
+          <Input placeholder='' value={lastName} name="lastName" onChange={this.handleInputChange} />
           <label>Country</label>
           <CountryDropdown
             value={country}
             onChange={(val) => this.selectCountry(val)} />
+          <Terms style={{ marginTop: 30}}>
+            <span>I agree to Shasta <a href="#">Terms of Use</a>.</span>
+            <Checkbox checked={this.state.user} onChange={this.toggleUseTerms}/>
+          </Terms>
+          <Terms>
+            <span>I agree to Shasta <a href="#">Politic Privacy</a>.</span>
+            <Checkbox checked={this.state.privacy} onChange={this.togglePrivacyTerms}/>
+          </Terms>
         </Form.Field>
-        <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
+        <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
       </Form>
     )
   }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled, { css} from 'styled-components';
+import { Image } from 'semantic-ui-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import MintShaComponent from '../Account/MintSha';
@@ -7,17 +8,44 @@ import _ from 'lodash';
 
 const MintSha = withRawDrizzle(MintShaComponent);
 
-const RequerimentsBox = styled.div`
-  margin-top: 60px;
+const BoxesBackgroundColor = '#f4b8df';
+const BoxesFontColor = '#3d293f';
+
+const WelcomeBox = styled.div`
+  max-width: 580px;
+  background: ${BoxesBackgroundColor};
   border-radius: 10px;
-  background: linear-gradient(to bottom right, #5d1053, #ff68fb);
-  padding: 30px;
+  padding: 30px 75px 40px;
+  color: ${BoxesFontColor};
+  font-size: 1.55rem;
+  text-decoration-color: ${BoxesFontColor};
+  & > h1 {
+    margin-top: 30px;
+    font-size: 2.7rem;
+  }
+`
+
+const RequerimentsBox = styled.div`
+  max-width: 580px;
+  background: ${BoxesBackgroundColor};
+  margin-top: 5px;
+  border-radius: 0px 0px 10px 10px;
+  padding: 56px 75px;
+  color: ${BoxesBackgroundColor};
+`
+
+const WelcomeAnimation = styled.div`
+&&& {
+  margin: 0 auto;
+  width: 111px;
+  height: 111px;
+  background-color: white;
+  border-radius: 100%;
+}
 `
 
 const MakeSureText = styled.p`
-  color: #f4ffd1;
-  text-align: center;
-  font-size: 1.16em;
+  font-size: 0.9em;
 `
 
 const Icon = styled(FontAwesomeIcon)`
@@ -26,8 +54,12 @@ const Icon = styled(FontAwesomeIcon)`
   `}
 `
 
-const Steps = styled.div`
-  margin-top: 10px;
+const HyperLink = styled.a`
+&&& {
+  color: ${BoxesFontColor};
+  text-decoration: underline;
+  text-decoration-color: ${BoxesFontColor};
+}
 `
 
 const Step = styled.div`
@@ -41,7 +73,13 @@ const Step = styled.div`
   }
 `
 const StepDescription = styled.p`
-  color: white;
+  color: ${BoxesFontColor};
+  font-size: 1.2rem
+`
+const Steps = styled.div`
+ & > ${Step}:not(:first-child) {
+  margin-top: 15px;
+ }
 `
 
 const determineIcon = (boolean) => boolean === true ? 'check' : 'times';
@@ -50,7 +88,7 @@ const StepIcon = function(props) {
   const icon = determineIcon(props.fulfilled);
 
   return (
-    <Icon icon={icon} size="2x" color="white" />
+    <Icon icon={icon} size="lg" color="white" />
   )
 }
 class Requeriments extends Component {
@@ -58,13 +96,14 @@ class Requeriments extends Component {
     const {isInstalled, isLogged, haveSha} = this.props;
     return (
       <div>
-        <RequerimentsBox>
-          <h2 style={{textAlign: "center", color: "white"}}>Welcome to Shasta Alpha</h2>
+        <WelcomeBox>
+          <WelcomeAnimation centered />
+          <h1>Welcome to Shasta</h1>
           <MakeSureText>Make sure to complete <u>all the steps</u> below to be able to sign up.</MakeSureText>
           <Steps>
             <Step>
               <StepIcon  fulfilled={isInstalled} />
-              <StepDescription>Install <a href="https://metamask.io/">Metamask</a> on your browser</StepDescription>
+              <StepDescription>Install <HyperLink href="https://metamask.io/">METAMASK</HyperLink> on your browser</StepDescription>
             </Step>
             <Step>
               <StepIcon  fulfilled={isLogged} />
@@ -77,7 +116,7 @@ class Requeriments extends Component {
               </MintSha>
             </Step>
           </Steps>
-        </RequerimentsBox> 
+        </WelcomeBox> 
       </div>
     )
   }

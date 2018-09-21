@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Grid, Transition } from 'semantic-ui-react'
+import { Link } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import _ from 'lodash';
+import styled from 'styled-components';
 
 // SignUp components
 import Requeriments from  './Requeriments';
@@ -11,6 +13,28 @@ import Registry from './Registry';
 import Install from './Helpers/Install';
 import Login from './Helpers/Login';
 import Claim from './Helpers/Claim';
+
+const Header = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0 auto;
+  & > * {
+    color: #3d293f;
+    font-size: 2rem;
+  }
+  &&&&&& > h1 {
+    margin-top: 75px;
+    margin-bottom: 0px;
+    font-size: 4.3rem;
+  }
+`
+const HyperLink = styled(Link)`
+  color: #ea78bc;
+  text-decoration: underline;
+  text-decoration-color: #ea78bc;
+`
 
 class SignUp extends Component {
   state = {
@@ -81,16 +105,20 @@ class SignUp extends Component {
     }
     return (
       <Grid>
-        <Grid.Row centered columns={2}>
-          <Grid.Column mobile={12} tablet={6} computer={6}>
+        <Header>
+          <h1>Sign Up</h1>
+          <p style={{marginBottom: 0}}>Already have an account? <HyperLink to="/sign-in">Sign in instead</HyperLink></p>
+        </Header>
+        <Grid.Row centered columns={2} style={{marginTop: 75}}>
+          <Grid.Column mobile={12} tablet={12} computer={6}>
             <Requeriments isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} />
           </Grid.Column>
-          <Grid.Column  mobile={12} tablet={6} computer={6}>
+          <Grid.Column  mobile={12} tablet={12} computer={6}>
             <Transition.Group
               animation='bounce'
               duration={2000}
-            > 
-            { true && rightComponent}
+            >
+              {rightComponent}
             </Transition.Group>
           </Grid.Column>
         </Grid.Row>
