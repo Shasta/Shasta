@@ -138,7 +138,7 @@ class SignIn extends Component {
   }
 }
 
-function mapStateToProps(state, props) { return { user: state } }
+function mapStateToProps(state, props) { return { user: state.userReducer } }
 function mapDispatchToProps(dispatch) { return { dispatch }; }
 
 export default withRawDrizzle(
