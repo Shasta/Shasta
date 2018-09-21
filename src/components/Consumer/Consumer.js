@@ -43,7 +43,7 @@ const ShastaBuyButton = styled(Button)`
 const ShastaCard = styled(Card)`
 
   width: 80% !important;
-  margin:0px !important;
+  margin: 10px !important;
   border-radius: 0px 20px 20px 0px !important;
   border-left: 10px solid #f076b6 !important;
   box-shadow: 0px 1px 1px 1px #D4D4D5 !important;
