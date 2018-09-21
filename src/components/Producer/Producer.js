@@ -246,7 +246,7 @@ class Producer extends Component {
             />
           </Table.Cell>
 
-          <Table.Cell>{offer.energyPrice} Shas/kWh</Table.Cell>
+          <Table.Cell>{offer.amountkWh} kWh</Table.Cell>
 
           <Table.Cell>
             <Button
