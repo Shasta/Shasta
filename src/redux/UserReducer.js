@@ -1,12 +1,12 @@
 import { USER } from './UserActions';
 
-const userDefault = {
-    organization: '',
-    logged: false,
-    verified: false
-}
+const initState = () => ({
+    organization: localStorage.user,
+    logged: localStorage.user ? true : false,
+    verified: localStorage.user ? true : false
+})
 
-export default function(state = userDefault, action) {
+export default function(state = initState(), action) {
     const user = Object.assign({}, state);
     switch (action.type) {
         case USER.login.success:
