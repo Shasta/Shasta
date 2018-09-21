@@ -40,10 +40,12 @@ class App extends Component {
                 path={path}
                 key={key}
                 render={ (route) => 
-                  <PublicLayout 
-                    component={component}
-                    route={route} 
-                  /> 
+                  user.logged ?
+                    <Redirect to='/home' /> :
+                    <PublicLayout 
+                      component={component}
+                      route={route} 
+                    /> 
                 }
               />
             )
