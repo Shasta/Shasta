@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const StepContent = styled(Step.Content)`
   padding-left: 20px;
-  @media only screen and (max-width: 1200px) {
+  @media only screen and (max-width: 850px) {
     &&&& {
         display: -ms-inline-flexbox ;
         display: inline-flex;
@@ -44,7 +44,7 @@ const ShastaStep = styled(Step)`
         }
     }
     color:#f076b6 !important;
-        @media only screen and (max-width: 1200px) {
+        @media only screen and (max-width: 850px) {
         &&&& {
             display: -ms-inline-flexbox ;
             display: inline-flex;
@@ -59,9 +59,10 @@ const ShastaStep = styled(Step)`
 `;
 
 const ShastaStepGroup = styled(Step.Group)`
-    height="5vw" !important;
+    height: 5vw !important;
+    width: 80% !important;
     display:flex;
-    @media only screen and (max-width: 1200px) {
+    @media only screen and (max-width: 850px) {
         &&&& {
             display: -ms-inline-flexbox ;
             display: inline-flex;
@@ -81,26 +82,18 @@ class MyStep extends Component {
         return (
             <ShastaStepGroup>
                 <ShastaStep active={step === 0}>
-                    <Icon icon='money-check' />
-                    <StepContent>
-                        <ShastaStepTitle>Amount</ShastaStepTitle>
-                    </StepContent>
-                </ShastaStep>
-
-                <ShastaStep active={step === 1}>
                     <Icon icon='filter' />
                     <StepContent>
                         <ShastaStepTitle>Filters</ShastaStepTitle>
                     </StepContent>
                 </ShastaStep>
-
-                <ShastaStep active={step === 2}>
+                <ShastaStep active={step === 1}>
                     <Icon icon='shopping-cart' />
                     <StepContent>
                         <ShastaStepTitle>Choose offer</ShastaStepTitle>
                     </StepContent>
                 </ShastaStep>
-                <ShastaStep active={step === 3}>
+                <ShastaStep active={step === 2}>
                     <Icon icon='file-signature' />
                     <StepContent>
                         <ShastaStepTitle>Confirm contract</ShastaStepTitle>

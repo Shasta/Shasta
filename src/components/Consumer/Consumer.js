@@ -1,6 +1,18 @@
 import React, { Component } from 'react';
-import { Button, Dropdown, Card, Loader, Segment } from 'semantic-ui-react'
+import { Button, Dropdown, Card, Loader, Segment, Grid, Image } from 'semantic-ui-react'
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
+
+//import icons
+import solarOffIcon from "./sourceIcons/solar-energy-off.png";
+import solarOnIcon from "./sourceIcons/solar-energy-on.png";
+import eolicOffIcon from "./sourceIcons/eolic-energy-off.png";
+import eolicOnIcon from "./sourceIcons/eolic-energy-on.png";
+import biomassOffIcon from "./sourceIcons/biomass-energy-off.png";
+import biomassOnIcon from "./sourceIcons/biomass-energy-on.png";
+import otherOffIcon from "./sourceIcons/other-energy-off.png";
+import otherOnIcon from "./sourceIcons/other-energy-on.png";
+import nuclearOffIcon from "./sourceIcons/nuclear-energy-off.png";
+import nuclearOnIcon from "./sourceIcons/nuclear-energy-on.png";
 
 import './Consumer.css';
 import ipfs from '../../ipfs'
@@ -10,9 +22,10 @@ import { countryOptions } from './common'
 import MyStep from './stepper/MyStep'
 import styled from 'styled-components';
 
+var _ = require('lodash');
 //Styled components
 const ShastaButton = styled(Button)`
-  background-color: #f076b6 !important;
+  background-color: #423142 !important;
   border-radius: 8px !important;
   padding: 12px 25px !important;
   border:0 !important;
@@ -36,26 +49,42 @@ const ShastaCard = styled(Card)`
   box-shadow: 0px 1px 1px 1px #D4D4D5 !important;
 `;
 
+const ShastaGridRow = styled(Grid.Row)`
+  border-left: 10px solid #f076b6 !important;
+`;
+
 let checkedAddresses = [];
 const sources = [
   {
+    key: 0,
     text: "Solar",
-    value: "Solar"
+    value: "Solar",
+    imgSrc: solarOffIcon,
+    imgSrc2: solarOnIcon
   }, {
+    key: 1,
     text: "Nuclear",
-    value: "Nuclear"
+    value: "Nuclear",
+    imgSrc: nuclearOffIcon,
+    imgSrc2: nuclearOnIcon
   }, {
+    key: 2,
     text: "Eolic",
-    value: "Eolic"
+    value: "Eolic",
+    imgSrc: eolicOffIcon,
+    imgSrc2: eolicOnIcon
   }, {
+    key: 3,
     text: "Biomass",
-    value: "Biomass"
+    value: "Biomass",
+    imgSrc: biomassOffIcon,
+    imgSrc2: biomassOnIcon
   }, {
+    key: 4,
     text: "Other",
-    value: "Other"
-  }, {
-    text: "No filter",
-    value: "No filter"
+    value: "Other",
+    imgSrc: otherOffIcon,
+    imgSrc2: otherOnIcon
   }
 ]
 
@@ -100,12 +129,14 @@ class Consumer extends Component {
       address: '',
       producersOffersList: [],
       totalToPay: 0,
-      filterSource: '',
+      filterSources: [],
       filterCountry: '',
       filterAmount: '',
       currentStep: 0,
       tx: null
     }
+
+    this.handleSourceClick = this.handleSourceClick.bind(this);
   }
 
   async componentDidMount() {
@@ -165,12 +196,6 @@ class Consumer extends Component {
     this.setState({ filterCountry: val.value });
   }
 
-  handleChangeSource = (e, data) => {
-    this.setState({
-      filterSource: data.value
-    })
-  }
-
   handleChangefilterAmount = (e, data) => {
     this.setState({
       filterAmount: data.value
@@ -185,6 +210,19 @@ class Consumer extends Component {
         currentStep: current + 1
       });
     }
+  }
+
+  handleSourceClick = (key) => {
+
+    let sourcesArray = this.state.filterSources;
+    if (sourcesArray.includes(key)) {
+      sourcesArray.splice(sourcesArray.indexOf(key), 1);
+    } else {
+      sourcesArray.push(key);
+    }
+    this.setState({
+      filterSources: sourcesArray
+    })
   }
 
   handleBackClick = () => {
@@ -239,54 +277,74 @@ class Consumer extends Component {
     const averageConsumerEnergy = this.state.filterAmount;
     switch (this.state.currentStep) {
       case 0:
+        const sourcesColumns = sources.map((source, i) => {
+
+          let image = source.imgSrc;
+          if (this.state.filterSources.includes(i)) {
+            image = source.imgSrc2;
+          }
+
+          return (
+            <Grid.Column key={i}>
+              <Image style={{ padding: "10px 10px" }} src={image} onClick={() => this.handleSourceClick(i)} />
+            </Grid.Column>
+          );
+        })
+
+
         return (
-          <div style={{ width: "35%" }}>
-            <p>Amount of Energy:</p>
-            <Dropdown
-              placeholder='Ammount of Energy'
-              fluid selection
-              options={pricesRanges}
-              onChange={this.handleChangefilterAmount}
-            />
-            <div style={{ paddingTop: 20 }}>
-              <ShastaButton primary onClick={this.handleNextClick}>
-                Next
+          <Grid>
+            <Grid.Column style={{ width: "30%" }}>
+              <div style={{ paddingBottom: 20 }}>
+                <ShastaGridRow>
+                  <div style={{ paddingLeft: 20 }}>
+                    <h3>Amount of Energy:</h3>
+                    <Dropdown
+                      placeholder='Ammount of Energy'
+                      fluid selection
+                      options={pricesRanges}
+                      onChange={this.handleChangefilterAmount}
+                    />
+                  </div>
+                </ShastaGridRow>
+              </div>
+              <ShastaGridRow>
+                <div style={{ paddingLeft: 20 }}>
+                  <h3>Country:</h3>
+                  <Dropdown
+                    placeholder='Select Country'
+                    fluid search selection
+                    onChange={this.selectCountry}
+                    options={countryOptions}
+                  />
+                </div>
+              </ShastaGridRow>
+            </Grid.Column>
+            <Grid.Column style={{ width: "50%" }}>
+              <ShastaGridRow style={{ paddingBottom: 20 }}>
+                <div style={{ paddingLeft: 20 }}>
+                  <h3>Source of energy:</h3>
+                  <div style={{ display: "flex" }}>
+                    {sourcesColumns}
+                  </div>
+                </div>
+              </ShastaGridRow>
+              <Grid.Row style={{ paddingTop: 20 }}>
+                <ShastaButton
+                  style={{ float: 'right' }}
+                  primary onClick={this.handleNextClick}
+                >
+                  Next
               </ShastaButton>
-            </div>
-          </div>
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Row>
+              <h3 style={{ width: "100%" }}>Best offer found: </h3>
+              {producerOffers[0]}
+            </Grid.Row>
+          </Grid>
         )
       case 1:
-        return (
-          <div>
-            <div style={{ width: "35%", paddingBottom: 20 }}>
-              <p>Source of energy:</p>
-              <Dropdown
-                placeholder='Source of energy'
-                fluid selection
-                options={sources}
-                onChange={this.handleChangeSource}
-              />
-            </div>
-            <div style={{ width: "35%" }}>
-              <p>Country:</p>
-              <Dropdown
-                placeholder='Select Country'
-                fluid search selection
-                onChange={this.selectCountry}
-                options={countryOptions}
-              />
-            </div>
-            <div style={{ paddingTop: 20 }}>
-              <ShastaButton secondary onClick={this.handleBackClick}>
-                Back
-              </ShastaButton>
-              <ShastaButton primary onClick={this.handleNextClick}>
-                Next
-              </ShastaButton>
-            </div>
-          </div>
-        );
-      case 2:
         return (
           <div>
             <h3>Offers: </h3>
@@ -295,7 +353,7 @@ class Consumer extends Component {
             </Card.Group>
           </div>
         );
-      case 3:
+      case 2:
         const { tx } = this.state;
         const { drizzle, drizzleState } = this.props;
         const web3 = drizzle.web3;
@@ -357,43 +415,54 @@ class Consumer extends Component {
     const { drizzleState } = this.props;
     const currentAccount = drizzleState.accounts[0];
 
-    const producerOffers = this.state.producersOffersList.map((contract) => {
+    let producerOffers = this.state.producersOffersList.map((contract) => {
+
+      console.log(contract)
+      //filter your offers
       if (currentAccount === contract.ethAddress) {
         return '';
       }
-      if (this.state.filterSource !== "No filter" && this.state.filterSource !== '') {
-        if (this.state.filterSource !== contract.providerSource) {
+
+      const sourceJson = sources.find(x => x.value === contract.providerSource);
+      //filter source
+      if (this.state.filterSources.length > 0) {
+        if (!this.state.filterSources.includes(sourceJson.key)) {
           return '';
         }
       }
+      //Filter by amount
       if (this.state.filterAmount !== '') {
         if (Number(contract.amountkWh) < this.state.filterAmount) {
           return '';
         }
       }
       return (
-          <ShastaCard fluid color='purple'>
-            <Card.Content>
-              <Card.Header>
-                {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
+        <ShastaCard fluid color='purple'>
+          <Card.Content>
+            <Card.Header>
+              {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
             </Card.Header>
-              <Card.Description>
-                Ethereum account: {contract.ethAddress}
-              </Card.Description>
-              <Card.Description>
-                Address: {contract.address}
-              </Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-              <p>Source: {contract.providerSource}</p>
-              <p>Total Price: {contract.fiatAmount} Sha</p>
-              <ShastaBuyButton  onClick={() => this.handleOfferSelection(contract)}>
-                Buy Energy
+            <Card.Description>
+              Ethereum account: {contract.ethAddress}
+            </Card.Description>
+            <Card.Description>
+              Address: {contract.address}
+            </Card.Description>
+          </Card.Content>
+          <Card.Content extra>
+            <p>Source: {contract.providerSource}</p>
+            <p>Total Price: {contract.fiatAmount} Sha</p>
+            <ShastaBuyButton onClick={() => this.handleOfferSelection(contract)}>
+              Buy Energy
             </ShastaBuyButton>
-            </Card.Content>
-          </ShastaCard>
+          </Card.Content>
+        </ShastaCard>
       );
     });
+
+    //remove empty items
+    producerOffers = producerOffers.filter(Boolean);
+
     return (
       <div style={{ marginLeft: '25%', marginTop: 20 }}>
         <MyStep step={this.state.currentStep} />
