@@ -66,7 +66,7 @@ class Hardware extends Component {
   render() {
     return (
       <div>
-        <div style={{ marginLeft: 450, marginTop: 50 }}>
+        <div style={{ marginLeft: "25%", marginTop: 50 }}>
           <Grid style={{ width: "90%" }}>
             <Grid.Row>
               <Grid.Column style={{ width: "50%" }}>
