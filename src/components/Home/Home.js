@@ -2,9 +2,24 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import withDrizzleContext from '../../utils/withDrizzleContext';
 import ipfs from '../../ipfs';
-import { Feed } from 'semantic-ui-react'
+import { Feed, Grid } from 'semantic-ui-react'
 import _ from 'lodash';
-import D3 from './d3.js';
+import { Line } from 'react-chartjs-2';
+import styled from "styled-components";
+
+const ShastaFeedDate = styled(Feed.Date)`
+
+  color:#f076b6 !important;
+  font-size:1vw !important;
+
+`;
+
+const ShastaFeedSummary = styled(Feed.Summary)`
+  
+  font-size:0.8vw !important;
+  font-weight:normal !important;
+  margin-left:15px !important;
+`;
 
 class Home extends Component {
 
@@ -14,35 +29,39 @@ class Home extends Component {
     this.state = {
       userJson: {
         organization: {
-          firstName: ""
+          firstName: "",
         }
       },
       notifications: [],
       lastestConsumerOfferIndex: -1,
       lastestProducerOfferIndex: -1,
+      tokenBalancePointer: ''
     }
   }
 
   async componentDidMount() {
-    const {drizzle, drizzleState,user} = this.props;
+    const { drizzle, drizzleState, user } = this.props;
     const currentAccount = drizzleState.accounts[0]
-    const drizzleMarket = drizzle.contracts.ShastaMarket;
-    const drizzleMap = drizzle.contracts.SharedMapPrice;
     const drizzleUser = drizzle.contracts.User;
 
     const web3 = drizzle.web3;
     const rawOrgName = web3.utils.utf8ToHex(user.organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
 
+    const shaLedgerInstance = drizzle.contracts.ShaLedger;
+    const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAccount);
+
+
     this.setState({
-      userJson: JSON.parse(rawJson)
+      userJson: JSON.parse(rawJson),
+      tokenBalancePointer
     })
 
     const shastaUserInstance = window.web3.eth.contract(drizzleUser.abi).at(drizzleUser.address);
 
-    shastaUserInstance.UpdatedUser({owner: this.props.address}, {fromBlock: 0}, async (err, result) => {
+    shastaUserInstance.UpdatedUser({ owner: this.props.address }, { fromBlock: 0 }, async (err, result) => {
       if (err) {
         console.error("Could not watch UpdatedUser event.", err)
         return;
@@ -63,11 +82,11 @@ class Home extends Component {
           timestamp: new Date(latestOffer.date)
         })
 
-        this.setState( prevState => ({
+        this.setState(prevState => ({
           notifications: _([...prevState.notifications, ...[consumerNotification]])
-          .orderBy('timestamp', 'desc')
-          .slice(0, 5)
-          .value(),
+            .orderBy('timestamp', 'desc')
+            .slice(0, 5)
+            .value(),
           lastestConsumerOfferIndex: currentLatestOfferIndex
         }))
       }
@@ -77,11 +96,11 @@ class Home extends Component {
           timestamp: new Date(latestPOffer.date)
         })
 
-        this.setState( prevState => ({
+        this.setState(prevState => ({
           notifications: _([...prevState.notifications, ...[producerNotification]])
-          .orderBy('timestamp', 'desc')
-          .slice(0, 5)
-          .value(),
+            .orderBy('timestamp', 'desc')
+            .slice(0, 5)
+            .value(),
           lastestProducerOfferIndex: currentLatestPOfferIndex
         }))
       }
@@ -89,23 +108,71 @@ class Home extends Component {
   }
 
   render() {
-    const {drizzleState} = this.props;
-    const {userJson} = this.state;
+
+    const { drizzleState, drizzle } = this.props;
+    const { tokenBalancePointer } = this.state;
+    const { web3 } = drizzle;
+
+    let totalSha = 0;
+    const ShaLedgerState = drizzleState.contracts.ShaLedger;
+    if (tokenBalancePointer in ShaLedgerState.balanceOf) {
+        // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
+        totalSha = web3.utils.fromWei(ShaLedgerState.balanceOf[tokenBalancePointer].value, 'ether');
+    }
+
+    //Chart fake data
+    const data = {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+      datasets: [
+        {
+          label: 'Amount of shas',
+          lineTension: 0.1,
+          backgroundColor: 'rgba(66,49,66,0.4)',
+          borderColor: 'rgba(66,49,66,1)',
+          borderCapStyle: 'butt',
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: 'miter',
+          pointBorderColor: 'rgba(66,49,66,1)',
+          pointBackgroundColor: '#fad',
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: 'rgba(66,49,66,1)',
+          pointHoverBorderColor: 'rgba(66,49,66,1)',
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+          fill: true,
+          data: [65, 59, 80, 81, 56, 55, totalSha]
+        }
+      ]
+    };
+
+    const options = {
+      responsive: true,
+      legend: {
+        labels: {
+          boxWidth: 0,
+        }
+      }
+    }
+
+    const { userJson } = this.state;
     const organization = userJson.organization;
     const currentAccount = drizzleState.accounts[0];
     const notifications = this.state.notifications.map((notification, index) => {
-      if (notification.type === "contract") {
-        const name = (notification.ethAddress === this.props.address) ? "You" : `${notification.firstName} ${notification.lastName}`;
-        return (
-          <Feed.Event key={index} style={{marginTop: 10}}>
-            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`${name} posted new offer to buy ${notification.fiatAmount}€ at ${notification.energyPrice} €/kWh`} />
-          </Feed.Event>
-        );
-      }
+
       if (notification.type === "newProvider") {
         return (
-          <Feed.Event key={index} style={{marginTop: 10}}>
-            <Feed.Content date={notification.timestamp.toLocaleString()} summary={`Provider ${notification.chargerName} offers energy at ${notification.energyPrice} kWh/€ from ${notification.providerSource} energy source.`} />
+          <Feed.Event key={index} style={{ marginTop: 10 }}>
+            <Feed.Content>
+              <ShastaFeedDate>
+                • {notification.timestamp.toLocaleString()}
+              </ShastaFeedDate>
+              <ShastaFeedSummary>
+                Provider {notification.chargerName} offers energy at ${notification.energyPrice} kWh/€ from {notification.providerSource} energy source.
+            </ShastaFeedSummary>
+            </Feed.Content>
           </Feed.Event>
         );
       }
@@ -114,14 +181,23 @@ class Home extends Component {
 
     return (
       // Menu with Bulma-React.
-      <div style={{ marginLeft: '375px' }}>
-        <h2 style={{ marginLeft: '30px', marginTop: '20px' }}>Welcome <a href={`https://rinkeby.etherscan.io/address/${currentAccount}`}>{organization.firstName}</a>,</h2>
-        <h5 style={{ marginLeft: '30px', marginTop: '10px' }}>You have {this.state.notifications.length} notifications.</h5>
-        <D3></D3>
-        <Feed style={{ marginLeft: '40px', marginTop: '30px' }}>
-          {notifications}
-        </Feed>
-      </div>
+      <Grid style={{ marginLeft: '25%', width: "40%", marginRight:"30%" }}>
+        <Grid.Row style={{ marginTop: 20 }}>
+          <h2>Welcome <a style={{ color: "#f6a6d1" }} href={`https://rinkeby.etherscan.io/address/${currentAccount}`}>{organization.firstName}</a>,</h2>
+        </Grid.Row>
+        <Grid.Row>
+          <h5>You have {this.state.notifications.length} notifications.</h5>
+        </Grid.Row>
+        <Grid.Row>
+          <h2>Your benefits</h2>
+          <Line data={data} options={options} />
+        </Grid.Row>
+        <Grid.Row>
+          <Feed>
+            {notifications}
+          </Feed>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

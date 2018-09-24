@@ -4,6 +4,14 @@ import MainChart from './MainChart';
 import withDrizzleContext from '../../utils/withDrizzleContext.js';
 import { Line, Pie } from 'react-chartjs-2';
 import "./Finance.less"
+import styled from "styled-components";
+
+const ShastaSidebar = styled(Sidebar)`
+
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+`;
 
 class Finance extends Component {
 
@@ -206,7 +214,7 @@ class Finance extends Component {
                     </Responsive>
                 </Responsive>
                 <Grid.Column>
-                    <Responsive as={Sidebar}
+                    <Responsive as={ShastaSidebar}
                         minWidth={1200}
                         animation='overlay'
                         icon='labeled'
