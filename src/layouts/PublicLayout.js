@@ -9,8 +9,11 @@ import ShastaLogo from '../static/logo-nav.png';
 
 const TopMenu = styled(Menu)`
 & {
-  height: 98px;
-
+  height: 75px;
+  @media only screen and (min-width: 1920px) {
+    padding: 0px 80px;
+  }
+}
 `
 const ResponsiveMenu = styled(Menu.Item)`
 &:before {
@@ -24,7 +27,7 @@ const AppLogo = styled(Menu.Item)`
     display: none;
   }
   & > img {
-    width: 295px !important;
+    width: 245px !important;
   }
 `
 class PublicHome extends Component {

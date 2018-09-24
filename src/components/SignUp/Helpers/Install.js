@@ -14,7 +14,7 @@ const FlexDiv = styled.div`
 export default function () {
   return (
     <FlexDiv>
-      <a href="https://metamask.io">
+      <a href="https://metamask.io" target="blank">
         <Image src={InstallSrc} centered size="large" />
       </a>
     </FlexDiv>

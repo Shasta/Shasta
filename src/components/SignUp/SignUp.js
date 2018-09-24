@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Transition } from 'semantic-ui-react'
+import { Grid, Container, Transition } from 'semantic-ui-react'
 import { Link } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import _ from 'lodash';
@@ -14,6 +14,23 @@ import Install from './Helpers/Install';
 import Login from './Helpers/Login';
 import Claim from './Helpers/Claim';
 
+const GridRow = styled(Grid.Row)`
+margin-top: 20px;
+@media only screen and (min-width: 1920px) {
+  margin-top: 80px;
+}
+@media only screen and (min-width: 1200px) and (max-width: 1919px) {
+  margin-top: 60px;
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  margin-top: 40px;
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+}
+@media only screen and (max-width: 767px) {
+
+}
+`
 const Header = styled.div`
   display: flex;
   justify-content: center;
@@ -22,12 +39,12 @@ const Header = styled.div`
   margin: 0 auto;
   & > * {
     color: #3d293f;
-    font-size: 2rem;
+    font-size: 1.4rem;
   }
   &&&&&& > h1 {
-    margin-top: 75px;
+    margin-top: 45px;
     margin-bottom: 0px;
-    font-size: 4.3rem;
+    font-size: 2.8rem;
   }
 `
 const HyperLink = styled(Link)`
@@ -78,8 +95,7 @@ class SignUp extends Component {
     const web3 = drizzle.web3;
 
     let isInstalled, isLogged, haveSha = false;
-
-    isInstalled = drizzle.web3.status !== 'failed';
+    isInstalled = _.get(drizzleState, 'web3.status', 'failed') !== 'failed';
     isLogged = isInstalled && initialized && drizzleState && Object.keys(drizzleState.accounts).length > 0;
     
     if (initialized) {
@@ -104,25 +120,27 @@ class SignUp extends Component {
       rightComponent = <Registry isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} store={this.props.store}/>
     }
     return (
-      <Grid>
+      <div>
         <Header>
-          <h1>Sign Up</h1>
-          <p style={{marginBottom: 0}}>Already have an account? <HyperLink to="/sign-in">Sign in instead</HyperLink></p>
-        </Header>
-        <Grid.Row centered columns={2} style={{marginTop: 75}}>
-          <Grid.Column mobile={12} tablet={12} computer={6}>
-            <Requeriments isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} />
-          </Grid.Column>
-          <Grid.Column  mobile={12} tablet={12} computer={6}>
-            <Transition.Group
-              animation='bounce'
-              duration={2000}
-            >
-              {rightComponent}
-            </Transition.Group>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+            <h1>Sign Up</h1>
+            <p style={{ textAlign: 'center'}}>Already have an account? <HyperLink to="/sign-in">Sign in instead</HyperLink></p>
+          </Header>
+        <Grid columns={2}>
+          <GridRow centered columns={2} verticalAlign="middle">
+            <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
+              <Requeriments isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} />
+            </Grid.Column>
+            <Grid.Column  mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
+              <Transition.Group
+                animation='bounce'
+                duration={2000}
+              >
+                {rightComponent}
+              </Transition.Group>
+            </Grid.Column>
+          </GridRow>
+        </Grid>
+      </div>
     );
   }
 }

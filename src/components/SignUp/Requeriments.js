@@ -12,26 +12,40 @@ const BoxesBackgroundColor = '#f4b8df';
 const BoxesFontColor = '#3d293f';
 
 const WelcomeBox = styled.div`
-  max-width: 580px;
+  width: 100%;
+  margin: 0 auto;
   background: ${BoxesBackgroundColor};
   border-radius: 10px;
-  padding: 30px 75px 40px;
+  padding: 30px 40px 40px;
   color: ${BoxesFontColor};
   font-size: 1.55rem;
   text-decoration-color: ${BoxesFontColor};
   & > h1 {
     margin-top: 30px;
-    font-size: 2.7rem;
+    font-size: 2.2rem;
   }
-`
-
-const RequerimentsBox = styled.div`
-  max-width: 580px;
-  background: ${BoxesBackgroundColor};
-  margin-top: 5px;
-  border-radius: 0px 0px 10px 10px;
-  padding: 56px 75px;
-  color: ${BoxesBackgroundColor};
+  @media only screen and (min-width: 1920px) {
+    max-width: 600px;
+  }
+  @media only screen and (min-width: 1200px) and (max-width: 1919px) {
+    max-width: 480px;
+  }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+    max-width: 440px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    max-width: 340px;
+    & > h1 {
+      font-size: 1.6rem;
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    padding: 30px 20px 40px;
+    & > h1 {
+      font-size: 1.6rem;
+    }
+  }
+  
 `
 
 const WelcomeAnimation = styled.div`
@@ -45,7 +59,7 @@ const WelcomeAnimation = styled.div`
 `
 
 const MakeSureText = styled.p`
-  font-size: 0.9em;
+  font-size: 0.8em;
 `
 
 const Icon = styled(FontAwesomeIcon)`
