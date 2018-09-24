@@ -6,8 +6,6 @@ import {
   Menu,
   Dropdown,
   Message,
-  List,
-  Segment,
   Input,
   Table
 } from "semantic-ui-react";
