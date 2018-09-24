@@ -11,23 +11,40 @@ import { connect} from 'react-redux';
 import {UserActions } from '../../redux/UserActions';
 
 const RegistryBox = styled.div`
+&&&& {
   border-radius: 6px;
-  max-width: 530px !important;
-  &&&& label {
-    font-weight: normal;
-    font-size: 1.4rem !important;
+  max-width: 330px;
+  width: 100%;
+  @media only screen and (min-width: 1920px) {
+    max-width: 520px;
   }
-  &&&& .ui.input > input {
-    margin-bottom: 20px;
-    border-radius: 0px;
-    border: 1px solid #777;
+  @media only screen and (min-width: 1200px) and (max-width: 1919px) {
+    max-width: 400px;
   }
-  &&&& select {
-    border-radius: 0px;
-    border: 1px solid #777;
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
   }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+  }
+  @media only screen and (max-width: 767px) {
+  }
+}
   
-  media only screen && (max-width)
+&&&& label {
+  font-weight: normal;
+  font-size: 1.1rem !important;
+}
+&&&& .ui.input > input {
+  margin-bottom: 8px;
+  border-radius: 0px;
+  border: 1px solid #777;
+  padding: 0.4rem 0.6rem;
+}
+&&&& select {
+  border-radius: 0px;
+  border: 1px solid #777;
+}
+
+
 `
 const Terms = styled.div`
   background: #fceef7;
@@ -37,7 +54,7 @@ const Terms = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 5px 0px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   &&&&& a {
     color: black;
     text-decoration: underline;
