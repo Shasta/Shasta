@@ -34,6 +34,9 @@ const options = {
         }
       }
     ]
+  },
+  web3: {
+    fallback: false
   }
 };
 

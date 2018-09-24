@@ -1,26 +1,45 @@
-.bottomDiv{
-    width: 100%;
-    height: 30px;
-    background-color: white;
-    z-index: 1;
-    position: absolute;
-    bottom: 0px;
+.menuItem {
+  width: 60%;
+}
+
+.bottomDiv {
+  width: 100%;
+  height: 30px;
+  background-color: white;
+  z-index: 1;
+  position: absolute;
+  bottom: 0px;
 }
 .itemDiv {
-    display: flex;
-    justify-content: bottom;
-    align-items: bottom;
+  display: flex;
+  justify-content: bottom;
+  align-items: bottom;
 }
 
 .itemNameDiv {
-    padding-left: 20px;
-    font-weight: bold;
-    font-size: 15px;
-    align-items: center;
-    display: flex;
-    justify-content: center;
+  padding-left: 20px;
+  font-weight: bold;
+  font-size: 15px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .nav-active-link .itemNameDiv > span {
-    border-bottom: 1px solid #ea78bc;
+  border-bottom: 1px solid #ea78bc;
+}
+
+@media only screen and (max-width: 1000px) {
+  .menuItem {
+    width: 35px;
+  }
+
+  .itemDiv {
+    padding-left: 0px;
+    display: inline-block;
+  }
+
+  .itemNameDiv {
+    display: none;
+  }
 }
