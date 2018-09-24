@@ -40,7 +40,6 @@ class NetworkStatus extends Component {
   render() {
     const { currentNetwork } = this.state;
     let segmentColor = 'red';
-    console.log(currentNetwork);
 
     if (currentNetwork === targetNetwork) {
       segmentColor = 'pink';

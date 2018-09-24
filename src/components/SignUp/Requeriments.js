@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import styled, { css} from 'styled-components';
 import { Image } from 'semantic-ui-react';
-
+import Lottie from "react-lottie";
+import ReqAnimation from '../../static/step-box-shasta.json';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import MintShaComponent from '../Account/MintSha';
@@ -57,14 +58,8 @@ const WelcomeBox = styled.div`
   
 `
 
-const WelcomeAnimation = styled.div`
-&&& {
-  margin: 0 auto;
-  width: 111px;
-  height: 111px;
-  background-color: white;
-  border-radius: 100%;
-}
+const WelcomeAnimation = styled(Lottie)`
+  
 `
 
 const MakeSureText = styled.p`
@@ -115,10 +110,20 @@ const StepIcon = function(props) {
 class Requeriments extends Component {
   render() {
     const {isInstalled, isLogged, haveSha, isRinkeby} = this.props;
+    
+    const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: ReqAnimation,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice"
+      }
+    };
+
     return (
       <div>
         <WelcomeBox>
-          <WelcomeAnimation centered />
+          <Lottie style={{margin: '0 auto', background: 'white', borderRadius: '100%'}} options={defaultOptions} width={111} height={111} />
           <h1>Welcome to Shasta</h1>
           <MakeSureText>Make sure to complete <u>all the steps</u> below to be able to sign up.</MakeSureText>
           <Steps>
