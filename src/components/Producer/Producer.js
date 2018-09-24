@@ -274,7 +274,7 @@ class Producer extends Component {
     }
 
     return (
-      <div style={{ marginLeft: "375px", marginTop: "50px" }}>
+      <div>
         <Sidebar
           as={Menu}
           animation="overlay"
