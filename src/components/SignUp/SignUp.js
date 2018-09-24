@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import _ from 'lodash';
 import styled from 'styled-components';
-
 // SignUp components
 import Requeriments from  './Requeriments';
 import Registry from './Registry';
@@ -14,21 +13,23 @@ import Install from './Helpers/Install';
 import Login from './Helpers/Login';
 import Claim from './Helpers/Claim';
 
+const targetNetwork = process.env.TARGET_NETWORK;
+
 const GridRow = styled(Grid.Row)`
-margin-top: 20px;
-@media only screen and (min-width: 1920px) {
-  margin-top: 80px;
-}
-@media only screen and (min-width: 1200px) and (max-width: 1919px) {
-  margin-top: 60px;
-}
-@media only screen and (min-width: 768px) and (max-width: 991px) {
-  margin-top: 40px;
-}
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-}
-@media only screen and (max-width: 767px) {
-}
+  margin-top: 20px;
+  @media only screen and (min-width: 1920px) {
+    margin-top: 80px;
+  }
+  @media only screen and (min-width: 1200px) and (max-width: 1919px) {
+    margin-top: 60px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    margin-top: 40px;
+  }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+  }
+  @media only screen and (max-width: 767px) {
+  }
 `
 const Header = styled.div`
   display: flex;
@@ -88,15 +89,32 @@ class SignUp extends Component {
     }
   }
 
+  async componentDidUpdate(nextProps, nextState) {
+    const { drizzle } = nextProps;
+    
+    const web3 = drizzle.web3;
+    if (web3 && web3.eth) {
+      const newNetwork = await web3.eth.net.getNetworkType();
+      if (newNetwork !== this.state.currentNetwork) {
+        this.setState({
+          currentNetwork: newNetwork
+        });
+      }
+    }
+  }
+
   render() {
     const { drizzle, drizzleState, initialized } = this.props;
-    const { tokenBalancePointer } = this.state;
+    const { tokenBalancePointer, currentNetwork } = this.state;
     const web3 = drizzle.web3;
 
     let isInstalled, isLogged, haveSha = false;
     isInstalled = _.get(drizzleState, 'web3.status', 'failed') !== 'failed';
     isLogged = isInstalled && initialized && drizzleState && Object.keys(drizzleState.accounts).length > 0;
-    
+
+    console.log('tn', targetNetwork)
+    const isRinkeby = isLogged && currentNetwork == targetNetwork;
+
     if (initialized) {
       if (tokenBalancePointer in drizzleState.contracts.ShaLedger.balanceOf) {
         const zeroBN = web3.utils.toBN("0");
@@ -109,13 +127,10 @@ class SignUp extends Component {
 
     let rightComponent = <Install />
 
-    if (isInstalled === true && isLogged === false) {
-      rightComponent = <Login />
-    }
-    if (isInstalled === true && isLogged === true && haveSha === false) {
+    if (isInstalled === true && isLogged === true && isRinkeby == true) {
       rightComponent = <Claim />
     }
-    if (isInstalled === true && isLogged === true && haveSha === true) {
+    if (isInstalled === true && isLogged === true && isRinkeby == true && haveSha === true) {
       rightComponent = <Registry isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} store={this.props.store}/>
     }
     return (
@@ -127,7 +142,7 @@ class SignUp extends Component {
         <Grid columns={2}>
           <GridRow centered columns={2} verticalAlign="middle">
             <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
-              <Requeriments isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} />
+              <Requeriments isInstalled={isInstalled} isLogged={isLogged} haveSha={haveSha} isRinkeby={isRinkeby}/>
             </Grid.Column>
             <Grid.Column  mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
               <Transition.Group

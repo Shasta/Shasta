@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import _ from 'lodash';
 
 import ShastaLogo from '../static/logo-nav.png';
+import withRawDrizzle from '../utils/withRawDrizzle';
+import RawNetworkStatus from '../components/NetworkStatus/NetworkStatus';
 
 const TopMenu = styled(Menu)`
 & {
@@ -27,9 +29,12 @@ const AppLogo = styled(Menu.Item)`
     display: none;
   }
   & > img {
-    width: 245px !important;
+    width: 200px !important;
   }
 `
+
+const NetworkStatus = withRawDrizzle(RawNetworkStatus)
+
 class PublicHome extends Component {
   state = {
     visible: false
@@ -84,6 +89,7 @@ class PublicHome extends Component {
           </Menu.Item>
         </Sidebar>
       
+        <NetworkStatus />
         {/* The rendered component */}
         <Component  {...this.props} /> 
       </div>
