@@ -68,10 +68,10 @@ class Dashboard extends React.Component {
       if (!privRoute.hiddenOnSideBar) {
         return (
           <MenuItem
+            className="menuItem"
             as={NavLink}
             to={privRoute.path}
             activeClassName="nav-active-link"
-            style={{ width: "60%" }}
           >
             <div className="itemDiv">
               {privRoute.icon && (
@@ -102,7 +102,12 @@ class Dashboard extends React.Component {
             width: "20%"
           }}
         >
-          <Image src={logo} size="small" style={{ paddingBottom: 20 }} />
+          <Image
+            className="logo"
+            src={logo}
+            size="small"
+            style={{ paddingBottom: 20 }}
+          />
           {Links}
         </Sidebar>
 
