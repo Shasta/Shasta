@@ -7,7 +7,7 @@ import styled from "styled-components";
 const ShastaButton = styled(Button)`
   background-color: #423142 !important;
   border-radius: 8px !important;
-  padding: 12px 25px !important;
+  padding: 8px 25px !important;
   border: 0 !important;
 `;
 

@@ -21,7 +21,7 @@ const EthAccount = styled.div`
 
 const ShastaButton = styled(Button)`
   border-radius: 8px !important;
-  padding: 12px 25px !important;
+  padding: 8px 25px !important;
   border: 0 !important;
 `;
 
