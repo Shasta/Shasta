@@ -83,7 +83,7 @@ class PublicHome extends Component {
             Sign In
           </Menu.Item>
         </Sidebar>
-
+      
         {/* The rendered component */}
         <Component  {...this.props} /> 
       </div>

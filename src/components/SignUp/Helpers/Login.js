@@ -1,28 +1,34 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import Logo from '../../../static/logo-shasta-02.png';
 
 const FlexDiv = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  width: 100%;
   height: 380px;
+  position: relative;
 `
 
-const HelperText = styled.div`
+const BackgroundImage = styled.img`
+  max-width: 330px;
   width: 100%;
-  max-width: 500px;
-  text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 30px;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  margin:auto;
+  z-index: 5;
 `
 
 export default function () {
   return (
     <FlexDiv>
-      <HelperText>Please login into Metamask to be able to interact with Shasta. Check the video below for a Metamask introduction.</HelperText>
-      <iframe width="100%" height="435px" src="https://www.youtube.com/embed/6Gf_kRE4MJU" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <BackgroundImage src={Logo} />
     </FlexDiv>
   )
 }

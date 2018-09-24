@@ -16,19 +16,25 @@ const WelcomeBox = styled.div`
   margin: 0 auto;
   background: ${BoxesBackgroundColor};
   border-radius: 10px;
-  padding: 30px 40px 40px;
+  padding: 30px 40px 20px;
   color: ${BoxesFontColor};
-  font-size: 1.55rem;
+  font-size: 1rem;
   text-decoration-color: ${BoxesFontColor};
   & > h1 {
-    margin-top: 30px;
+    margin-top: 20px;
     font-size: 2.2rem;
   }
   @media only screen and (min-width: 1920px) {
-    max-width: 600px;
+    font-size: 1.2rem;
+    max-width: 520px;
   }
   @media only screen and (min-width: 1200px) and (max-width: 1919px) {
-    max-width: 480px;
+    padding: 30px 20px 20px;
+    font-size: 1.05rem;
+    max-width: 380px;
+    & > h1 {
+      font-size: 1.7rem;
+    }
   }
   @media only screen and (min-width: 992px) and (max-width: 1199px) {
     max-width: 440px;
@@ -40,7 +46,7 @@ const WelcomeBox = styled.div`
     }
   }
   @media only screen and (max-width: 767px) {
-    padding: 30px 20px 40px;
+    padding: 30px 20px 20px;
     & > h1 {
       font-size: 1.6rem;
     }
@@ -59,7 +65,6 @@ const WelcomeAnimation = styled.div`
 `
 
 const MakeSureText = styled.p`
-  font-size: 0.8em;
 `
 
 const Icon = styled(FontAwesomeIcon)`
@@ -88,11 +93,10 @@ const Step = styled.div`
 `
 const StepDescription = styled.p`
   color: ${BoxesFontColor};
-  font-size: 1.2rem
 `
 const Steps = styled.div`
  & > ${Step}:not(:first-child) {
-  margin-top: 15px;
+  margin-top: 8px;
  }
 `
 

@@ -52,9 +52,10 @@ const HelperText = styled.p`
   max-width: 660px;
   text-align: center;
   margin-top: 35px;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: black;
 `
+
 export default function () {
   return (
   <FlexDiv>

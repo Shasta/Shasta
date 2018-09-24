@@ -28,7 +28,6 @@ margin-top: 20px;
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 @media only screen and (max-width: 767px) {
-
 }
 `
 const Header = styled.div`
