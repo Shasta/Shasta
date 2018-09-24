@@ -107,7 +107,17 @@ class Dashboard extends React.Component {
         </Sidebar>
 
         {/* Render component */}
-        <Component {...this.props} />
+
+        <div
+          style={{
+            // backgroundColor: "red",
+            marginLeft: "20%",
+            // border: "4px dotted blue",
+            padding: "80px"
+          }}
+        >
+          <Component {...this.props} />
+        </div>
       </div>
     );
   }
