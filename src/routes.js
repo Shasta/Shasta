@@ -7,12 +7,12 @@ import Settings from "./components/Settings/Settings";
 import Producer from "./components/Producer/Producer";
 import Hardware from "./components/Hardware/Hardware";
 import Finance from "./components/Finance/Finance";
-import homeIcon from './static/home_icon.png';
-import consumerIcon from './static/consumer_icon.png';
-import hardwareIcon from './static/hardware_icon.png';
-import settingsIcon from './static/settings_icon.png';
-import producerIcon from './static/finance_icon.png';
-import financeIcon from './static/marketer_icon.png';
+import homeIcon from "./static/home_icon.png";
+import consumerIcon from "./static/consumer_icon.png";
+import hardwareIcon from "./static/hardware_icon.png";
+import settingsIcon from "./static/settings_icon.png";
+import producerIcon from "./static/finance_icon.png";
+import financeIcon from "./static/marketer_icon.png";
 
 export const publicRoutes = {
   SignUp: {
@@ -37,8 +37,8 @@ export const privateRoutes = {
   Finances: {
     path: "/finances",
     component: Finance,
-    title: 'Finances',
-    icon: financeIcon,
+    title: "Finances",
+    icon: financeIcon
   },
   Consumer: {
     path: "/consumer",
@@ -67,6 +67,7 @@ export const privateRoutes = {
   Logout: {
     path: "/logout",
     component: Logout,
-    title: "Logout"
+    title: "Logout",
+    hiddenOnSideBar: true
   }
 };
