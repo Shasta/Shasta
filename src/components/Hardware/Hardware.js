@@ -43,21 +43,21 @@ class Hardware extends Component {
   }
 
   async getAccountInfo() {
-    let result = await axios.get("/accountInfo");
+    let result = await axios.get("/api/accountInfo.json");
     this.setState({
       accountInfo: result.data
     });
   }
 
   async getHistoryConsumedEnergy() {
-    let result = await axios.get("/historyConsumedEnergy");
+    let result = await axios.get("/api/historyConsumedEnergy.json");
     this.setState({
       historyConsumedEnergy: result.data.data
     });
   }
 
   async getHistorySurplusEnergy() {
-    let result = await axios.get("/historySurplusEnergy");
+    let result = await axios.get("/api/historySurplusEnergy.json");
     this.setState({
       historySurplusEnergy: result.data.data
     });

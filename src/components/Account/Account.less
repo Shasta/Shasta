@@ -1,0 +1,36 @@
+@color-eth: #5e6da3;
+@color-sha: #3f2d40;
+
+.indicatorEth {
+  .indicator(@color-eth, "eth");
+}
+
+.indicatorSha {
+  .indicator(@color-sha, "sha");
+}
+
+.indicator(@color, @coin) {
+  border-style: solid;
+  padding: 2px;
+  padding-left: 37px;
+  padding-right: 6px;
+
+  margin-left: 40px;
+  font-weight: bold;
+  border-width: 1px;
+  border-color: @color;
+  position: relative;
+
+  color: black;
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: -40%;
+    left: -10px;
+    background-image: url("/images/@{coin}-coin.png");
+    background-size: contain;
+  }
+}

@@ -117,6 +117,7 @@
     "react-chartjs-2": "^2.7.4",
     "react-dev-utils": "^5.0.2",
     "react-dom": "^16.5.2",
+    "react-lottie": "^1.2.3",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
     "redux-thunk": "^2.3.0",
