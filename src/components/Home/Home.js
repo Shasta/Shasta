@@ -181,7 +181,7 @@ class Home extends Component {
 
     return (
       // Menu with Bulma-React.
-      <Grid style={{ marginLeft: '25%', width: "40%" }}>
+      <Grid style={{ marginLeft: '25%', width: "40%", marginRight:"30%" }}>
         <Grid.Row style={{ marginTop: 20 }}>
           <h2>Welcome <a style={{ color: "#f6a6d1" }} href={`https://rinkeby.etherscan.io/address/${currentAccount}`}>{organization.firstName}</a>,</h2>
         </Grid.Row>
