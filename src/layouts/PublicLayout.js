@@ -5,8 +5,18 @@ import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import _ from 'lodash';
 
-import ShastaLogo from '../static/logo-shasta-02.png';
+import ShastaLogo from '../static/logo-nav.png';
+import withRawDrizzle from '../utils/withRawDrizzle';
+import RawNetworkStatus from '../components/NetworkStatus/NetworkStatus';
 
+const TopMenu = styled(Menu)`
+& {
+  height: 75px;
+  @media only screen and (min-width: 1920px) {
+    padding: 0px 80px;
+  }
+}
+`
 const ResponsiveMenu = styled(Menu.Item)`
 &:before {
   display: none;
@@ -18,14 +28,13 @@ const AppLogo = styled(Menu.Item)`
   &:before {
     display: none;
   }
-  & > h2 {
-    margin: 0;
-    margin-left: 10px;
-  }
   & > img {
-    width: 55px !important;
+    width: 200px !important;
   }
 `
+
+const NetworkStatus = withRawDrizzle(RawNetworkStatus)
+
 class PublicHome extends Component {
   state = {
     visible: false
@@ -50,25 +59,16 @@ class PublicHome extends Component {
     return (
       <div>
         {/* The top menu */}
-        <Menu>
+        <TopMenu>
           <AppLogo as={Link} to="/">
-            <img src={ShastaLogo} />
-            <h2>Shasta</h2>
+            <img src={ShastaLogo} style={{width: 295}}/>
           </AppLogo>
-          <Responsive as={Menu.Menu} position='right' minWidth="1024">
-            <Menu.Item as={Link} to="/sign-in">
-             <Button color="purple">Sign In</Button>
-            </Menu.Item>
-            <Menu.Item as={Link} to="/">
-              <Button color="purple">Sign Up</Button>
-            </Menu.Item>
-          </Responsive>
           <Responsive as={Menu.Menu} position='right' maxWidth="1024">
             <ResponsiveMenu as={Button} onClick={this.handleSidebarShow}>
               <Icon icon="bars" />
             </ResponsiveMenu>
           </Responsive>
-        </Menu>
+        </TopMenu>
 
         {/* The lateral right sidebar for responsive menu*/}
         <Sidebar
@@ -88,7 +88,8 @@ class PublicHome extends Component {
             Sign In
           </Menu.Item>
         </Sidebar>
-
+      
+        <NetworkStatus />
         {/* The rendered component */}
         <Component  {...this.props} /> 
       </div>
