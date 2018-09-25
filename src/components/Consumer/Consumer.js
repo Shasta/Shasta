@@ -337,7 +337,7 @@ class Consumer extends Component {
           return (
             <Grid.Column key={i}>
               <Image
-                style={{ padding: "10px 10px" }}
+                style={{ margin: "10px 10px", cursor:'pointer' }}
                 src={image}
                 onClick={() => this.handleSourceClick(i)}
               />

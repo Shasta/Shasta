@@ -214,7 +214,6 @@ class Home extends Component {
           <h5>You have {this.state.notifications.length} notifications.</h5>
         </Grid.Row>
         <Grid.Row>
-          <h2>Your benefits</h2>
           <Line data={data} options={options} />
         </Grid.Row>
         <Grid.Row>
