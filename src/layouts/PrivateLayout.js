@@ -72,6 +72,7 @@ class Dashboard extends React.Component {
             as={NavLink}
             to={privRoute.path}
             activeClassName="nav-active-link"
+            key={key}
           >
             <div className="itemDiv">
               {privRoute.icon && (
@@ -118,7 +119,7 @@ class Dashboard extends React.Component {
             // backgroundColor: "red",
             marginLeft: "20%",
             // border: "4px dotted blue",
-            padding: "80px"
+            padding: "60px"
           }}
         >
           <Component {...this.props} />

@@ -60,7 +60,6 @@ const ShastaGridRow = styled(Grid.Row)`
   border-left: 10px solid #f076b6 !important;
 `;
 
-let checkedAddresses = [];
 const sources = [
   {
     key: 0,
@@ -189,6 +188,8 @@ class Consumer extends Component {
   }
 
   async getProducerOffers() {
+    let checkedAddresses = [];
+
     const { drizzle, drizzleState } = this.props;
     const web3 = drizzle.web3;
     const currentAccount = drizzleState.accounts[0];
@@ -225,6 +226,7 @@ class Consumer extends Component {
             producersOffersList.push(userData.producerOffers[key]);
           }
         }
+
         this.setState({
           producersOffersList: producersOffersList.sort(
             (a, b) => a.energyPrice < b.energyPrice
@@ -278,10 +280,9 @@ class Consumer extends Component {
 
   handleOfferSelection = con => {
     if (con && con.ethAddress) {
-      console.log(con);
       this.setState({
         selectedContract: con,
-        currentStep: 3
+        currentStep: 2
       });
     }
   };
@@ -337,7 +338,7 @@ class Consumer extends Component {
           return (
             <Grid.Column key={i}>
               <Image
-                style={{ margin: "10px 10px", cursor:'pointer' }}
+                style={{ margin: "10px 10px", cursor: "pointer" }}
                 src={image}
                 onClick={() => this.handleSourceClick(i)}
               />
@@ -501,7 +502,6 @@ class Consumer extends Component {
     const currentAccount = drizzleState.accounts[0];
 
     let producerOffers = this.state.producersOffersList.map(contract => {
-      console.log(contract);
       //filter your offers
       if (currentAccount === contract.ethAddress) {
         return "";

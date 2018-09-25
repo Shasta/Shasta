@@ -196,28 +196,37 @@ class Home extends Component {
     );
 
     return (
-      // Menu with Bulma-React.
-      <Grid style={{ width: "40%" }}>
+      <Grid>
         <Grid.Row>
-          <h2>
-            Welcome{" "}
-            <a
-              style={{ color: "#f6a6d1" }}
-              href={`https://rinkeby.etherscan.io/address/${currentAccount}`}
-            >
-              {organization.firstName}
-            </a>
-            ,
-          </h2>
+          <Grid.Column width={16}>
+            <h2>
+              Welcome{" "}
+              <a
+                style={{ color: "#f6a6d1" }}
+                href={`https://rinkeby.etherscan.io/address/${currentAccount}`}
+              >
+                {organization.firstName}
+              </a>
+              ,
+            </h2>
+          </Grid.Column>
+        </Grid.Row>
+
+        <Grid.Row>
+          <Grid.Column width={16}>
+            <h5>You have {this.state.notifications.length} notifications.</h5>
+          </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-          <h5>You have {this.state.notifications.length} notifications.</h5>
+          <Grid.Column width={10}>
+            <Line data={data} options={options} />
+          </Grid.Column>
+          <Grid.Column width={6} />
         </Grid.Row>
         <Grid.Row>
-          <Line data={data} options={options} />
-        </Grid.Row>
-        <Grid.Row>
-          <Feed>{notifications}</Feed>
+          <Grid.Column width={16}>
+            <Feed>{notifications}</Feed>
+          </Grid.Column>
         </Grid.Row>
       </Grid>
     );
