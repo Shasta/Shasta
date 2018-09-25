@@ -118,7 +118,7 @@ class Dashboard extends React.Component {
             // backgroundColor: "red",
             marginLeft: "20%",
             // border: "4px dotted blue",
-            padding: "80px"
+            padding: "60px"
           }}
         >
           <Component {...this.props} />
