@@ -1,13 +1,15 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Menu, Button, Responsive, Sidebar } from 'semantic-ui-react'
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import _ from 'lodash';
-
+import { connect } from 'react-redux';
 import ShastaLogo from '../static/logo-nav.png';
 import withRawDrizzle from '../utils/withRawDrizzle';
 import RawNetworkStatus from '../components/NetworkStatus/NetworkStatus';
+import LoadingCenter from '../components/LoadingCenter';
+import { LoadingActions } from '../redux/LoadingActions';
 
 const TopMenu = styled(Menu)`
 & {
@@ -35,7 +37,11 @@ const AppLogo = styled(Menu.Item)`
 
 const NetworkStatus = withRawDrizzle(RawNetworkStatus)
 
-class PublicHome extends Component {
+class PublicHome extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.loaderAction = new LoadingActions(this.props.dispatch);
+  }
   state = {
     visible: false
   }
@@ -52,10 +58,33 @@ class PublicHome extends Component {
     })
   }
 
+  componentDidUpdate(newProps, newState) {
+    const { drizzleState } = newProps;
+    if (drizzleState && drizzleState.transactionStack) {
+      const latestTx = drizzleState.transactionStack.length -1;
+      const txHash = drizzleState.transactionStack[latestTx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        const transactionStatus = transaction.status;
+        if (transactionStatus === "pending" && newProps.isAppLoading == false) {
+          this.loaderAction.show(); 
+        } 
+        if (transactionStatus !== "pending" && newProps.isAppLoading == true) {
+          this.loaderAction.hide();
+        }
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.loaderAction.hide();
+  }
+
   render() {
     const Component = this.props.component;
+    const isAppLoading = this.props.isAppLoading;
     const {visible} = this.state;
-
+    console.log("is loading", isAppLoading);
     return (
       <div>
         {/* The top menu */}
@@ -92,9 +121,18 @@ class PublicHome extends Component {
         <NetworkStatus />
         {/* The rendered component */}
         <Component  {...this.props} /> 
+        {isAppLoading && <LoadingCenter />}
       </div>
     );
   }
 }
 
-export default PublicHome;
+function mapStateToProps(state, props) { return { isAppLoading: state.isAppLoading } };
+function mapDispatchToProps(dispatch) { return { dispatch }; }
+
+export default withRawDrizzle(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PublicHome)
+);

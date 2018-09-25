@@ -5,7 +5,8 @@ import styled from 'styled-components';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 
 import { connect} from 'react-redux';
-import {UserActions } from '../../redux/UserActions';
+import { UserActions } from '../../redux/UserActions';
+import { LoadingActions } from '../../redux/LoadingActions';
 
 import ShastaLogo from '../../static/logo-shasta-02.png';
 
@@ -48,6 +49,7 @@ class SignIn extends Component {
   constructor(props) {
     super(props);
     this.action = new UserActions(this.props.dispatch);
+    this.loadAction = new LoadingActions(this.props.dispatch);
   }
   state = {
     organization: "",
@@ -63,6 +65,7 @@ class SignIn extends Component {
     const username = this.state.organization;
     if (initialized && drizzleState && !!drizzleState.accounts && !!drizzleState.accounts[0]) {
       try {
+        this.loadAction.show();
         const web3 = drizzle.web3;
         const rawNickname = web3.utils.utf8ToHex(username);
         const currentAddress = drizzleState.accounts[0];
@@ -76,7 +79,9 @@ class SignIn extends Component {
         }
         // Org exists and current user is org owner
         this.action.login(username);
+        this.loadAction.hide();
       } catch (error) {
+        this.loadAction.hide();
         if (error == 'org-not-same-address') {
           this.setState({
             notSameUser: true
