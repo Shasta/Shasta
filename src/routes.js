@@ -7,12 +7,19 @@ import Settings from "./components/Settings/Settings";
 import Producer from "./components/Producer/Producer";
 import Hardware from "./components/Hardware/Hardware";
 import Finance from "./components/Finance/Finance";
-import homeIcon from "./static/home_icon.png";
-import consumerIcon from "./static/consumer_icon.png";
-import hardwareIcon from "./static/hardware_icon.png";
-import settingsIcon from "./static/settings_icon.png";
-import producerIcon from "./static/finance_icon.png";
-import financeIcon from "./static/marketer_icon.png";
+import homeIconOff from "./static/home_icon_off.png";
+import consumerIconOff from "./static/consumer_icon_off.png";
+import hardwareIconOff from "./static/hardware_icon_off.png";
+import settingsIconOff from "./static/settings_icon_off.png";
+import producerIconOff from "./static/finance_icon_off.png";
+import financeIconOff from "./static/marketer_icon_off.png";
+
+import homeIconOn from "./static/home_icon_on.png";
+import consumerIconOn from "./static/consumer_icon_on.png";
+import hardwareIconOn from "./static/hardware_icon_on.png";
+import settingsIconOn from "./static/settings_icon_on.png";
+import producerIconOn from "./static/finance_icon_on.png";
+import financeIconOn from "./static/marketer_icon_on.png";
 
 export const publicRoutes = {
   SignUp: {
@@ -32,37 +39,43 @@ export const privateRoutes = {
     path: "/home",
     component: DashboardHome,
     title: "Home",
-    icon: homeIcon
+    iconOff: homeIconOff,
+    iconOn: homeIconOn
   },
   Finances: {
     path: "/finances",
     component: Finance,
     title: "Finances",
-    icon: financeIcon
+    iconOff: financeIconOff,
+    iconOn: financeIconOn
   },
   Consumer: {
     path: "/consumer",
     component: Consumer,
     title: "Consumer",
-    icon: consumerIcon
+    iconOff: consumerIconOff,
+    iconOn: consumerIconOn
   },
   Producer: {
     path: "/producer",
     component: Producer,
     title: "Producer",
-    icon: producerIcon
+    iconOff: producerIconOff,
+    iconOn: producerIconOn
   },
   Hardware: {
     path: "/hardware",
     component: Hardware,
     title: "Hardware",
-    icon: hardwareIcon
+    iconOff: hardwareIconOff,
+    iconOn: hardwareIconOn
   },
   Settings: {
     path: "/settings",
     component: Settings,
     title: "Settings",
-    icon: settingsIcon
+    iconOff: settingsIconOff,
+    iconOn: settingsIconOn
   },
   Logout: {
     path: "/logout",

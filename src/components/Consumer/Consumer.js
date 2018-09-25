@@ -6,7 +6,8 @@ import {
   Loader,
   Segment,
   Grid,
-  Image
+  Image,
+  Message
 } from "semantic-ui-react";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 
@@ -60,7 +61,6 @@ const ShastaGridRow = styled(Grid.Row)`
   border-left: 10px solid #f076b6 !important;
 `;
 
-let checkedAddresses = [];
 const sources = [
   {
     key: 0,
@@ -98,6 +98,23 @@ const sources = [
     imgSrc2: otherOnIcon
   }
 ];
+
+const sourcesIcons = selectedName => {
+  return sources.map((source, i) => {
+    let image = source.imgSrc;
+    if (source.value === selectedName) {
+      image = source.imgSrc2;
+    }
+
+    return (
+      <Image
+        key={i}
+        style={{ width: "60px", height: "60px", padding: "10px 10px" }}
+        src={image}
+      />
+    );
+  });
+};
 
 const pricesRanges = [
   {
@@ -148,7 +165,9 @@ class Consumer extends Component {
       filterCountry: "",
       filterAmount: "",
       currentStep: 0,
-      tx: null
+      tx: null,
+      amountSelected: false,
+      messageVisibility: false
     };
 
     this.handleSourceClick = this.handleSourceClick.bind(this);
@@ -172,6 +191,8 @@ class Consumer extends Component {
   }
 
   async getProducerOffers() {
+    let checkedAddresses = [];
+
     const { drizzle, drizzleState } = this.props;
     const web3 = drizzle.web3;
     const currentAccount = drizzleState.accounts[0];
@@ -208,6 +229,7 @@ class Consumer extends Component {
             producersOffersList.push(userData.producerOffers[key]);
           }
         }
+
         this.setState({
           producersOffersList: producersOffersList.sort(
             (a, b) => a.energyPrice < b.energyPrice
@@ -223,17 +245,24 @@ class Consumer extends Component {
 
   handleChangefilterAmount = (e, data) => {
     this.setState({
-      filterAmount: data.value
+      filterAmount: data.value,
+      amountSelected: true,
+      messageVisibility: false
     });
   };
 
   handleNextClick = () => {
     const current = this.state.currentStep;
-
-    if (current < 2) {
+    if (this.state.amountSelected) {
+      if (current < 2) {
+        this.setState({
+          currentStep: current + 1
+        });
+      }
+    } else {
       this.setState({
-        currentStep: current + 1
-      });
+        messageVisibility: true
+      })
     }
   };
 
@@ -260,12 +289,17 @@ class Consumer extends Component {
   };
 
   handleOfferSelection = con => {
-    if (con && con.ethAddress) {
-      console.log(con);
+    if (this.state.amountSelected) {
+      if (con && con.ethAddress) {
+        this.setState({
+          selectedContract: con,
+          currentStep: 2
+        });
+      }
+    } else {
       this.setState({
-        selectedContract: con,
-        currentStep: 3
-      });
+        messageVisibility: true
+      })
     }
   };
 
@@ -282,6 +316,10 @@ class Consumer extends Component {
       billInstance.abi,
       billInstance.address
     );
+    console.log("con: ", con)
+    console.log("avg: ", avg)
+    console.log("price: ", price)
+    console.log("total: ", total);
     const confirmContractAbi = billInstanceWeb3.methods
       .newPrepaidContract(
         tokenInstance.address,
@@ -320,7 +358,7 @@ class Consumer extends Component {
           return (
             <Grid.Column key={i}>
               <Image
-                style={{ padding: "10px 10px" }}
+                style={{ margin: "10px 10px", cursor: "pointer" }}
                 src={image}
                 onClick={() => this.handleSourceClick(i)}
               />
@@ -358,6 +396,7 @@ class Consumer extends Component {
                   />
                 </div>
               </ShastaGridRow>
+              <Message color='red' hidden={!this.state.messageVisibility}>Select an amount of energy to buy please.</Message>
             </Grid.Column>
             <Grid.Column style={{ width: "50%" }}>
               <ShastaGridRow style={{ paddingBottom: 20 }}>
@@ -385,8 +424,19 @@ class Consumer extends Component {
       case 1:
         return (
           <div>
-            <h3>Offers: </h3>
-            <Card.Group>{producerOffers}</Card.Group>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width="16">
+                  <h3>Offers: </h3>
+                  <Card.Group>{producerOffers}</Card.Group>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column width="16">
+                  <Button onClick={this.handleBackClick}>Back</Button>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
           </div>
         );
       case 2:
@@ -400,6 +450,7 @@ class Consumer extends Component {
         const avgRaw = web3.utils.toBN(averageConsumerEnergy);
         const totalRaw = priceRaw.mul(avgRaw);
         const totalPrice = web3.utils.fromWei(totalRaw, "ether");
+        console.log("TP: ", averageConsumerEnergy);
 
         let txStatus = "";
         if (drizzleState.transactionStack[tx]) {
@@ -412,7 +463,6 @@ class Consumer extends Component {
             }
           }
         }
-        console.log("tx status", txStatus);
         return (
           <div>
             <h3>Confirm contract</h3>
@@ -484,7 +534,6 @@ class Consumer extends Component {
     const currentAccount = drizzleState.accounts[0];
 
     let producerOffers = this.state.producersOffersList.map(contract => {
-      console.log(contract);
       //filter your offers
       if (currentAccount === contract.ethAddress) {
         return "";
@@ -515,13 +564,20 @@ class Consumer extends Component {
             <Card.Description>Address: {contract.address}</Card.Description>
           </Card.Content>
           <Card.Content extra>
-            <p>Source: {contract.providerSource}</p>
-            <p>Total Price: {contract.fiatAmount} Sha</p>
-            <ShastaBuyButton
-              onClick={() => this.handleOfferSelection(contract)}
-            >
-              Buy Energy
-            </ShastaBuyButton>
+            <Grid stackable columns={2}>
+              <Grid.Column>
+                <p>Source: {contract.providerSource}</p>
+                <p>Total Price: {contract.fiatAmount} Sha</p>
+                <ShastaBuyButton
+                  onClick={() => this.handleOfferSelection(contract)}
+                >
+                  Buy Energy
+                </ShastaBuyButton>
+              </Grid.Column>
+              <Grid.Column textAlign="right">
+                {sourcesIcons(contract.providerSource)}
+              </Grid.Column>
+            </Grid>
           </Card.Content>
         </ShastaCard>
       );
@@ -532,7 +588,7 @@ class Consumer extends Component {
 
     return (
       <div>
-        <MyStep step={this.state.currentStep} />
+        <MyStep step={this.state.currentStep} undo={this.handleBackClick} />
         {this.getContent(producerOffers)}
       </div>
     );

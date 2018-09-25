@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { CountryDropdown } from 'react-country-region-selector';
-import { Button, Form, Input, Checkbox } from 'semantic-ui-react'
+import { Button, Form, Input, Checkbox, Message } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import ipfs from '../../ipfs';
-import _  from 'lodash';
+import _ from 'lodash';
 
-import { connect} from 'react-redux';
-import {UserActions } from '../../redux/UserActions';
+import { connect } from 'react-redux';
+import { UserActions } from '../../redux/UserActions';
 
 const RegistryBox = styled.div`
 &&&& {
@@ -81,7 +81,8 @@ class RegistryForm extends Component {
     country: "",
     use: false,
     privacy: false,
-    toDashboard: false
+    toDashboard: false,
+    usernameTaken: false
   }
 
   constructor(props) {
@@ -91,16 +92,16 @@ class RegistryForm extends Component {
   }
 
   componentDidMount() {
-    const { drizzleState, drizzle, initialized} = this.props;
-    const {tokenBalancePointer} = this.state;
+    const { drizzleState, drizzle, initialized } = this.props;
+    const { tokenBalancePointer } = this.state;
 
     if (initialized && !!drizzleState && tokenBalancePointer !== "") {
-      const { accounts } = drizzleState; 
+      const { accounts } = drizzleState;
       const currentAddress = accounts[0];
       if (currentAddress) {
         const shaLedgerInstance = drizzle.contracts.ShaLedger;
         const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
-  
+
         this.setState({
           tokenBalancePointer,
           currentAddress
@@ -110,8 +111,8 @@ class RegistryForm extends Component {
   }
 
   refreshTokenBalance = () => {
-    const {drizzle, drizzleState} = this.props;
-    const { accounts } = drizzleState; 
+    const { drizzle, drizzleState } = this.props;
+    const { accounts } = drizzleState;
     const currentAddress = accounts[0];
     const shaLedgerInstance = drizzle.contracts.ShaLedger;
     const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
@@ -122,9 +123,9 @@ class RegistryForm extends Component {
   }
 
   createUser = async () => {
-    const {initialized, drizzle, drizzleState} = this.props;
-    const {organizationName, firstName, lastName, country} = this.state;
-    const mainAccount = drizzleState && drizzleState.accounts && !!Object.keys(drizzleState.accounts).length ? drizzleState.accounts[0] : ""; 
+    const { initialized, drizzle, drizzleState } = this.props;
+    const { organizationName, firstName, lastName, country } = this.state;
+    const mainAccount = drizzleState && drizzleState.accounts && !!Object.keys(drizzleState.accounts).length ? drizzleState.accounts[0] : "";
     if (initialized === true && mainAccount !== "") {
       const contractInstance = drizzle.contracts.User;
       const userJson = {
@@ -143,24 +144,34 @@ class RegistryForm extends Component {
       const rawOrgName = drizzle.web3.utils.utf8ToHex(organizationName);
       const ipfsHash = drizzle.web3.utils.utf8ToHex(ipfsResponse[0].hash);
 
-      const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({from: mainAccount})
-      const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
+      //Check username is taken
+      const usernameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
+      console.log(usernameTaken)
+      if (!usernameTaken) {
+        //Create the user
+        const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
+        const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
 
-      if (!userCreationResponse) {
-        console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
-      }
+        if (!userCreationResponse) {
+          console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
+        }
 
-      if (userCreationResponse) {
-        this.action.login(organizationName)
+        if (userCreationResponse) {
+          this.action.login(organizationName)
+          this.setState({
+            toDashboard: true
+          })
+        }
+      } else {
         this.setState({
-          toDashboard: true
+          usernameTaken: true
         })
       }
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const {drizzle, drizzleState, initialized} = nextProps;
+    const { drizzle, drizzleState, initialized } = nextProps;
     if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length === 0) {
       return;
     }
@@ -200,11 +211,10 @@ class RegistryForm extends Component {
   }
   render() {
     const { organizationName, firstName, lastName, country, toDashboard, use, privacy } = this.state;
-    
+
     if (toDashboard === true) {
       return <Redirect to="/home" />
     }
-    
     const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
 
     return (
@@ -220,17 +230,19 @@ class RegistryForm extends Component {
           <CountryDropdown
             value={country}
             onChange={(val) => this.selectCountry(val)} />
-          <Terms style={{ marginTop: 30}}>
+          <Terms style={{ marginTop: 30 }}>
             <span>I agree to Shasta <a href="#">Terms of Use</a>.</span>
-            <Checkbox checked={this.state.user} onChange={this.toggleUseTerms}/>
+            <Checkbox checked={this.state.user} onChange={this.toggleUseTerms} />
           </Terms>
           <Terms>
             <span>I agree to Shasta <a href="#">Politic Privacy</a>.</span>
-            <Checkbox checked={this.state.privacy} onChange={this.togglePrivacyTerms}/>
+            <Checkbox checked={this.state.privacy} onChange={this.togglePrivacyTerms} />
           </Terms>
         </Form.Field>
         <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
+        <Message color='red' hidden={!this.state.usernameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
       </Form>
+
     )
   }
 }

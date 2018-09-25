@@ -6,7 +6,6 @@ import _ from "lodash";
 import Tab from "../components/Tab/Tab";
 import logo from "../static/logo-shasta-02.png";
 import withDrizzleContext from "../utils/withDrizzleContext";
-import ipfs from "../ipfs";
 import { connect } from "react-redux";
 import "./PrivateLayout.less";
 import LoadingTop from '../components/LoadingTop';
@@ -16,51 +15,7 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.createDemo = this.createDemo.bind(this);
     this.loaderAction = new LoadingActions(this.props.dispatch);
-  }
-
-  async createDemo() {
-    const { drizzle, drizzleState } = this.props;
-    const { organization } = this.props.user;
-    const currentAccount = drizzleState.accounts[0];
-
-    const web3 = drizzle.web3;
-    const rawOrgName = web3.utils.utf8ToHex(organization);
-    const rawHash = await drizzle.contracts.User.methods
-      .getIpfsHashByUsername(rawOrgName)
-      .call({ from: currentAccount });
-    const ipfsHash = web3.utils.hexToUtf8(rawHash);
-    const rawJson = await ipfs.cat(ipfsHash);
-    const userJson = JSON.parse(rawJson);
-    let contractInstance = drizzle.contracts.User;
-    var faker = require("faker");
-
-    // Generate the location object, will be saved later in JSON.
-    const producerOffer = {
-      chargerName: "charger-" + faker.random.number(),
-      latitude: "36.70",
-      longitude: "-4.457",
-      providerSource: "Solar",
-      address: faker.address.streetAddress(),
-      energyPrice: "0.12",
-      fiatAmount: "13",
-      date: Date.now(),
-      pendingOffer: true,
-      ethAddress: currentAccount
-    };
-    userJson.producerOffers.push(producerOffer);
-
-    // Upload to IPFS and receive response
-    const ipfsResponse = await ipfs.add(Buffer.from(JSON.stringify(userJson)));
-    const thirdIpfsHash = web3.utils.utf8ToHex(ipfsResponse[0].hash);
-    const thirdPrice = web3.utils.toWei(producerOffer.fiatAmount, "ether");
-    const estimatedGas = await contractInstance.methods
-      .createOffer(thirdPrice, thirdIpfsHash)
-      .estimateGas({ from: currentAccount });
-    await contractInstance.methods
-      .createOffer(thirdPrice, thirdIpfsHash)
-      .send({ gas: estimatedGas, from: currentAccount });
   }
 
   componentDidUpdate(newProps, newState) {
@@ -100,11 +55,19 @@ class Dashboard extends React.Component {
             as={NavLink}
             to={privRoute.path}
             activeClassName="nav-active-link"
+            key={key}
           >
             <div className="itemDiv">
-              {privRoute.icon && (
-                <Image style={{ width: 35, height: 30 }} src={privRoute.icon} />
-              )}
+              <Image
+                className="iconOff"
+                style={{ width: 35, height: 30 }}
+                src={privRoute.iconOff}
+              />
+              <Image
+                className="iconOn"
+                style={{ width: 35, height: 30 }}
+                src={privRoute.iconOn}
+              />
               <div className="itemNameDiv">
                 <span>{privRoute.title}</span>
               </div>
@@ -146,7 +109,7 @@ class Dashboard extends React.Component {
             // backgroundColor: "red",
             marginLeft: "20%",
             // border: "4px dotted blue",
-            padding: "80px"
+            padding: "60px"
           }}
         >
           <Component {...this.props} />
