@@ -281,7 +281,7 @@ class Consumer extends Component {
       console.log(con);
       this.setState({
         selectedContract: con,
-        currentStep: 3
+        currentStep: 2
       });
     }
   };
