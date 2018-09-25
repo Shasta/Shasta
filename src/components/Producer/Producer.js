@@ -76,6 +76,7 @@ class Producer extends Component {
       .getIpfsHashByUsername(rawOrgName)
       .call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
+    console.log("ipfsHash: ", ipfsHash)
     const rawJson = await ipfs.cat(ipfsHash);
     const userJson = JSON.parse(rawJson);
 
@@ -108,6 +109,57 @@ class Producer extends Component {
 
     this.setState({ visible: false });
   };
+
+  async handleCancelOffer(index) {
+
+    // Get the SharedMap.sol instance
+    const { drizzle, drizzleState } = this.props;
+    const userJson = _.cloneDeep(this.state.userJson);
+    const web3 = drizzle.web3;
+    const currentAddress = drizzleState.accounts[0];
+    const drizzleUser = drizzle.contracts.User;
+    const shastaMarketInstance = drizzle.contracts.ShastaMarket;
+
+    userJson.producerOffers.splice(index, 1);
+    try {
+      // Show loader spinner
+      this.setState({ loader: true });
+      // Upload to IPFS and receive response
+      const ipfsResponse = await ipfs.add([
+        Buffer.from(JSON.stringify(userJson))
+      ]);
+
+      const offers = shastaMarketInstance.methods.getOffersLength().call();
+      console.log("offers: ", offers);
+
+      const ipfsHash = ipfsResponse[0].hash;
+      console.log("ipfsHash: ", ipfsHash);
+      console.log(currentAddress)
+
+      const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash);
+      console.log("raw", rawIpfsHash);
+      console.log(drizzleUser.methods)
+      const estimatedGas = await drizzleUser.methods
+        .cancelOffer(index, rawIpfsHash)
+        .estimateGas({ from: currentAddress });
+      await drizzleUser.methods
+        .cancelOffer(index, rawIpfsHash)
+        .send({ gas: estimatedGas, from: currentAddress });
+
+      this.setState({
+        chargers: userJson.producerOffers,
+        userJson,
+        chargerLatitude: "",
+        chargerLongitude: "",
+        chargerName: "",
+        chargerStatus: "open",
+        visible: false,
+        energyPrice: 0
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   handleChangeSource = (e, data) => {
     this.setState({
@@ -252,6 +304,7 @@ class Producer extends Component {
               color="grey"
               value={index}
               style={{ backgroundColor: "white", float: "right" }}
+              onClick={() => this.handleCancelOffer(index)}
             >
               Cancel Offer
             </Button>
