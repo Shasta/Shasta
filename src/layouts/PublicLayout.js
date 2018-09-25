@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Menu, Button, Responsive, Sidebar } from 'semantic-ui-react'
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import _ from 'lodash';
-
+import { connect } from 'react-redux';
 import ShastaLogo from '../static/logo-nav.png';
 import withRawDrizzle from '../utils/withRawDrizzle';
 import RawNetworkStatus from '../components/NetworkStatus/NetworkStatus';
@@ -35,7 +35,7 @@ const AppLogo = styled(Menu.Item)`
 
 const NetworkStatus = withRawDrizzle(RawNetworkStatus)
 
-class PublicHome extends Component {
+class PublicHome extends PureComponent {
   state = {
     visible: false
   }
@@ -54,8 +54,9 @@ class PublicHome extends Component {
 
   render() {
     const Component = this.props.component;
+    const isAppLoading = this.props.isAppLoading;
     const {visible} = this.state;
-
+    console.log("is loading", isAppLoading);
     return (
       <div>
         {/* The top menu */}
@@ -97,4 +98,8 @@ class PublicHome extends Component {
   }
 }
 
-export default PublicHome;
+function mapStateToProps(state, props) { return { isAppLoading: state.isAppLoading } };
+
+export default connect(
+    mapStateToProps,
+)(PublicHome)
