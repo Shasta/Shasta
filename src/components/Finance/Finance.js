@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { Feed, Sidebar, Responsive, Segment, Grid } from "semantic-ui-react";
 import MainChart from "./MainChart";
 import withDrizzleContext from "../../utils/withDrizzleContext.js";
@@ -119,52 +119,107 @@ class Finance extends Component {
       }
     };
     return (
-      <Grid stackable columns={2}>
-        <Grid.Column>
-          <Grid.Row>
-            <MainChart totalSha={totalSha} />
-          </Grid.Row>
-          <Grid.Row>
-            <h2>Energy price</h2>
-            <Line data={data} options={chartOptions} height={100} />
-          </Grid.Row>
-        </Grid.Column>
-        <Grid.Column>
-          <h3 className="titles">Your balances: </h3>
-          <div className="currencyDiv">
-            <div className="divBorderCurrencySha">
-              <div className="divTagCurrencySha">
-                <p>SHA</p>
+      <Fragment>
+        <Responsive minWidth="1200">
+          <Grid stackable>
+            <Grid.Column width={10}>
+              <Grid.Row>
+                <MainChart totalSha={totalSha} />
+              </Grid.Row>
+              <Grid.Row>
+                <h2>Energy price</h2>
+                <Line data={data} options={chartOptions} height={100} />
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Column width={6} style={{ paddingLeft: "5%" }}>
+              <h3 className="titles">Your balances: </h3>
+              <div className="currencyDiv">
+                <div className="divBorderCurrencySha">
+                  <div className="divTagCurrencySha">
+                    <p>SHA</p>
+                  </div>
+                  <h1 className="displaySha">{totalSha}</h1>
+                </div>
+                <div className="divBorderCurrencyEther">
+                  <div className="divTagCurrencyEther">ETH</div>
+                  <h1 className="displayEther">{this.state.totalEth}</h1>
+                </div>
               </div>
-              <h1 className="displaySha">{totalSha}</h1>
-            </div>
-            <div className="divBorderCurrencyEther">
-              <div className="divTagCurrencyEther">ETH</div>
-              <h1 className="displayEther">{this.state.totalEth}</h1>
-            </div>
-          </div>
 
-          <h3 className="titles">Your actions:</h3>
-          <Feed>
-            <Feed.Event className="feedTitle">
-              <Feed.Content
-                date="● today"
-                summary="You bought 30kWh for 5 Shas"
-              />
-            </Feed.Event>
-            <Feed.Event className="feedTitle">
-              <Feed.Content
-                date="● yesterday"
-                summary="You earned 10 shas with your energy"
-              />
-            </Feed.Event>
-          </Feed>
-          <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
-            <h3 className="titles">Source of energy sold:</h3>
-            <Pie data={pieData} options={pieOptions} />
-          </div>
-        </Grid.Column>
-      </Grid>
+              <h3 className="titles">Your actions:</h3>
+              <Feed>
+                <Feed.Event className="feedTitle">
+                  <Feed.Content
+                    date="● today"
+                    summary="You bought 30kWh for 5 Shas"
+                  />
+                </Feed.Event>
+                <Feed.Event className="feedTitle">
+                  <Feed.Content
+                    date="● yesterday"
+                    summary="You earned 10 shas with your energy"
+                  />
+                </Feed.Event>
+              </Feed>
+              <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
+                <h3 className="titles">Source of energy sold:</h3>
+                <Pie data={pieData} options={pieOptions} />
+              </div>
+            </Grid.Column>
+          </Grid>
+        </Responsive>
+        <Responsive maxWidth="1200">
+          <Grid stackable>
+            <Grid.Row>
+              <MainChart totalSha={totalSha} />
+            </Grid.Row>
+            <Grid.Row>
+              <h2>Energy price</h2>
+              <Line data={data} options={chartOptions} height={100} />
+            </Grid.Row>
+            <Grid.Row style={{ paddingLeft: "20%" }}>
+              <h3 className="titles">Your balances: </h3>
+            </Grid.Row>
+            <Grid.Row style={{ paddingLeft: "20%" }}>
+              <div className="currencyDiv" style={{ width: "100%" }}>
+                <div className="divBorderCurrencySha">
+                  <div className="divTagCurrencySha">
+                    <p>SHA</p>
+                  </div>
+                  <h1 className="displaySha">{totalSha}</h1>
+                </div>
+                <div className="divBorderCurrencyEther">
+                  <div className="divTagCurrencyEther">ETH</div>
+                  <h1 className="displayEther">{this.state.totalEth}</h1>
+                </div>
+              </div>
+            </Grid.Row>
+            <Grid.Row style={{ paddingLeft: "20%" }}>
+              <h3 className="titles">Your actions:</h3>
+            </Grid.Row>
+            <Grid.Row style={{ paddingLeft: "20%" }}>
+              <Feed>
+                <Feed.Event className="feedTitle">
+                  <Feed.Content
+                    date="● today"
+                    summary="You bought 30kWh for 5 Shas"
+                  />
+                </Feed.Event>
+                <Feed.Event className="feedTitle">
+                  <Feed.Content
+                    date="● yesterday"
+                    summary="You earned 10 shas with your energy"
+                  />
+                </Feed.Event>
+              </Feed>
+              <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
+                <h3 className="titles">Source of energy sold:</h3>
+                <Pie data={pieData} options={pieOptions} />
+              </div>
+            </Grid.Row>
+          </Grid>
+        </Responsive>
+      </Fragment>
     );
   }
 }
