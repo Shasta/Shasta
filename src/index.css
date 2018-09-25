@@ -5,5 +5,9 @@ body {
 }
 
 * {
-  font-family: 'Overpass Mono', monospace !important;
+  font-family: "Overpass Mono", monospace !important;
+}
+
+.dropdown.icon {
+  font-family: "Dropdown" !important;
 }
