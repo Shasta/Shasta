@@ -403,8 +403,19 @@ class Consumer extends Component {
       case 1:
         return (
           <div>
-            <h3>Offers: </h3>
-            <Card.Group>{producerOffers}</Card.Group>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width="16">
+                  <h3>Offers: </h3>
+                  <Card.Group>{producerOffers}</Card.Group>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column width="16">
+                  <Button onClick={this.handleBackClick}>Back</Button>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
           </div>
         );
       case 2:
@@ -556,7 +567,7 @@ class Consumer extends Component {
 
     return (
       <div>
-        <MyStep step={this.state.currentStep} />
+        <MyStep step={this.state.currentStep} undo={this.handleBackClick} />
         {this.getContent(producerOffers)}
       </div>
     );
