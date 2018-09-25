@@ -72,6 +72,7 @@ class Dashboard extends React.Component {
             as={NavLink}
             to={privRoute.path}
             activeClassName="nav-active-link"
+            key={key}
           >
             <div className="itemDiv">
               {privRoute.icon && (
