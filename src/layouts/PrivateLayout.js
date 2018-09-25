@@ -75,9 +75,16 @@ class Dashboard extends React.Component {
             key={key}
           >
             <div className="itemDiv">
-              {privRoute.icon && (
-                <Image style={{ width: 35, height: 30 }} src={privRoute.icon} />
-              )}
+              <Image
+                className="iconOff"
+                style={{ width: 35, height: 30 }}
+                src={privRoute.iconOff}
+              />
+              <Image
+                className="iconOn"
+                style={{ width: 35, height: 30 }}
+                src={privRoute.iconOn}
+              />
               <div className="itemNameDiv">
                 <span>{privRoute.title}</span>
               </div>

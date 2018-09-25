@@ -1,5 +1,23 @@
 .menuItem {
   width: 60%;
+
+  .iconOn {
+    display: none !important;
+  }
+
+  .iconOff {
+    display: block !important;
+  }
+}
+
+.menuItem.nav-active-link {
+  .iconOn {
+    display: block !important;
+  }
+
+  .iconOff {
+    display: none !important;
+  }
 }
 
 .bottomDiv {
@@ -23,6 +41,11 @@
   align-items: center;
   display: flex;
   justify-content: center;
+}
+
+.nav-active-link {
+  border-bottom: 1px solid #ea78bc;
+  color: #ea78bc !important;
 }
 
 .nav-active-link {
