@@ -112,7 +112,7 @@ class SignUp extends Component {
     isInstalled = _.get(drizzleState, 'web3.status', 'failed') !== 'failed';
     isLogged = isInstalled && initialized && drizzleState && Object.keys(drizzleState.accounts).length > 0;
 
-    console.log('tn', targetNetwork)
+    //console.log('tn', targetNetwork)
     const isRinkeby = isLogged && currentNetwork == targetNetwork;
 
     if (initialized) {
