@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import ShastaLogo from '../static/logo-nav.png';
 import withRawDrizzle from '../utils/withRawDrizzle';
 import RawNetworkStatus from '../components/NetworkStatus/NetworkStatus';
+import LoadingCenter from '../components/LoadingCenter';
+import { LoadingActions } from '../redux/LoadingActions';
 
 const TopMenu = styled(Menu)`
 & {
@@ -36,6 +38,10 @@ const AppLogo = styled(Menu.Item)`
 const NetworkStatus = withRawDrizzle(RawNetworkStatus)
 
 class PublicHome extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.loaderAction = new LoadingActions(this.props.dispatch);
+  }
   state = {
     visible: false
   }
@@ -50,6 +56,28 @@ class PublicHome extends PureComponent {
     this.setState({
       visible: true
     })
+  }
+
+  componentDidUpdate(newProps, newState) {
+    const { drizzleState } = newProps;
+    if (drizzleState && drizzleState.transactionStack) {
+      const latestTx = drizzleState.transactionStack.length -1;
+      const txHash = drizzleState.transactionStack[latestTx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        const transactionStatus = transaction.status;
+        if (transactionStatus === "pending" && newProps.isAppLoading == false) {
+          this.loaderAction.show(); 
+        } 
+        if (transactionStatus !== "pending" && newProps.isAppLoading == true) {
+          this.loaderAction.hide();
+        }
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.loaderAction.hide();
   }
 
   render() {
@@ -93,13 +121,18 @@ class PublicHome extends PureComponent {
         <NetworkStatus />
         {/* The rendered component */}
         <Component  {...this.props} /> 
+        {isAppLoading && <LoadingCenter />}
       </div>
     );
   }
 }
 
 function mapStateToProps(state, props) { return { isAppLoading: state.isAppLoading } };
+function mapDispatchToProps(dispatch) { return { dispatch }; }
 
-export default connect(
+export default withRawDrizzle(
+  connect(
     mapStateToProps,
-)(PublicHome)
+    mapDispatchToProps
+  )(PublicHome)
+);

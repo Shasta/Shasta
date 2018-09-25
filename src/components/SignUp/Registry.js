@@ -205,7 +205,6 @@ class RegistryForm extends Component {
       return <Redirect to="/home" />
     }
     
-    console.log(this.state);
     const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
 
     return (

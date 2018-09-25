@@ -9,12 +9,15 @@ import withDrizzleContext from "../utils/withDrizzleContext";
 import ipfs from "../ipfs";
 import { connect } from "react-redux";
 import "./PrivateLayout.less";
+import LoadingTop from '../components/LoadingTop';
+import { LoadingActions }  from '../redux/LoadingActions';
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
     this.createDemo = this.createDemo.bind(this);
+    this.loaderAction = new LoadingActions(this.props.dispatch);
   }
 
   async createDemo() {
@@ -60,8 +63,33 @@ class Dashboard extends React.Component {
       .send({ gas: estimatedGas, from: currentAccount });
   }
 
+  componentDidUpdate(newProps, newState) {
+    const { drizzleState } = newProps;
+    console.log("priv", drizzleState)
+    if (drizzleState && drizzleState.transactionStack) {
+      const latestTx = drizzleState.transactionStack.length -1;
+      const txHash = drizzleState.transactionStack[latestTx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        const transactionStatus = transaction.status;
+        if (transactionStatus === "pending" && newProps.isAppLoading == false) {
+          console.log("show");
+          this.loaderAction.show(); 
+        } 
+        if (transactionStatus !== "pending" && newProps.isAppLoading == true) {
+          console.log("hide");
+          this.loaderAction.hide();
+        }
+      }
+    }
+  }
+  
+  componentWillUnmount() {
+    this.loaderAction.hide();
+  }
+
   render() {
-    const { web3, account, balance } = this.props;
+    const { web3, account, balance, isAppLoading } = this.props;
     const Component = this.props.component;
 
     const Links = _.map(privateRoutes, (privRoute, key) => {
@@ -123,13 +151,24 @@ class Dashboard extends React.Component {
         >
           <Component {...this.props} />
         </div>
+        {isAppLoading == true && <LoadingTop />}
       </div>
     );
   }
 }
 
 function mapStateToProps(state, props) {
-  return { user: state.userReducer };
+  return {
+    user: state.userReducer,
+    isAppLoading: state.isAppLoading
+  };
 }
 
-export default withDrizzleContext(connect(mapStateToProps)(Dashboard));
+function mapDispatchToProps(dispatch) { return { dispatch }; }
+
+export default withDrizzleContext(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Dashboard)
+);

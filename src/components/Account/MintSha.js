@@ -93,7 +93,7 @@ class MintSha extends Component {
           <Button basic color='grey' onClick={this.handleClose} >
             Close
           </Button>
-          <Button basic color='green' onClick={this.mintTokens}>
+          <Button basic style={{border: '1px solid #f4b8df'}} onClick={this.mintTokens}>
             Claim your 100 SHA
           </Button>
       </Modal.Actions>
