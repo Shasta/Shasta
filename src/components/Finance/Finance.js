@@ -177,10 +177,10 @@ class Finance extends Component {
               <h2>Energy price</h2>
               <Line data={data} options={chartOptions} height={100} />
             </Grid.Row>
-            <Grid.Row style={{ paddingLeft: "20%" }}>
+            <Grid.Row style={{ paddingLeft: "20%", paddingRight: "20%" }}>
               <h3 className="titles">Your balances: </h3>
             </Grid.Row>
-            <Grid.Row style={{ paddingLeft: "20%" }}>
+            <Grid.Row style={{ padding: "0% 20%" }}>
               <div className="currencyDiv" style={{ width: "100%" }}>
                 <div className="divBorderCurrencySha">
                   <div className="divTagCurrencySha">
@@ -194,10 +194,10 @@ class Finance extends Component {
                 </div>
               </div>
             </Grid.Row>
-            <Grid.Row style={{ paddingLeft: "20%" }}>
+            <Grid.Row style={{ padding: "0% 20%" }}>
               <h3 className="titles">Your actions:</h3>
             </Grid.Row>
-            <Grid.Row style={{ paddingLeft: "20%" }}>
+            <Grid.Row style={{ padding: "0% 20%" }}>
               <Feed>
                 <Feed.Event className="feedTitle">
                   <Feed.Content
