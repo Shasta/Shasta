@@ -130,40 +130,38 @@ class Finance extends Component {
           </Grid.Row>
         </Grid.Column>
         <Grid.Column>
-          <div style={{ padding: "70px", float: "left", width: "100%" }}>
-            <h3 className="titles">Your balances: </h3>
-            <div className="currencyDiv">
-              <div className="divBorderCurrencySha">
-                <div className="divTagCurrencySha">
-                  <p>SHA</p>
-                </div>
-                <h1 className="displaySha">{totalSha}</h1>
+          <h3 className="titles">Your balances: </h3>
+          <div className="currencyDiv">
+            <div className="divBorderCurrencySha">
+              <div className="divTagCurrencySha">
+                <p>SHA</p>
               </div>
-              <div className="divBorderCurrencyEther">
-                <div className="divTagCurrencyEther">ETH</div>
-                <h1 className="displayEther">{this.state.totalEth}</h1>
-              </div>
+              <h1 className="displaySha">{totalSha}</h1>
             </div>
+            <div className="divBorderCurrencyEther">
+              <div className="divTagCurrencyEther">ETH</div>
+              <h1 className="displayEther">{this.state.totalEth}</h1>
+            </div>
+          </div>
 
-            <h3 className="titles">Your actions:</h3>
-            <Feed>
-              <Feed.Event className="feedTitle">
-                <Feed.Content
-                  date="● today"
-                  summary="You bought 30kWh for 5 Shas"
-                />
-              </Feed.Event>
-              <Feed.Event className="feedTitle">
-                <Feed.Content
-                  date="● yesterday"
-                  summary="You earned 10 shas with your energy"
-                />
-              </Feed.Event>
-            </Feed>
-            <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
-              <h3 className="titles">Source of energy sold:</h3>
-              <Pie data={pieData} options={pieOptions} />
-            </div>
+          <h3 className="titles">Your actions:</h3>
+          <Feed>
+            <Feed.Event className="feedTitle">
+              <Feed.Content
+                date="● today"
+                summary="You bought 30kWh for 5 Shas"
+              />
+            </Feed.Event>
+            <Feed.Event className="feedTitle">
+              <Feed.Content
+                date="● yesterday"
+                summary="You earned 10 shas with your energy"
+              />
+            </Feed.Event>
+          </Feed>
+          <div style={{ width: "100%", height: 300, paddingTop: 40 }}>
+            <h3 className="titles">Source of energy sold:</h3>
+            <Pie data={pieData} options={pieOptions} />
           </div>
         </Grid.Column>
       </Grid>
