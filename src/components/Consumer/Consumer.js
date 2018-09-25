@@ -99,6 +99,23 @@ const sources = [
   }
 ];
 
+const sourcesIcons = selectedName => {
+  return sources.map((source, i) => {
+    let image = source.imgSrc;
+    if (source.value === selectedName) {
+      image = source.imgSrc2;
+    }
+
+    return (
+      <Image
+        key={i}
+        style={{ width: "60px", height: "60px", padding: "10px 10px" }}
+        src={image}
+      />
+    );
+  });
+};
+
 const pricesRanges = [
   {
     text: "100 kWh",
@@ -320,7 +337,7 @@ class Consumer extends Component {
           return (
             <Grid.Column key={i}>
               <Image
-                style={{ padding: "10px 10px" }}
+                style={{ margin: "10px 10px", cursor:'pointer' }}
                 src={image}
                 onClick={() => this.handleSourceClick(i)}
               />
@@ -515,13 +532,20 @@ class Consumer extends Component {
             <Card.Description>Address: {contract.address}</Card.Description>
           </Card.Content>
           <Card.Content extra>
-            <p>Source: {contract.providerSource}</p>
-            <p>Total Price: {contract.fiatAmount} Sha</p>
-            <ShastaBuyButton
-              onClick={() => this.handleOfferSelection(contract)}
-            >
-              Buy Energy
-            </ShastaBuyButton>
+            <Grid stackable columns={2}>
+              <Grid.Column>
+                <p>Source: {contract.providerSource}</p>
+                <p>Total Price: {contract.fiatAmount} Sha</p>
+                <ShastaBuyButton
+                  onClick={() => this.handleOfferSelection(contract)}
+                >
+                  Buy Energy
+                </ShastaBuyButton>
+              </Grid.Column>
+              <Grid.Column textAlign="right">
+                {sourcesIcons(contract.providerSource)}
+              </Grid.Column>
+            </Grid>
           </Card.Content>
         </ShastaCard>
       );
