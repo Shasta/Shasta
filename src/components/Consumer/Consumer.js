@@ -6,7 +6,8 @@ import {
   Loader,
   Segment,
   Grid,
-  Image
+  Image,
+  Message
 } from "semantic-ui-react";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 
@@ -164,7 +165,9 @@ class Consumer extends Component {
       filterCountry: "",
       filterAmount: "",
       currentStep: 0,
-      tx: null
+      tx: null,
+      amountSelected: false,
+      messageVisibility: false
     };
 
     this.handleSourceClick = this.handleSourceClick.bind(this);
@@ -242,17 +245,24 @@ class Consumer extends Component {
 
   handleChangefilterAmount = (e, data) => {
     this.setState({
-      filterAmount: data.value
+      filterAmount: data.value,
+      amountSelected: true,
+      messageVisibility: false
     });
   };
 
   handleNextClick = () => {
     const current = this.state.currentStep;
-
-    if (current < 2) {
+    if (this.state.amountSelected) {
+      if (current < 2) {
+        this.setState({
+          currentStep: current + 1
+        });
+      }
+    } else {
       this.setState({
-        currentStep: current + 1
-      });
+        messageVisibility: true
+      })
     }
   };
 
@@ -279,11 +289,17 @@ class Consumer extends Component {
   };
 
   handleOfferSelection = con => {
-    if (con && con.ethAddress) {
+    if (this.state.amountSelected) {
+      if (con && con.ethAddress) {
+        this.setState({
+          selectedContract: con,
+          currentStep: 2
+        });
+      }
+    } else {
       this.setState({
-        selectedContract: con,
-        currentStep: 2
-      });
+        messageVisibility: true
+      })
     }
   };
 
@@ -300,6 +316,10 @@ class Consumer extends Component {
       billInstance.abi,
       billInstance.address
     );
+    console.log("con: ", con)
+    console.log("avg: ", avg)
+    console.log("price: ", price)
+    console.log("total: ", total);
     const confirmContractAbi = billInstanceWeb3.methods
       .newPrepaidContract(
         tokenInstance.address,
@@ -376,6 +396,7 @@ class Consumer extends Component {
                   />
                 </div>
               </ShastaGridRow>
+              <Message color='red' hidden={!this.state.messageVisibility}>Select an amount of energy to buy please.</Message>
             </Grid.Column>
             <Grid.Column style={{ width: "50%" }}>
               <ShastaGridRow style={{ paddingBottom: 20 }}>
@@ -429,6 +450,7 @@ class Consumer extends Component {
         const avgRaw = web3.utils.toBN(averageConsumerEnergy);
         const totalRaw = priceRaw.mul(avgRaw);
         const totalPrice = web3.utils.fromWei(totalRaw, "ether");
+        console.log("TP: ", averageConsumerEnergy);
 
         let txStatus = "";
         if (drizzleState.transactionStack[tx]) {
@@ -441,7 +463,6 @@ class Consumer extends Component {
             }
           }
         }
-        console.log("tx status", txStatus);
         return (
           <div>
             <h3>Confirm contract</h3>
