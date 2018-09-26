@@ -1,145 +1,137 @@
-import React from 'react';
-import { privateRoutes } from '../routes';
-import { Image, Menu, Sidebar, Button } from 'semantic-ui-react'
-import { Route, Switch, Link } from "react-router-dom";
-import _ from 'lodash';
-import Tab from '../components/Tab/Tab';
-import logo from '../static/logo-shasta-02.png';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import withDrizzleContext from '../utils/withDrizzleContext';
-import ipfs from '../ipfs';
-import { connect } from 'react-redux';
+import React from "react";
+import { privateRoutes } from "../routes";
+import { Image, Menu, Sidebar, MenuItem } from "semantic-ui-react";
+import { NavLink } from "react-router-dom";
+import _ from "lodash";
+import Tab from "../components/Tab/Tab";
+import logo from "../static/logo-shasta-02.png";
+import withDrizzleContext from "../utils/withDrizzleContext";
+import { connect } from "react-redux";
+import "./PrivateLayout.less";
+import LoadingTop from '../components/LoadingTop';
+import { LoadingActions }  from '../redux/LoadingActions';
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.createDemo = this.createDemo.bind(this);
+    this.loaderAction = new LoadingActions(this.props.dispatch);
   }
 
-  async createDemo() {
-    const { drizzle, drizzleState } = this.props;
-    const { organization } = this.props.user;
-    const currentAccount = drizzleState.accounts[0];
-
-    const web3 = drizzle.web3;
-    const rawOrgName = web3.utils.utf8ToHex(organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
-    const ipfsHash = web3.utils.hexToUtf8(rawHash);
-    const rawJson = await ipfs.cat(ipfsHash);
-    const userJson = JSON.parse(rawJson);
-
-    var faker = require('faker');
-
-    const consumerOffer = {
-      fiatAmount: "40",
-      date: Date.now(),
-      firstName: "Vitalik",
-      lastName: "Buterin",
-      country: "Russia",
-      source: "Nuclear",
-      energyPrice: "0.15",
-      fiatAmount: "24",
-      description: "Real energy directly from mother Russia",
-      pendingOffer: true,
-      ethAddress: currentAccount,
-      address: faker.address.streetAddress(),
+  componentDidUpdate(newProps, newState) {
+    const { drizzleState } = newProps;
+    console.log("priv", drizzleState)
+    if (drizzleState && drizzleState.transactionStack) {
+      const latestTx = drizzleState.transactionStack.length -1;
+      const txHash = drizzleState.transactionStack[latestTx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        const transactionStatus = transaction.status;
+        if (transactionStatus === "pending" && newProps.isAppLoading == false) {
+          console.log("show");
+          this.loaderAction.show(); 
+        } 
+        if (transactionStatus !== "pending" && newProps.isAppLoading == true) {
+          console.log("hide");
+          this.loaderAction.hide();
+        }
+      }
     }
-
-
-    userJson.consumerOffers.push(consumerOffer);
-
-    const res = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
-
-    let ipfsH = web3.utils.utf8ToHex(res[0].hash);
-
-    let contractInstance = drizzle.contracts.User;
-    const rawFiat = web3.utils.toWei(consumerOffer.fiatAmount, 'ether');
-    await contractInstance.methods.createBid(rawFiat, ipfsH).send({ gas: 400000, from: currentAccount })
-
-    const consumerOffer2 = {
-      fiatAmount: "20",
-      date: Date.now(),
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      country: faker.address.country(),
-      source: "Solar",
-      energyPrice: "0.15",
-      description: "Lorem Ipsum",
-      pendingOffer: true,
-      ethAddress: this.props.address,
-      address: faker.address.streetAddress(),
-    }
-    userJson.consumerOffers.push(consumerOffer2);
-    const res2 = await ipfs.add([Buffer.from(JSON.stringify(userJson))]);
-
-    const secondIpfsH = web3.utils.utf8ToHex(res2[0].hash);
-    const secondPrice = web3.utils.toWei(consumerOffer2.fiatAmount, 'ether');
-    await contractInstance.methods.createBid(secondPrice, secondIpfsH).send( { gas: 400000, from: currentAccount })
-
-    // Generate the location object, will be saved later in JSON.
-    const producerOffer = {
-      chargerName: "charger-" + faker.random.number(),
-      latitude: "36.70",
-      longitude: "-4.457",
-      providerSource: "Solar",
-      address: faker.address.streetAddress(),
-      energyPrice: "0.12",
-      fiatAmount: "13",
-      date: Date.now(),
-      pendingOffer: true,
-      ethAddress: currentAccount
-    }
-    userJson.producerOffers.push(producerOffer);
-
-    // Upload to IPFS and receive response
-    const ipfsResponse = await ipfs.add(Buffer.from(JSON.stringify(userJson)));
-    const thirdIpfsHash = web3.utils.utf8ToHex(ipfsResponse[0].hash);
-    const thirdPrice = web3.utils.toWei(producerOffer.fiatAmount, 'ether');
-    const estimatedGas = await contractInstance.methods.createOffer(thirdPrice, thirdIpfsHash).estimateGas({ from: currentAccount });
-    await contractInstance.methods.createOffer(thirdPrice, thirdIpfsHash).send({ gas: estimatedGas, from: currentAccount })
+  }
+  
+  componentWillUnmount() {
+    this.loaderAction.hide();
   }
 
   render() {
-    const {
-      web3,
-      account,
-      balance,
-    } = this.props;
+    const { web3, account, balance, isAppLoading } = this.props;
     const Component = this.props.component;
 
-    const Links = _.map(privateRoutes, (privRoute, key) => 
-      (
-        <Menu.Item as={Link} to={privRoute.path}>
-          <FontAwesomeIcon icon={privRoute.icon}></FontAwesomeIcon><h4>{privRoute.title}</h4>
-        </Menu.Item>
-      )
-    )
+    const Links = _.map(privateRoutes, (privRoute, key) => {
+      if (!privRoute.hiddenOnSideBar) {
+        return (
+          <MenuItem
+            className="menuItem"
+            as={NavLink}
+            to={privRoute.path}
+            activeClassName="nav-active-link"
+            key={key}
+          >
+            <div className="itemDiv">
+              <Image
+                className="iconOff"
+                style={{ width: 35, height: 30 }}
+                src={privRoute.iconOff}
+              />
+              <Image
+                className="iconOn"
+                style={{ width: 35, height: 30 }}
+                src={privRoute.iconOn}
+              />
+              <div className="itemNameDiv">
+                <span>{privRoute.title}</span>
+              </div>
+            </div>
+          </MenuItem>
+        );
+      }
+    });
+
     return (
       <div>
-        <Tab web3={web3} account={account} balance={balance}></Tab>
-        <Sidebar as={Menu} animation='overlay' icon='labeled' vertical visible width='wide'>
-          <Menu.Item as={Link} to="/home">
-            <Image src={logo} size='small' style={{ marginLeft: '85px' }}></Image>
-          </Menu.Item>
+        <Tab web3={web3} account={account} balance={balance} />
+        <Sidebar
+          as={Menu}
+          animation="overlay"
+          icon="labeled"
+          vertical
+          visible
+          style={{
+            display: "flex",
+            alignItems: "center",
+            paddingTop: 40,
+            width: "20%"
+          }}
+        >
+          <Image
+            className="logo"
+            src={logo}
+            size="small"
+            style={{ paddingBottom: 20 }}
+          />
           {Links}
-          <Menu.Item as={Link} to="/logout">
-            <h4>Logout</h4>
-          </Menu.Item>
-          <Button onClick={this.createDemo}>Create Demo</Button>
         </Sidebar>
 
         {/* Render component */}
-        <Component {...this.props} />
+
+        <div
+          style={{
+            // backgroundColor: "red",
+            marginLeft: "20%",
+            // border: "4px dotted blue",
+            padding: "60px"
+          }}
+        >
+          <Component {...this.props} />
+        </div>
+        {isAppLoading == true && <LoadingTop />}
       </div>
     );
   }
 }
 
-function mapStateToProps(state, props) { return { user: state.userReducer } }
+function mapStateToProps(state, props) {
+  return {
+    user: state.userReducer,
+    isAppLoading: state.isAppLoading
+  };
+}
+
+function mapDispatchToProps(dispatch) { return { dispatch }; }
 
 export default withDrizzleContext(
   connect(
     mapStateToProps,
+    mapDispatchToProps
   )(Dashboard)
 );

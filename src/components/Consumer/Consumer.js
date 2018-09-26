@@ -1,362 +1,604 @@
-import React, { Component } from 'react';
-import { Button, Grid, Sidebar, Menu, Form, Checkbox, Dropdown, Card, Message, Input } from 'semantic-ui-react'
-import './Consumer.css';
-import axios from 'axios';
-import ipfs from '../../ipfs'
-import withDrizzleContext from '../../utils/withDrizzleContext'
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import {
+  Button,
+  Dropdown,
+  Card,
+  Loader,
+  Segment,
+  Grid,
+  Image,
+  Message
+} from "semantic-ui-react";
+import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 
-let checkedAddresses = [];
+//import icons
+import solarOffIcon from "../../static/solar-energy-60x60-off.png";
+import solarOnIcon from "../../static/solar-energy-60x60-on.png";
+import eolicOffIcon from "../../static/eolic-energy-60x60-off.png";
+import eolicOnIcon from "../../static/eolic-energy-60x60-on.png";
+import biomassOffIcon from "../../static/boimass-energy-60x60-off.png";
+import biomassOnIcon from "../../static/boimass-energy-60x60-on.png";
+import otherOffIcon from "../../static/other-energy-60x60-off.png";
+import otherOnIcon from "../../static/other-energy-60x60-on.png";
+import nuclearOffIcon from "../../static/nuclear-energy-60x60-off.png";
+import nuclearOnIcon from "../../static//nuclear-energy-60x60-on.png";
+
+import "./Consumer.css";
+import ipfs from "../../ipfs";
+import withDrizzleContext from "../../utils/withDrizzleContext";
+import { connect } from "react-redux";
+import { countryOptions } from "./common";
+import MyStep from "./stepper/MyStep";
+import styled from "styled-components";
+
+var _ = require("lodash");
+//Styled components
+const ShastaButton = styled(Button)`
+  background-color: #423142 !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  border: 0 !important;
+`;
+
+const ShastaBuyButton = styled(Button)`
+  background-color: white !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  border-style: solid !important;
+  border-color: gray !important;
+  border-width: thin !important;
+`;
+
+const ShastaCard = styled(Card)`
+  width: 80% !important;
+  margin: 10px !important;
+  border-radius: 0px 20px 20px 0px !important;
+  border-left: 10px solid #f076b6 !important;
+  box-shadow: 0px 1px 1px 1px #d4d4d5 !important;
+`;
+
+const ShastaGridRow = styled(Grid.Row)`
+  border-left: 10px solid #f076b6 !important;
+`;
+
+const sources = [
+  {
+    key: 0,
+    text: "Solar",
+    value: "Solar",
+    imgSrc: solarOffIcon,
+    imgSrc2: solarOnIcon
+  },
+  {
+    key: 1,
+    text: "Nuclear",
+    value: "Nuclear",
+    imgSrc: nuclearOffIcon,
+    imgSrc2: nuclearOnIcon
+  },
+  {
+    key: 2,
+    text: "Eolic",
+    value: "Eolic",
+    imgSrc: eolicOffIcon,
+    imgSrc2: eolicOnIcon
+  },
+  {
+    key: 3,
+    text: "Biomass",
+    value: "Biomass",
+    imgSrc: biomassOffIcon,
+    imgSrc2: biomassOnIcon
+  },
+  {
+    key: 4,
+    text: "Other",
+    value: "Other",
+    imgSrc: otherOffIcon,
+    imgSrc2: otherOnIcon
+  }
+];
+
+const sourcesIcons = selectedName => {
+  return sources.map((source, i) => {
+    let image = source.imgSrc;
+    if (source.value === selectedName) {
+      image = source.imgSrc2;
+    }
+
+    return (
+      <Image
+        key={i}
+        style={{ width: "60px", height: "60px", padding: "10px 10px" }}
+        src={image}
+      />
+    );
+  });
+};
+
+const pricesRanges = [
+  {
+    text: "100 kWh",
+    value: 100
+  },
+  {
+    text: "200 kWh",
+    value: 200
+  },
+  {
+    text: "300 kWh",
+    value: 300
+  },
+  {
+    text: "400 kWh",
+    value: 400
+  },
+  {
+    text: "500 kWh",
+    value: 500
+  },
+  {
+    text: "600 kWh",
+    value: 600
+  }
+];
 
 class Consumer extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       userJson: {
         consumerOffers: [],
         producerOffers: []
       },
+      selectedContract: null,
       visible: false,
       percent: 0,
-      firstName: '',
-      lastName: '',
-      country: '',
-      dropdownValue: '',
-      ipfsHash: '',
-      ipfsFirstName: '',
-      ipfsAddress: '',
-      fiatAmount: '',
-      dropdownSource: '',
-      address: '',
+      ipfsHash: "",
+      ipfsFirstName: "",
+      ipfsAddress: "",
+      address: "",
       producersOffersList: [],
-      ammountkWh: '',
-      energyPrice: 0.132,
-      totalToPay: 0
-    }
+      totalToPay: 0,
+      filterSources: [],
+      filterCountry: "",
+      filterAmount: "",
+      currentStep: 0,
+      tx: null,
+      amountSelected: false,
+      messageVisibility: false
+    };
 
-    this.createConsumerOffer = this.createConsumerOffer.bind(this);
+    this.handleSourceClick = this.handleSourceClick.bind(this);
   }
 
   async componentDidMount() {
-    const {drizzle, drizzleState,user} = this.props;
-    const currentAccount = drizzleState.accounts[0]
+    const { drizzle, drizzleState, user } = this.props;
+    const currentAccount = drizzleState.accounts[0];
 
     const web3 = drizzle.web3;
     const rawOrgName = web3.utils.utf8ToHex(user.organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
+    const rawHash = await drizzle.contracts.User.methods
+      .getIpfsHashByUsername(rawOrgName)
+      .call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
     const rawJson = await ipfs.cat(ipfsHash);
     this.setState({
       userJson: JSON.parse(rawJson)
-    })
+    });
     this.getProducerOffers();
-  }
-  toggle = () => this.setState({ percent: this.state.percent === 0 ? 100 : 0 })
-
-  handleButtonClick = () => this.setState({ visible: !this.state.visible })
-
-  handleSidebarHide = () => this.setState({ visible: false })
-
-
-  async createConsumerOffer() {
-    const {drizzle, drizzleState, user} = this.props;
-    const web3 = drizzle.web3;
-    const currentAccount = drizzleState.accounts[0];
-    const rawOrgName = web3.utils.utf8ToHex(user.organization);
-    const rawHash = await drizzle.contracts.User.methods.getIpfsHashByUsername(rawOrgName).call({from: currentAccount});
-    const userIpfsHash = web3.utils.hexToUtf8(rawHash);
-    const rawJson = await ipfs.cat(userIpfsHash);
-    const userJson = JSON.parse(rawJson);
-    this.setState({
-      userJson
-    })
-
-    var newOffer = {
-      date: Date.now(),
-      firstName: userJson.organization.firstName,
-      lastName: userJson.organization.lastName,
-      country: userJson.organization.country,
-      address: this.state.address,
-      ammountkWh: this.state.ammountkWh,
-      energyPrice: this.state.energyPrice,
-      fiatAmount: this.state.totalToPay,
-      source: this.state.dropdownSource,
-      pendingOffer: true,
-      ethAddress: currentAccount
-    }
-
-    console.log("New contract", newOffer);
-
-    //Add the new contract to the profile
-
-    userJson.consumerOffers.push(newOffer);
-    console.log("Info to update: ", userJson);
-
-    const contract = this.props.contract;
-    const address = currentAccount;
-    const url = 'https://min-api.cryptocompare.com/data/price?fsym=EUR&tsyms=ETH';
-
-    const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
-
-    const ipfsHash = res[0].hash;
-
-    console.log("ipfs hash: ", ipfsHash);
-
-    //Get the exact value in ethers
-    let result = await axios.get(url);
-
-    //Set the conversion from EUR to WEI
-    let value = this.props.web3.toWei(result.data.ETH * newOffer.fiatAmount);
-    value = Math.round(value);
-    console.log("value: ", value);
-
-    //Call the transaction
-    const contractInstance = drizzle.contracts.User;
-
-    const success = await contractInstance.methods.createBid(self.state.fiatAmount, ipfsHash).send({ gas: 400000, from: address, value: value });
-    if (success) {
-      console.log('Updated user ' + userJson.organization.name + ' on ethereum!, and bid correctly created');
-
-    } else {
-      console.log('error updating user on ethereum.');
-    }
-
   }
 
   async getProducerOffers() {
-    const {drizzle, drizzleState, user }= this.props;
+    let checkedAddresses = [];
+
+    const { drizzle, drizzleState } = this.props;
     const web3 = drizzle.web3;
     const currentAccount = drizzleState.accounts[0];
     const shastaMarketInstance = drizzle.contracts.ShastaMarket;
     const userContractInstance = drizzle.contracts.User;
-    
 
     // Offers
     let producersOffersList = [];
-    const offersLength = await shastaMarketInstance.methods.getOffersLength().call({ from: currentAccount });
-    console.log("Number of offers: ", Number.parseInt(offersLength))
-    let auxArray = Array.from({ length: Number.parseInt(offersLength) }, (x, item) => item);
+    const offersLength = await shastaMarketInstance.methods
+      .getOffersLength()
+      .call({ from: currentAccount });
+    let auxArray = Array.from(
+      { length: Number.parseInt(offersLength) },
+      (x, item) => item
+    );
 
     auxArray.forEach(async (item, i) => {
-
-      let userContract = await shastaMarketInstance.methods.getOfferFromIndex(i).call({ from: currentAccount });
+      let userContract = await shastaMarketInstance.methods
+        .getOfferFromIndex(i)
+        .call({ from: currentAccount });
       let userAddress = userContract[1];
       if (!checkedAddresses.includes(userAddress)) {
-        console.log(userContract)
-
         checkedAddresses.push(userAddress);
-        let ipfsHashRaw = await userContractInstance.methods.getIpfsHashByAddress(userAddress).call({ from: userAddress });
+        let ipfsHashRaw = await userContractInstance.methods
+          .getIpfsHashByAddress(userAddress)
+          .call({ from: userAddress });
         let ipfsHash = web3.utils.hexToUtf8(ipfsHashRaw);
-        console.log("ipfs rec: ", ipfsHash);
 
         let rawContent = await ipfs.cat(ipfsHash);
         let userData = JSON.parse(rawContent.toString("utf8"));
 
         for (let key in userData.producerOffers) {
           if (userData.producerOffers.hasOwnProperty(key)) {
-            producersOffersList.push(userData.producerOffers[key])
+            producersOffersList.push(userData.producerOffers[key]);
           }
         }
-        console.log(producersOffersList)
-        this.setState(({
-          producersOffersList: producersOffersList.sort((a, b) => a.energyPrice < b.energyPrice)
-        }));
+
+        this.setState({
+          producersOffersList: producersOffersList.sort(
+            (a, b) => a.energyPrice < b.energyPrice
+          )
+        });
       }
-    })
-
+    });
   }
 
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    })
-  }
+  selectCountry = (e, val) => {
+    this.setState({ filterCountry: val.value });
+  };
 
-  handleChangeAmmount = (e) => {
-    let isNumeric = Number.isInteger(Number(e.target.value));
-    let totalToPay = (isNumeric) ? Number(e.target.value) * this.state.energyPrice : 0;
-    //Format number
-    totalToPay = Math.round(totalToPay * 100) / 100;
+  handleChangefilterAmount = (e, data) => {
     this.setState({
-      [e.target.name]: e.target.value,
-      totalToPay: totalToPay
-    })
-    console.log("state:", this.state)
-  }
-  handleChangeDropdownSource = (e) => {
+      filterAmount: data.value,
+      amountSelected: true,
+      messageVisibility: false
+    });
+  };
+
+  handleNextClick = () => {
+    const current = this.state.currentStep;
+    if (this.state.amountSelected) {
+      if (current < 2) {
+        this.setState({
+          currentStep: current + 1
+        });
+      }
+    } else {
+      this.setState({
+        messageVisibility: true
+      });
+    }
+  };
+
+  handleSourceClick = key => {
+    let sourcesArray = this.state.filterSources;
+    if (sourcesArray.includes(key)) {
+      sourcesArray.splice(sourcesArray.indexOf(key), 1);
+    } else {
+      sourcesArray.push(key);
+    }
     this.setState({
-      dropdownSource: e.target.textContent
-    })
-  }
+      filterSources: sourcesArray
+    });
+  };
+
+  handleBackClick = () => {
+    const current = this.state.currentStep;
+
+    if (current > 0) {
+      this.setState({
+        currentStep: current - 1
+      });
+    }
+  };
+
+  handleOfferSelection = con => {
+    if (this.state.amountSelected) {
+      if (con && con.ethAddress) {
+        this.setState({
+          selectedContract: con,
+          currentStep: 2
+        });
+      }
+    } else {
+      this.setState({
+        messageVisibility: true
+      });
+    }
+  };
+
+  handleConfirmation = (con, avg, price, total) => {
+    const ipfsContractMetadata = "";
+    const ipfsBillMetadata = "";
+    const { drizzle, drizzleState } = this.props;
+    const web3 = drizzle.web3;
+    const consumerAddress = drizzleState.accounts[0];
+    const producerAddress = con.ethAddress;
+    const tokenInstance = drizzle.contracts.ShaLedger;
+    const billInstance = drizzle.contracts.BillSystem;
+    const billInstanceWeb3 = new web3.eth.Contract(
+      billInstance.abi,
+      billInstance.address
+    );
+    console.log("con: ", con);
+    console.log("avg: ", avg);
+    console.log("price: ", price);
+    console.log("total: ", total);
+    const confirmContractAbi = billInstanceWeb3.methods
+      .newPrepaidContract(
+        tokenInstance.address,
+        producerAddress,
+        consumerAddress,
+        price.toString(),
+        avg.toString(),
+        true,
+        ipfsContractMetadata,
+        ipfsBillMetadata
+      )
+      .encodeABI();
+    const tx = tokenInstance.methods.approveAndCall.cacheSend(
+      billInstance.address,
+      total.toString(),
+      confirmContractAbi,
+      { from: consumerAddress }
+    );
+
+    this.setState({
+      tx
+    });
+  };
+
+  getContent = producerOffers => {
+    const contract = this.state.selectedContract;
+    const averageConsumerEnergy = this.state.filterAmount;
+    switch (this.state.currentStep) {
+      case 0:
+        const sourcesColumns = sources.map((source, i) => {
+          let image = source.imgSrc;
+          if (this.state.filterSources.includes(i)) {
+            image = source.imgSrc2;
+          }
+
+          return (
+            <Grid.Column key={i}>
+              <Image
+                style={{ margin: "10px 10px", cursor: "pointer" }}
+                src={image}
+                onClick={() => this.handleSourceClick(i)}
+              />
+            </Grid.Column>
+          );
+        });
+
+        return (
+          <Grid>
+            <Grid.Column style={{ width: "30%" }}>
+              <div style={{ paddingBottom: 20 }}>
+                <ShastaGridRow>
+                  <div style={{ paddingLeft: 20 }}>
+                    <h3>Amount of Energy:</h3>
+                    <Dropdown
+                      placeholder="Ammount of Energy"
+                      fluid
+                      selection
+                      options={pricesRanges}
+                      onChange={this.handleChangefilterAmount}
+                    />
+                  </div>
+                </ShastaGridRow>
+              </div>
+              <ShastaGridRow>
+                <div style={{ paddingLeft: 20 }}>
+                  <h3>Country:</h3>
+                  <Dropdown
+                    placeholder="Select Country"
+                    fluid
+                    search
+                    selection
+                    onChange={this.selectCountry}
+                    options={countryOptions}
+                  />
+                </div>
+              </ShastaGridRow>
+              <Message color="red" hidden={!this.state.messageVisibility}>
+                Select an amount of energy to buy please.
+              </Message>
+            </Grid.Column>
+            <Grid.Column style={{ width: "50%" }}>
+              <ShastaGridRow style={{ paddingBottom: 20 }}>
+                <div style={{ paddingLeft: 20 }}>
+                  <h3>Source of energy:</h3>
+                  <div style={{ display: "flex" }}>{sourcesColumns}</div>
+                </div>
+              </ShastaGridRow>
+              <Grid.Row style={{ paddingTop: 20 }}>
+                <ShastaButton
+                  style={{ float: "right" }}
+                  primary
+                  onClick={this.handleNextClick}
+                >
+                  Next
+                </ShastaButton>
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Row>
+              <h3 style={{ width: "100%" }}>Best offer found: </h3>
+              {producerOffers[0]}
+            </Grid.Row>
+          </Grid>
+        );
+      case 1:
+        return (
+          <div>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width="16">
+                  <h3>Offers: </h3>
+                  <Card.Group>{producerOffers}</Card.Group>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column width="16">
+                  <Button onClick={this.handleBackClick}>Back</Button>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
+        );
+      case 2:
+        const { tx } = this.state;
+        const { drizzle, drizzleState } = this.props;
+        const web3 = drizzle.web3;
+        const energyPrice = contract.energyPrice;
+        const priceRaw = web3.utils.toBN(
+          web3.utils.toWei(energyPrice.toString(), "ether")
+        );
+        const avgRaw = web3.utils.toBN(averageConsumerEnergy);
+        const totalRaw = priceRaw.mul(avgRaw);
+        const totalPrice = web3.utils.fromWei(totalRaw, "ether");
+        console.log("TP: ", averageConsumerEnergy);
+
+        let txStatus = "";
+        if (drizzleState.transactionStack[tx]) {
+          const txHash = drizzleState.transactionStack[tx];
+          if (txHash && txHash in drizzleState.transactions) {
+            const transaction = drizzleState.transactions[txHash];
+            txStatus = transaction.status;
+            if (txStatus == "error") {
+              console.error(transaction.error);
+            }
+          }
+        }
+        return (
+          <div>
+            <h3>Confirm contract</h3>
+            <div>
+              <p>
+                Can provide up to {contract.amountkWh} kWh at{" "}
+                {contract.energyPrice} Sha per kWh.
+              </p>
+              <p>Energy source: {contract.providerSource}</p>
+              <p>
+                Total monthly cost with your average energy usage: {totalPrice}{" "}
+                Sha for {averageConsumerEnergy} kWh
+              </p>
+              <p>
+                Confirm below to accept the energy contract with Shasta, paying
+                the first month beforehand in Sha token.
+              </p>
+            </div>
+            <div style={{ paddingTop: 20, display: "flex" }}>
+              <Button onClick={this.handleBackClick}>Back</Button>
+              <Button
+                primary
+                disabled={txStatus !== ""}
+                onClick={() =>
+                  this.handleConfirmation(contract, avgRaw, priceRaw, totalRaw)
+                }
+              >
+                Confirm contract
+              </Button>
+              {txStatus === "pending" && (
+                <Loader active={true}>Pending transaction</Loader>
+              )}
+              {txStatus === "success" && (
+                <Segment
+                  color="green"
+                  style={{
+                    margin: 0,
+                    padding: 5,
+                    width: 140,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Icon
+                    icon="check"
+                    color="green"
+                    size="lg"
+                    style={{ marginRight: 10 }}
+                  />
+                  Success
+                </Segment>
+              )}
+              {txStatus === "error" && (
+                <Segment color="red" style={{ width: 140 }}>
+                  Some error ocurred while making the transaction. Please
+                  contact with Shasta team if you consider that is a bug, via
+                  email at hello@shasta.world
+                </Segment>
+              )}
+            </div>
+          </div>
+        );
+    }
+  };
 
   render() {
-    const {drizzleState} = this.props;
+    const { drizzleState } = this.props;
     const currentAccount = drizzleState.accounts[0];
-    const { visible } = this.state
 
-    const sources = [
-      {
-        text: "Solar",
-        value: "Solar"
-      }, {
-        text: "Nuclear",
-        value: "Nuclear"
-      }, {
-        text: "Eolic",
-        value: "Eolic"
-      }, {
-        text: "Biomass",
-        value: "Biomass"
-      }, {
-        text: "Other",
-        value: "Other"
+    let producerOffers = this.state.producersOffersList.map(contract => {
+      //filter your offers
+      if (currentAccount === contract.ethAddress) {
+        return "";
       }
-    ]
-    console.log(this.state.userJson)
 
-    const consumerOffers = this.state.userJson.consumerOffers.map((contract) => {
-      return (
-        <Card fluid style={{ maxWidth: '800px' }} color='purple'>
-          <Card.Content>
-            <Card.Header>
-              {contract.fiatAmount} Shas at {contract.energyPrice} Shas/kWh
-            </Card.Header>
-            <Card.Description>
-              Ethereum account: {currentAccount}
-            </Card.Description>
-            <Card.Description>
-              Country: {contract.country}
-            </Card.Description>
-            <Card.Description>
-              Address: {contract.address}
-            </Card.Description>
-          </Card.Content>
-          <Card.Content extra>
-            <p>Source: {contract.source}</p>
-            <Button basic color='purple'>
-              Cancel Offer
-              </Button>
-          </Card.Content>
-        </Card>
-      );
-    });
-
-    const producerOffers = this.state.producersOffersList.map((contract) => {
-      console.log(contract)
-      if (currentAccount == contract.ethAddress) {
-        return '';
+      const sourceJson = sources.find(x => x.value === contract.providerSource);
+      //filter source
+      if (this.state.filterSources.length > 0) {
+        if (!this.state.filterSources.includes(sourceJson.key)) {
+          return "";
+        }
+      }
+      //Filter by amount
+      if (this.state.filterAmount !== "") {
+        if (Number(contract.amountkWh) < this.state.filterAmount) {
+          return "";
+        }
       }
       return (
-        <Card fluid style={{ maxWidth: '800px' }} color='purple'>
+        <ShastaCard fluid color="purple">
           <Card.Content>
             <Card.Header>
-              {contract.fiatAmount} Shas at {contract.energyPrice} Shas/kWh
+              {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
             </Card.Header>
             <Card.Description>
               Ethereum account: {contract.ethAddress}
             </Card.Description>
-            <Card.Description>
-              Address: {contract.address}
-            </Card.Description>
+            <Card.Description>Address: {contract.address}</Card.Description>
           </Card.Content>
           <Card.Content extra>
-            <p>Source: {contract.providerSource}</p>
-            <Button basic color='purple'>
-              Buy Energy
-              </Button>
+            <Grid stackable columns={2}>
+              <Grid.Column>
+                <p>Source: {contract.providerSource}</p>
+                <p>Total Price: {contract.fiatAmount} Sha</p>
+                <ShastaBuyButton
+                  onClick={() => this.handleOfferSelection(contract)}
+                >
+                  Buy Energy
+                </ShastaBuyButton>
+              </Grid.Column>
+              <Grid.Column textAlign="right">
+                {sourcesIcons(contract.providerSource)}
+              </Grid.Column>
+            </Grid>
           </Card.Content>
-        </Card>
+        </ShastaCard>
       );
     });
-    console.log('cards', producerOffers)
+
+    //remove empty items
+    producerOffers = producerOffers.filter(Boolean);
+
     return (
       <div>
-        <div>
-          <Sidebar
-            as={Menu}
-            animation='overlay'
-            icon='labeled'
-            onHide={this.handleSidebarHide}
-            vertical
-            direction='right'
-            visible={visible}
-            width='very wide'
-          >
-            <Menu.Item>
-              <h3 style={{ position: 'relative' }}>New Contract</h3>
-            </Menu.Item>
-            <Menu.Item>
-              <Form>
-                <Form.Field>
-                  <label>Address</label>
-                  <input placeholder='Address'
-                    name='address'
-                    value={this.state.Address}
-                    onChange={e => this.handleChange(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label style={{ float: 'left', padding: 5 }}> Energy Price: {this.state.energyPrice} (Shas/kWh)</label>
-                  <Message icon>
-                    <Message.Content>
-                      The current price is decided every day through the governance system. Want to participate? Click here
-                    </Message.Content>
-                  </Message>
-                </Form.Field>
-                <Form.Field>
-                  <label >Amount kWh you want to buy for a month:</label>
-                  <Input placeholder='Amount'
-                    name='ammountkWh'
-                    value={this.state.ammountkWh}
-                    label={{ basic: true, content: 'kWh/month' }}
-                    labelPosition='right'
-                    onChange={e => this.handleChangeAmmount(e)} />
-                </Form.Field>
-                <Form.Field>
-                  <label>Source</label>
-                  <Dropdown placeholder='Energy Source' name='dropdownValue' fluid selection options={sources} onChange={this.handleChangeDropdownSource} />
-                </Form.Field>                <Message icon>
-                  <Message.Content>
-                    <p>1 Shas = 1$</p>
-                    Total shas to pay: {this.state.totalToPay}
-                  </Message.Content>
-                </Message>
-                <Form.Field>
-                  <Checkbox label='I agree to the Terms and Conditions' />
-                </Form.Field>
-                <Button onClick={this.createConsumerOffer} type='submit'>Submit</Button>
-              </Form>
-            </Menu.Item>
-            <h3>Powered by <a href='https://district0x.io/'>District0x</a></h3>
-          </Sidebar>
-        </div>
-        <div style={{ marginLeft: 400, marginTop: 20 }}>
-          <Grid>
-            <Grid.Row columns={3}>
-              <Grid.Column><h3>Your Buy Offers: </h3></Grid.Column>
-              <Grid.Column></Grid.Column>
-              <Grid.Column>
-                <Button onClick={this.handleButtonClick}>Start a Contract</Button>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-          <Card.Group>
-            {consumerOffers}
-          </Card.Group>
-          <h3>Buy energy:</h3>
-          <Card.Group>
-            {producerOffers}
-          </Card.Group>
-        </div>
+        <MyStep step={this.state.currentStep} undo={this.handleBackClick} />
+        {this.getContent(producerOffers)}
       </div>
     );
   }
 }
 
-function mapStateToProps(state, props) { return { user: state.userReducer } }
+function mapStateToProps(state, props) {
+  return { user: state.userReducer };
+}
 
-export default withDrizzleContext(
-  connect(
-    mapStateToProps,
-  )(Consumer)
-);
+export default withDrizzleContext(connect(mapStateToProps)(Consumer));

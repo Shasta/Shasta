@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import styled, { css } from 'styled-components';
+import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import styled, { css } from "styled-components";
+import pointer from "../../static/pointer.png";
 
 const MarkerInfo = styled.div`
   z-index: 1100;
@@ -11,53 +12,53 @@ const MarkerInfo = styled.div`
   top: -60px;
   padding: 8px;
   min-width: 100px;
-`
+`;
 
 const MarkerWrapper = styled.div`
   position: absolute;
   top: -30px;
   left: -10px;
   &:hover > ${MarkerInfo} {
-    display: block
+    display: block;
   }
-`
+`;
 
 const Marker = styled(FontAwesomeIcon)`
-  ${props => props.color && css`
-    color: ${props.color}
-  `}
-`
-
-
+  ${props =>
+    props.color &&
+    css`
+      color: ${props.color};
+    `};
+`;
 
 class ChargerMark extends Component {
   render() {
     const { name, status, hover } = this.props;
-    const statusCapitalized = status ? status.charAt(0).toUpperCase() + status.slice(1) : status;
-    let markColor = "black"
+    const statusCapitalized = status
+      ? status.charAt(0).toUpperCase() + status.slice(1)
+      : status;
+    let markColor = "black";
 
     if (status === "closed") {
-      markColor = 'red';
+      markColor = "red";
     } else if (status === "open") {
-      markColor = '#0748ffeb'
+      markColor = "#0748ffeb";
     }
 
     return (
       <MarkerWrapper>
-        { hover &&
+        {hover && (
           <MarkerInfo>
             <h4>{name}</h4>
             <span>Status: {statusCapitalized}</span>
           </MarkerInfo>
-        }
-        <Marker
-          icon="bolt"
-          size="3x"
-          color={markColor}
-        />
+        )}
+
+        <img src={pointer} style={{ height: "58px", width: "48px" }} />
+        {/* <Marker icon="bolt" size="3x" color={markColor} /> */}
       </MarkerWrapper>
     );
   }
-};
+}
 
 export default ChargerMark;

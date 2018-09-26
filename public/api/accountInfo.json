@@ -1,0 +1,7 @@
+{
+  "hardware_id": "Rasp3 - Roof",
+  "status": "conected",
+  "consumedEnergy": 40,
+  "surplusEnergy": 17,
+  "remainingSurplusEnergy": 4
+}

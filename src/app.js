@@ -1,22 +1,25 @@
-import React, { Component } from 'react';
-import { Route, BrowserRouter, Redirect, Switch} from 'react-router-dom';
-import _ from 'lodash';
-import { publicRoutes, privateRoutes} from './routes';
-import {connect} from 'react-redux';
-import {UserActions} from './redux/UserActions';
+import React, { Component } from "react";
+import { Route, BrowserRouter, Switch, Redirect } from "react-router-dom";
+import { withRouter } from "react-router";
+import _ from "lodash";
+import { publicRoutes, privateRoutes } from "./routes";
+import { connect } from "react-redux";
+import { UserActions } from "./redux/UserActions";
 
-import PublicLayout from './layouts/PublicLayout';
-import PrivateLayout from './layouts/PrivateLayout';
+import PublicLayout from "./layouts/PublicLayout";
+import PrivateLayout from "./layouts/PrivateLayout";
 
-const NotFound = () => (
-  <div>Not found 404</div>
-)
+import Error404 from "./components/404/Error404";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    
+
     this.userActions = new UserActions(this.props.dispatch);
+
+    this.props.history.listen((location, action) => {
+      this.userActions.verify();
+    });
   }
 
   componentWillMount() {
@@ -27,56 +30,57 @@ class App extends Component {
     const user = this.props.user ? this.props.user : { logged: false };
     return (
       <Switch>
-        { _.map(publicRoutes, (publicRoute, key) => {
+        {_.map(publicRoutes, (publicRoute, key) => {
           const { component, path } = publicRoute;
           return (
             <Route
               exact
               path={path}
               key={key}
-              render={ (route) => 
-                  <PublicLayout 
-                    component={component}
-                    route={route} 
-                  /> 
+              render={route =>
+                user.logged ? (
+                  <Redirect to="/home" />
+                ) : (
+                  <PublicLayout component={component} route={route} />
+                )
               }
             />
-          )
+          );
         })}
-        
-        { _.map(privateRoutes, (route, key) => {
+
+        {_.map(privateRoutes, (route, key) => {
           const { component, path } = route;
           return (
             <Route
               exact
               path={path}
               key={key}
-              render={ () => 
+              render={() =>
                 user.logged ? (
-                  <PrivateLayout 
-                      component={component}  
-                      route={route}
-                  />
+                  <PrivateLayout component={component} route={route} />
                 ) : (
-                  <PublicLayout 
-                      component={publicRoutes["SignUp"].component} 
-                      route={route}
-                  />
+                  <Redirect to="/" />
                 )
               }
             />
-          )
+          );
         })}
-        <Route component={ NotFound } />
+        <Route component={Error404} />
       </Switch>
     );
   }
 }
 
-function mapStateToProps(state, props) { return { user: state.userReducer } }
-function mapDispatchToProps(dispatch) { return { dispatch }; }
+function mapStateToProps(state, props) {
+  return { user: state.userReducer };
+}
+function mapDispatchToProps(dispatch) {
+  return { dispatch };
+}
 
-export default  connect(
+export default withRouter(
+  connect(
     mapStateToProps,
     mapDispatchToProps
-)(App);
+  )(App)
+);

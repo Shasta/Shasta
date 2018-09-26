@@ -1,22 +1,75 @@
 import React, { Component } from 'react';
-import styled, { css} from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import styled from 'styled-components';
 import { CountryDropdown } from 'react-country-region-selector';
-import { Button, Form, Grid, Image, Input, Transition } from 'semantic-ui-react'
+import { Button, Form, Input, Checkbox, Message } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import withRawDrizzle from '../../utils/withRawDrizzle';
 import ipfs from '../../ipfs';
-import _  from 'lodash';
+import _ from 'lodash';
 
-import { connect} from 'react-redux';
-import {UserActions } from '../../redux/UserActions';
+import { connect } from 'react-redux';
+import { UserActions } from '../../redux/UserActions';
 
 const RegistryBox = styled.div`
-  margin: 20px 0px;
-  padding: 20px;
+&&&& {
   border-radius: 6px;
-  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14), 0 3px 3px -2px rgba(0, 0, 0, .2), 0 1px 8px 0 rgba(0, 0, 0, .12);
-  max-width: 400px !important;
+  max-width: 330px;
+  width: 100%;
+  @media only screen and (min-width: 1920px) {
+    max-width: 520px;
+  }
+  @media only screen and (min-width: 1200px) and (max-width: 1919px) {
+    max-width: 400px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+  }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+  }
+  @media only screen and (max-width: 767px) {
+  }
+}
+  
+&&&& label {
+  font-weight: normal;
+  font-size: 1.1rem !important;
+}
+&&&& .ui.input > input {
+  margin-bottom: 8px;
+  border-radius: 0px;
+  border: 1px solid #777;
+  padding: 0.4rem 0.6rem;
+}
+&&&& select {
+  border-radius: 0px;
+  border: 1px solid #777;
+}
+
+
+`
+const Terms = styled.div`
+  background: #fceef7;
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0px;
+  font-size: 1.1rem;
+  &&&&& a {
+    color: black;
+    text-decoration: underline;
+  }
+`
+
+const SubmitButton = styled(Button)`
+&&&& {
+  background-color: #3e2a40;
+  border-radius: 10px;
+  font-size: 1.18rem;
+  color: white;
+  padding: 15px 39px;
+  font-weight: normal;
+}
 `
 class RegistryForm extends Component {
   state = {
@@ -26,7 +79,12 @@ class RegistryForm extends Component {
     firstName: "",
     lastName: "",
     country: "",
-    toDashboard: false
+    use: false,
+    privacy: false,
+    toDashboard: false,
+    tx: -1,
+    organizationNameTaken: false,
+    addressHaveOrg: false
   }
 
   constructor(props) {
@@ -36,16 +94,16 @@ class RegistryForm extends Component {
   }
 
   componentDidMount() {
-    const { drizzleState, drizzle, initialized} = this.props;
-    const {tokenBalancePointer} = this.state;
+    const { drizzleState, drizzle, initialized } = this.props;
+    const { tokenBalancePointer } = this.state;
 
     if (initialized && !!drizzleState && tokenBalancePointer !== "") {
-      const { accounts } = drizzleState; 
+      const { accounts } = drizzleState;
       const currentAddress = accounts[0];
       if (currentAddress) {
         const shaLedgerInstance = drizzle.contracts.ShaLedger;
         const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
-  
+
         this.setState({
           tokenBalancePointer,
           currentAddress
@@ -55,8 +113,8 @@ class RegistryForm extends Component {
   }
 
   refreshTokenBalance = () => {
-    const {drizzle, drizzleState} = this.props;
-    const { accounts } = drizzleState; 
+    const { drizzle, drizzleState } = this.props;
+    const { accounts } = drizzleState;
     const currentAddress = accounts[0];
     const shaLedgerInstance = drizzle.contracts.ShaLedger;
     const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(currentAddress);
@@ -67,10 +125,10 @@ class RegistryForm extends Component {
   }
 
   createUser = async () => {
-    const {initialized, drizzle, drizzleState} = this.props;
-    const {organizationName, firstName, lastName, country} = this.state;
-    const mainAccount = drizzleState && drizzleState.accounts && !!Object.keys(drizzleState.accounts).length ? drizzleState.accounts[0] : ""; 
-    if (initialized == true && mainAccount !== "") {
+    const { initialized, drizzle, drizzleState } = this.props;
+    const { organizationName, firstName, lastName, country } = this.state;
+    const mainAccount = drizzleState && drizzleState.accounts && !!Object.keys(drizzleState.accounts).length ? drizzleState.accounts[0] : "";
+    if (initialized === true && mainAccount !== "") {
       const contractInstance = drizzle.contracts.User;
       const userJson = {
         organization: {
@@ -88,25 +146,37 @@ class RegistryForm extends Component {
       const rawOrgName = drizzle.web3.utils.utf8ToHex(organizationName);
       const ipfsHash = drizzle.web3.utils.utf8ToHex(ipfsResponse[0].hash);
 
-      const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({from: mainAccount})
-      const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
-
-      if (!userCreationResponse) {
-        console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
-      }
-
-      if (userCreationResponse) {
-        this.action.login(organizationName)
+      //Check this address already has an organization
+      const addressHaveOrg = await contractInstance.methods.hasUser(mainAccount).call();
+      console.log("hasOrg: ", addressHaveOrg)
+      if (!addressHaveOrg) {
+        //Check username is taken
+        const organizationNameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
+        if (!organizationNameTaken) {
+          //Create the user
+          const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
+          const tx = contractInstance.methods.createUser.cacheSend(rawOrgName, ipfsHash, { gas: estimatedGas, from: mainAccount });
+          this.setState({
+            tx
+          })
+        } else {
+          this.setState({
+            organizationNameTaken: true
+          })
+        }
+      } else {
         this.setState({
-          toDashboard: true
+          addressHaveOrg: true
         })
       }
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const {drizzle, drizzleState, initialized} = nextProps;
-    if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length == 0) {
+  componentDidUpdate(nextProps, nextState) {
+    const { drizzle, drizzleState, initialized } = nextProps;
+    const { tx, organizationName } = nextState;
+
+    if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length === 0) {
       return;
     }
 
@@ -122,60 +192,92 @@ class RegistryForm extends Component {
         currentAddress: newAddress
       });
     }
+
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx] && !!drizzleState.transactionStack[tx].length ) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status && transaction.status == "success") {
+        this.action.login(organizationName);
+        this.setState({
+          toDashboard: true
+        })
+      }
+    }
   }
 
   handleInputChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.setState({
+      [event.target.name]: event.target.value,
+      organizationNameTaken: false
+    })
   }
 
   selectCountry = (value) => {
     this.setState({ country: value });
   }
 
+  togglePrivacyTerms = () => {
+    this.setState((prevState) => ({
+      privacy: !prevState.privacy
+    }));
+  }
+
+  toggleUseTerms = () => {
+    this.setState((prevState) => ({
+      use: !prevState.use
+    }));
+  }
   render() {
-    const { drizzle, drizzleState, initialized } = this.props;
-    const { tokenBalancePointer, organizationName, firstName, lastName, country, toDashboard } = this.state;
-    
+    const { drizzleState } = this.props;
+    const { organizationName, firstName, lastName, country, toDashboard, use, privacy, tx } = this.state;
+    let transactionStatus = "";
+
+    const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
+
     if (toDashboard === true) {
       return <Redirect to="/home" />
     }
-    const web3 = drizzle.web3;
-
-    let isInstalled, isLogged, haveSha = false;
-
-    isInstalled = drizzle.web3.status !== 'failed';
-    isLogged = isInstalled && initialized && drizzleState && Object.keys(drizzleState.accounts).length > 0;
-    
-    if (initialized) {
-      if (tokenBalancePointer in drizzleState.contracts.ShaLedger.balanceOf) {
-        const zeroBN = web3.utils.toBN("0");
-        // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
-        const tokenBalance = web3.utils.toBN(drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value);
-        haveSha = tokenBalance.gt(zeroBN);
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx]) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        transactionStatus = _.upperFirst(transaction.status);
       }
     }
+
     return (
       <Form as={RegistryBox}>
-        <h3 style={{textAlign: "center"}}>Sign up</h3>
         <Form.Field>
           <label>Organization Name</label>
-          <Input placeholder='Organization Name' value={organizationName} name="organizationName" onChange={this.handleInputChange} />
+          <Input placeholder='' value={organizationName} name="organizationName" onChange={this.handleInputChange} />
           <label>First Name</label>
-          <Input placeholder='First Name' value={firstName} name="firstName" onChange={this.handleInputChange} />
+          <Input placeholder='' value={firstName} name="firstName" onChange={this.handleInputChange} />
           <label>Last Name</label>
-          <Input placeholder='Last Name' value={lastName} name="lastName" onChange={this.handleInputChange} />
+          <Input placeholder='' value={lastName} name="lastName" onChange={this.handleInputChange} />
           <label>Country</label>
           <CountryDropdown
             value={country}
             onChange={(val) => this.selectCountry(val)} />
+          <Terms style={{ marginTop: 30 }}>
+            <span>I agree to Shasta <a href="#">Terms of Use</a>.</span>
+            <Checkbox checked={this.state.user} onChange={this.toggleUseTerms} />
+          </Terms>
+          <Terms>
+            <span>I agree to Shasta <a href="#">Politic Privacy</a>.</span>
+            <Checkbox checked={this.state.privacy} onChange={this.togglePrivacyTerms} />
+          </Terms>
         </Form.Field>
-        <Button type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</Button>
+        <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
+        <Message color='red' hidden={!this.state.organizationNameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
+        <Message color='red' hidden={!this.state.addressHaveOrg}>You already created an organization with this account</Message>
+        <Message warning={!(transactionStatus.length > 0)}>Tx status: {transactionStatus}</Message>
       </Form>
+
     )
   }
 }
 
-function mapStateToProps(state, props) { return { user: state.user } }
+function mapStateToProps(state, props) { return { user: state.userReducer } }
 function mapDispatchToProps(dispatch) { return { dispatch }; }
 
 export default withRawDrizzle(

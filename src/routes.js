@@ -1,66 +1,86 @@
-import SignIn from './components/SignIn/SignIn';
-import SignUp from './components/SignUp/SignUp';
-import Logout from './components/Logout';
-import DashboardHome from './components/Home/Home';
-import Consumer from './components/Consumer/Consumer';
-import Settings from './components/Settings/Settings';
-import Producer from './components/Producer/Producer';
-// Hardware
-import React from 'react';
-import Finance from './components/Finance/Finance';
+import SignIn from "./components/SignIn/SignIn";
+import SignUp from "./components/SignUp/SignUp";
+import Logout from "./components/Logout";
+import DashboardHome from "./components/Home/Home";
+import Consumer from "./components/Consumer/Consumer";
+import Settings from "./components/Settings/Settings";
+import Producer from "./components/Producer/Producer";
+import Hardware from "./components/Hardware/Hardware";
+import Finance from "./components/Finance/Finance";
+import homeIconOff from "./static/home_icon_off.png";
+import consumerIconOff from "./static/consumer_icon_off.png";
+import hardwareIconOff from "./static/hardware_icon_off.png";
+import settingsIconOff from "./static/settings_icon_off.png";
+import producerIconOff from "./static/finance_icon_off.png";
+import financeIconOff from "./static/marketer_icon_off.png";
+
+import homeIconOn from "./static/home_icon_on.png";
+import consumerIconOn from "./static/consumer_icon_on.png";
+import hardwareIconOn from "./static/hardware_icon_on.png";
+import settingsIconOn from "./static/settings_icon_on.png";
+import producerIconOn from "./static/finance_icon_on.png";
+import financeIconOn from "./static/marketer_icon_on.png";
 
 export const publicRoutes = {
   SignUp: {
-    path: '/',
+    path: "/",
     component: SignUp,
-    title: 'Sign up'
+    title: "Sign up"
   },
   SignIn: {
-    path: '/sign-in',
+    path: "/sign-in",
     component: SignIn,
-    title: 'Sign In'
-  },
-  Logout: {
-    path: '/logout',
-    component: Logout,
-    title: 'Logout'
+    title: "Sign In"
   }
 };
 
 export const privateRoutes = {
   DashboardHome: {
-    path: '/home',
+    path: "/home",
     component: DashboardHome,
-    title: 'Home',
-    icon: 'home',
+    title: "Home",
+    iconOff: homeIconOff,
+    iconOn: homeIconOn
   },
   Finances: {
-    path: '/dashboard/finances',
+    path: "/finances",
     component: Finance,
-    title: 'Finances'
+    title: "Finances",
+    iconOff: financeIconOff,
+    iconOn: financeIconOn
   },
   Consumer: {
-    path: '/consumer',
+    path: "/consumer",
     component: Consumer,
-    title: 'Consumer',
-    icon: 'users'
+    title: "Consumer",
+    iconOff: consumerIconOff,
+    iconOn: consumerIconOn
   },
   Producer: {
-    path: '/producer',
+    path: "/producer",
     component: Producer,
-    title: 'Producer',
-    icon: 'map'
+    title: "Producer",
+    iconOff: producerIconOff,
+    iconOn: producerIconOn
   },
   Hardware: {
-    path: '/hardware',
-    component: () => <div/>,
-    title: 'Hardware',
-    icon: 'digital-tachograph'
+    path: "/hardware",
+    component: Hardware,
+    title: "Hardware",
+    iconOff: hardwareIconOff,
+    iconOn: hardwareIconOn
   },
   Settings: {
-    path: '/settings',
+    path: "/settings",
     component: Settings,
-    title: 'Settings',
-    icon: 'cog'
+    title: "Settings",
+    iconOff: settingsIconOff,
+    iconOn: settingsIconOn
+  },
+  Logout: {
+    path: "/logout",
+    component: Logout,
+    title: "Logout",
+    hiddenOnSideBar: true
   }
-}
+};

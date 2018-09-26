@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Button,  Modal } from 'semantic-ui-react'
-import withRawDrizzleContext from '../../utils/withRawDrizzle.js';
 import parseDrizzleError from '../../utils/parseDrizzleError.js';
 import stringHelpers from '../../utils/stringHelpers.js';
 import {has} from 'lodash';
@@ -26,7 +25,6 @@ class MintSha extends Component {
         gas: 100000
       }
 
-      const cacheSendParams = [...params, ...[options]];
       const tx = mint.cacheSend(...params, options);
 
       this.setState(() => ({
@@ -46,7 +44,7 @@ class MintSha extends Component {
 
   async componentDidMount() {
     const { drizzleState, drizzle, openAtStart} = this.props;
-    if (drizzleState && drizzleState.accounts) {
+    if (drizzleState && drizzleState.accounts && drizzleState.accounts[0]) {
       const { accounts } = drizzleState; 
       const currentAddress = accounts[0];
   
@@ -73,7 +71,7 @@ class MintSha extends Component {
         transactionStatus = stringHelpers.capitalize(drizzleState.transactions[txHash].status);
         transactionMsg = transactionStatus;
       }
-      if (transactionStatus == "Error") {
+      if (transactionStatus === "Error") {
         transactionMsg = parseDrizzleError(drizzleState.transactions[txHash].error.message);
       }
     }
@@ -95,7 +93,7 @@ class MintSha extends Component {
           <Button basic color='grey' onClick={this.handleClose} >
             Close
           </Button>
-          <Button basic color='green' onClick={this.mintTokens}>
+          <Button basic style={{border: '1px solid #f4b8df'}} onClick={this.mintTokens}>
             Claim your 100 SHA
           </Button>
       </Modal.Actions>
@@ -104,4 +102,4 @@ class MintSha extends Component {
   }
 }
 
-export default withRawDrizzleContext(MintSha);
+export default MintSha;

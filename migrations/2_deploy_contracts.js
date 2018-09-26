@@ -9,9 +9,15 @@ module.exports = function(deployer) {
   deployer.deploy(ShaLedger);
   deployer.deploy(BillSystem);
   deployer.deploy(ContractRegistry);
-  deployer.deploy(ShastaMarket).then(function() {
-    return deployer.deploy(User, ShastaMarket.address).then(function() {
-      return deployer.deploy(SharedMapPrice, User.address, ShastaMarket.address);
-    })
+  deployer.deploy(ShastaMarket)
+  .then(function() {
+    return deployer.deploy(User, ShastaMarket.address)
+  })
+  .then(function() {
+    return deployer.deploy(SharedMapPrice, User.address, ShastaMarket.address);
+  })
+  .then(async function() {
+    const billInstance = await BillSystem.deployed();
+    billInstance.setContractRegistry(ContractRegistry.address);
   })
 };
