@@ -15,7 +15,7 @@ const options = {
     BillSystem
   ],
   polls: {
-    accounts: 10000
+    accounts: 4000
   },
   events: {
     User: [
