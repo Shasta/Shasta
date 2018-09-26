@@ -149,10 +149,6 @@ class Producer extends Component {
         { gas: estimatedGas, from: currentAddress }
       );
 
-      // await drizzleUser.methods
-      //   .cancelOffer(index, rawIpfsHash)
-      //   .send({ gas: estimatedGas, from: currentAddress });
-
       this.setState({
         chargers: userJson.producerOffers,
         userJson,
@@ -239,7 +235,8 @@ class Producer extends Component {
         chargerName: "",
         chargerStatus: "open",
         visible: false,
-        energyPrice: 0
+        energyPrice: 0,
+        tx
       });
     } catch (err) {
       console.error(err);
@@ -270,6 +267,16 @@ class Producer extends Component {
       userJson,
       tx
     } = this.state;
+
+    const { drizzleState } = this.props;
+    let transactionStatus = "";
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx]) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        transactionStatus = _.upperFirst(transaction.status);
+      }
+    }
 
     let fieldErrors = [];
     const providerSources = [
@@ -481,9 +488,14 @@ class Producer extends Component {
             Your sell offers:{" "}
           </h3>
         </div>
-        <Table singleLine style={{ width: "65%" }}>
-          <Table.Body>{producerOffers}</Table.Body>
-        </Table>
+        <div style={{ width: "65%" }}>
+          <Table singleLine >
+            <Table.Body>{producerOffers}</Table.Body>
+          </Table>
+          <Message warning={!(transactionStatus.length > 0)}>
+            Tx status: {transactionStatus}
+          </Message>
+        </div>
       </div>
     );
   }
