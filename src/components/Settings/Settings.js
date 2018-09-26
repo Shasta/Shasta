@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Form } from "semantic-ui-react";
+import { Button, Form, Message } from "semantic-ui-react";
 import { CountryDropdown, RegionDropdown } from "react-country-region-selector";
 import withDrizzleContext from "../../utils/withDrizzleContext";
 import { connect } from "react-redux";
@@ -55,18 +55,10 @@ class Settings extends Component {
     const estimateGas = await drizzle.contracts.User.methods
       .updateUser(rawIpfsHash)
       .estimateGas({ from: currentAccount });
-    const success = await drizzle.contracts.User.methods
-      .updateUser(rawIpfsHash)
-      .send({ gas: estimateGas, from: currentAccount });
-    if (success) {
-      console.log("self:", this);
-      console.log(
-        "updated organization " + orgData.organization.name + " on ethereum!"
-      );
-      //this.setState({ isLoged: true })
-    } else {
-      console.log("error creating userupdating organization on ethereum");
-    }
+    const tx = drizzle.contracts.User.methods     .updateUser.cacheSend(rawIpfsHash, { gas: estimateGas, from: currentAccount });
+    this.setState({
+      tx
+    })
   };
 
   async componentDidMount() {
@@ -101,7 +93,16 @@ class Settings extends Component {
   }
 
   render() {
-    const { country, region } = this.state;
+    const { drizzleState } = this.props;
+    const { country, region, tx } = this.state;
+    let transactionStatus = "";
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx]) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        transactionStatus = _.upperFirst(transaction.status);
+      }
+    }
     return (
       <div>
         <Form style={{ width: "50%" }}>
@@ -167,6 +168,9 @@ class Settings extends Component {
           <Button type="submit" onClick={this.updateOrganization}>
             Submit
           </Button>
+          <Message warning={!(transactionStatus.length > 0)}>
+            Tx status: {transactionStatus}
+          </Message>
         </Form>
       </div>
     );
