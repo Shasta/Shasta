@@ -60,7 +60,8 @@ class Producer extends Component {
     userJson: {
       producerOffers: [],
       consumerOffers: []
-    }
+    },
+    tx: null
   };
 
   // Add Web3 event watchers at ComponentDidMount lifecycle,
@@ -142,9 +143,16 @@ class Producer extends Component {
       const estimatedGas = await drizzleUser.methods
         .cancelOffer(index, rawIpfsHash)
         .estimateGas({ from: currentAddress });
-      await drizzleUser.methods
-        .cancelOffer(index, rawIpfsHash)
-        .send({ gas: estimatedGas, from: currentAddress });
+
+      const tx =  drizzleUser.methods.cancelOffer.cacheSend(
+        index,
+        rawIpfsHash,
+        { gas: estimatedGas, from: currentAddress }
+      );
+
+      // await drizzleUser.methods
+      //   .cancelOffer(index, rawIpfsHash)
+      //   .send({ gas: estimatedGas, from: currentAddress });
 
       this.setState({
         chargers: userJson.producerOffers,
@@ -154,7 +162,8 @@ class Producer extends Component {
         chargerName: "",
         chargerStatus: "open",
         visible: false,
-        energyPrice: 0
+        energyPrice: 0,
+        tx
       });
     } catch (err) {
       console.error(err);
@@ -256,8 +265,10 @@ class Producer extends Component {
       chargerLatitude,
       chargerLongitude,
       chargers,
-      userJson
+      userJson,
+      tx
     } = this.state;
+
     let fieldErrors = [];
     const providerSources = [
       {
