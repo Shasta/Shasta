@@ -143,11 +143,10 @@ class Producer extends Component {
         .cancelOffer(index, rawIpfsHash)
         .estimateGas({ from: currentAddress });
 
-      const tx = drizzleUser.methods.cancelOffer.cacheSend(
-        index,
-        rawIpfsHash,
-        { gas: estimatedGas, from: currentAddress }
-      );
+      const tx = drizzleUser.methods.cancelOffer.cacheSend(index, rawIpfsHash, {
+        gas: estimatedGas,
+        from: currentAddress
+      });
 
       this.setState({
         chargers: userJson.producerOffers,
@@ -270,7 +269,11 @@ class Producer extends Component {
 
     const { drizzleState } = this.props;
     let transactionStatus = "";
-    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx]) {
+    if (
+      drizzleState &&
+      drizzleState.transactionStack &&
+      drizzleState.transactionStack[tx]
+    ) {
       const txHash = drizzleState.transactionStack[tx];
       const transaction = drizzleState.transactions[txHash];
       if (transaction && transaction.status) {
@@ -306,7 +309,7 @@ class Producer extends Component {
       return (
         <Table.Row key={index}>
           <Table.Cell verticalAlign="middle">
-            <img src={img.iconHome} style={{ width: "20px", height: "20px" }} />
+            <img src={img.iconHome} style={{ width: "20px", height: "20px" }} />{" "}
             {offer.address}
           </Table.Cell>
           <Table.Cell>
@@ -489,7 +492,7 @@ class Producer extends Component {
           </h3>
         </div>
         <div style={{ width: "65%" }}>
-          <Table singleLine >
+          <Table singleLine>
             <Table.Body>{producerOffers}</Table.Body>
           </Table>
           <Message warning={!(transactionStatus.length > 0)}>
