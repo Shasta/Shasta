@@ -12,16 +12,16 @@ import {
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 
 //import icons
-import solarOffIcon from "./sourceIcons/solar-energy-off.png";
-import solarOnIcon from "./sourceIcons/solar-energy-on.png";
-import eolicOffIcon from "./sourceIcons/eolic-energy-off.png";
-import eolicOnIcon from "./sourceIcons/eolic-energy-on.png";
-import biomassOffIcon from "./sourceIcons/biomass-energy-off.png";
-import biomassOnIcon from "./sourceIcons/biomass-energy-on.png";
-import otherOffIcon from "./sourceIcons/other-energy-off.png";
-import otherOnIcon from "./sourceIcons/other-energy-on.png";
-import nuclearOffIcon from "./sourceIcons/nuclear-energy-off.png";
-import nuclearOnIcon from "./sourceIcons/nuclear-energy-on.png";
+import solarOffIcon from "../../static/solar-energy-60x60-off.png";
+import solarOnIcon from "../../static/solar-energy-60x60-on.png";
+import eolicOffIcon from "../../static/eolic-energy-60x60-off.png";
+import eolicOnIcon from "../../static/eolic-energy-60x60-on.png";
+import biomassOffIcon from "../../static/boimass-energy-60x60-off.png";
+import biomassOnIcon from "../../static/boimass-energy-60x60-on.png";
+import otherOffIcon from "../../static/other-energy-60x60-off.png";
+import otherOnIcon from "../../static/other-energy-60x60-on.png";
+import nuclearOffIcon from "../../static/nuclear-energy-60x60-off.png";
+import nuclearOnIcon from "../../static//nuclear-energy-60x60-on.png";
 
 import "./Consumer.css";
 import ipfs from "../../ipfs";
@@ -262,7 +262,7 @@ class Consumer extends Component {
     } else {
       this.setState({
         messageVisibility: true
-      })
+      });
     }
   };
 
@@ -299,7 +299,7 @@ class Consumer extends Component {
     } else {
       this.setState({
         messageVisibility: true
-      })
+      });
     }
   };
 
@@ -316,9 +316,9 @@ class Consumer extends Component {
       billInstance.abi,
       billInstance.address
     );
-    console.log("con: ", con)
-    console.log("avg: ", avg)
-    console.log("price: ", price)
+    console.log("con: ", con);
+    console.log("avg: ", avg);
+    console.log("price: ", price);
     console.log("total: ", total);
     const confirmContractAbi = billInstanceWeb3.methods
       .newPrepaidContract(
@@ -396,7 +396,9 @@ class Consumer extends Component {
                   />
                 </div>
               </ShastaGridRow>
-              <Message color='red' hidden={!this.state.messageVisibility}>Select an amount of energy to buy please.</Message>
+              <Message color="red" hidden={!this.state.messageVisibility}>
+                Select an amount of energy to buy please.
+              </Message>
             </Grid.Column>
             <Grid.Column style={{ width: "50%" }}>
               <ShastaGridRow style={{ paddingBottom: 20 }}>

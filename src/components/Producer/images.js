@@ -1,8 +1,8 @@
-import iconBiomass from "../../static/mini-boimass-energy-off.png";
-import iconEolic from "../../static/mini-eolic-energy-off.png";
-import iconNuclear from "../../static/mini-nuclear-energy-off.png";
-import iconOther from "../../static/mini-other-energy-off.png";
-import iconSolar from "../../static/mini-solar-energy-off.png";
+import iconBiomass from "../../static/boimass-energy-60x60-off.png";
+import iconEolic from "../../static/eolic-energy-60x60-off.png";
+import iconNuclear from "../../static/nuclear-energy-60x60-off.png";
+import iconOther from "../../static/other-energy-60x60-off.png";
+import iconSolar from "../../static/solar-energy-60x60-off.png";
 
 import iconHome from "../../static/home_icon_off.png";
 import iconHeader from "../../static/current-providers.png";
