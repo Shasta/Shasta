@@ -77,7 +77,7 @@ class Producer extends Component {
       .getIpfsHashByUsername(rawOrgName)
       .call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
-    console.log("ipfsHash: ", ipfsHash)
+    console.log("ipfsHash: ", ipfsHash);
     const rawJson = await ipfs.cat(ipfsHash);
     const userJson = JSON.parse(rawJson);
 
@@ -112,7 +112,6 @@ class Producer extends Component {
   };
 
   async handleCancelOffer(index) {
-
     // Get the SharedMap.sol instance
     const { drizzle, drizzleState } = this.props;
     const userJson = _.cloneDeep(this.state.userJson);
@@ -135,11 +134,11 @@ class Producer extends Component {
 
       const ipfsHash = ipfsResponse[0].hash;
       console.log("ipfsHash: ", ipfsHash);
-      console.log(currentAddress)
+      console.log(currentAddress);
 
       const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash);
       console.log("raw", rawIpfsHash);
-      console.log(drizzleUser.methods)
+      console.log(drizzleUser.methods);
       const estimatedGas = await drizzleUser.methods
         .cancelOffer(index, rawIpfsHash)
         .estimateGas({ from: currentAddress });
@@ -473,7 +472,14 @@ class Producer extends Component {
         />
         <div style={{ padding: 15 }}>
           {" "}
-          <h3>Your sell offers: </h3>
+          <h3>
+            {" "}
+            <img
+              src={img.iconEnergyOffer}
+              style={{ width: "40px", height: "40px" }}
+            />{" "}
+            Your sell offers:{" "}
+          </h3>
         </div>
         <Table singleLine style={{ width: "65%" }}>
           <Table.Body>{producerOffers}</Table.Body>

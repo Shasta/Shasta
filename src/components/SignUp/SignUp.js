@@ -65,6 +65,7 @@ class SignUp extends Component {
     const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();
     if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
       const shaLedgerInstance = drizzle.contracts.ShaLedger;
+      console.log("cachecall")
       const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress, {from: newAddress});
 
       this.setState({
@@ -74,12 +75,13 @@ class SignUp extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  async componentDidUpdate(nextProps) {
     const {initialized, drizzle, drizzleState} = nextProps;
     const { currentAddress } = this.state;
-    const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();;
+    const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();
     if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
       const shaLedgerInstance = drizzle.contracts.ShaLedger;
+      console.log("cachecall")
       const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress, {from: newAddress});
 
       this.setState({
@@ -87,11 +89,7 @@ class SignUp extends Component {
         currentAddress: newAddress
       });
     }
-  }
 
-  async componentDidUpdate(nextProps, nextState) {
-    const { drizzle } = nextProps;
-    
     const web3 = drizzle.web3;
     if (web3 && web3.eth) {
       const newNetwork = await web3.eth.net.getNetworkType();
@@ -120,6 +118,7 @@ class SignUp extends Component {
         // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
         const rawBalance = drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value;
         const tokenBalance = web3.utils.toBN(rawBalance);
+        console.log(tokenBalance)
         haveSha = tokenBalance.gt(zeroBN);
       }
     }

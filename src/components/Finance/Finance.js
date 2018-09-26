@@ -6,10 +6,19 @@ import { Line, Pie } from "react-chartjs-2";
 import "./Finance.less";
 import styled from "styled-components";
 
+import iconEnergyPrice from "../../static/energy-price.png";
+
 const ShastaSidebar = styled(Sidebar)`
   -webkit-box-shadow: none !important;
   -moz-box-shadow: none !important;
   box-shadow: none !important;
+`;
+
+const ShastaIcon = styled.img`
+  vertical-align: middle;
+  width: 40px;
+  height: 40px;
+  margin-right: 20px;
 `;
 
 class Finance extends Component {
@@ -127,7 +136,11 @@ class Finance extends Component {
                 <MainChart totalSha={totalSha} />
               </Grid.Row>
               <Grid.Row>
-                <h2>Energy price</h2>
+                <h2>
+                  {" "}
+                  <ShastaIcon src={iconEnergyPrice} />
+                  Energy price
+                </h2>
                 <Line data={data} options={chartOptions} height={100} />
               </Grid.Row>
             </Grid.Column>

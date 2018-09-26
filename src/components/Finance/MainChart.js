@@ -1,6 +1,16 @@
 import React, { Component, Fragment } from "react";
 import { Line } from "react-chartjs-2";
 
+import iconSHA from "../../static/sha-historic.png";
+import styled from "styled-components";
+
+const ShastaIcon = styled.img`
+  vertical-align: middle;
+  width: 40px;
+  height: 40px;
+  margin-right: 20px;
+`;
+
 class MainChart extends Component {
   render() {
     const data = {
@@ -40,7 +50,11 @@ class MainChart extends Component {
     };
     return (
       <Fragment>
-        <h2>Sha historic</h2>
+        <h2>
+          {" "}
+          <ShastaIcon src={iconSHA} />
+          Sha historic
+        </h2>
         <Line data={data} options={options} height={100} />
       </Fragment>
     );
