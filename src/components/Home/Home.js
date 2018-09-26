@@ -6,6 +6,7 @@ import { Feed, Grid } from "semantic-ui-react";
 import _ from "lodash";
 import { Line } from "react-chartjs-2";
 import styled from "styled-components";
+import iconWelcomeUser from "../../static/welcome-user.png";
 
 const ShastaFeedDate = styled(Feed.Date)`
   color: #f076b6 !important;
@@ -16,6 +17,13 @@ const ShastaFeedSummary = styled(Feed.Summary)`
   font-size: 0.8vw !important;
   font-weight: normal !important;
   margin-left: 15px !important;
+`;
+
+const ShastaIcon = styled.img`
+  vertical-align: middle;
+  width: 40px;
+  height: 40px;
+  margin-right: 20px;
 `;
 
 class Home extends Component {
@@ -200,6 +208,7 @@ class Home extends Component {
         <Grid.Row>
           <Grid.Column width={16}>
             <h2>
+              <ShastaIcon src={iconWelcomeUser} />
               Welcome{" "}
               <a
                 style={{ color: "#f6a6d1" }}
