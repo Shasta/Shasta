@@ -82,7 +82,8 @@ class RegistryForm extends Component {
     use: false,
     privacy: false,
     toDashboard: false,
-    usernameTaken: false
+    organizationNameTaken: false,
+    addressHaveOrg: false
   }
 
   constructor(props) {
@@ -144,27 +145,37 @@ class RegistryForm extends Component {
       const rawOrgName = drizzle.web3.utils.utf8ToHex(organizationName);
       const ipfsHash = drizzle.web3.utils.utf8ToHex(ipfsResponse[0].hash);
 
-      //Check username is taken
-      const usernameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
-      console.log(usernameTaken)
-      if (!usernameTaken) {
-        //Create the user
-        const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
-        const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
+      //Check this address already has an organization
+      const addressHaveOrg = await contractInstance.methods.hasUser(mainAccount).call();
+      console.log("hasOrg: ", addressHaveOrg)
+      if (!addressHaveOrg) {
 
-        if (!userCreationResponse) {
-          console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
-        }
+        //Check username is taken
+        const organizationNameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
+        console.log(organizationNameTaken)
+        if (!organizationNameTaken) {
+          //Create the user
+          const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
+          const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
 
-        if (userCreationResponse) {
-          this.action.login(organizationName)
+          if (!userCreationResponse) {
+            console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
+          }
+
+          if (userCreationResponse) {
+            this.action.login(organizationName)
+            this.setState({
+              toDashboard: true
+            })
+          }
+        } else {
           this.setState({
-            toDashboard: true
+            organizationNameTaken: true
           })
         }
       } else {
         this.setState({
-          usernameTaken: true
+          addressHaveOrg: true
         })
       }
     }
@@ -191,7 +202,10 @@ class RegistryForm extends Component {
   }
 
   handleInputChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.setState({
+      [event.target.name]: event.target.value,
+      organizationNameTaken: false
+    })
   }
 
   selectCountry = (value) => {
@@ -240,7 +254,8 @@ class RegistryForm extends Component {
           </Terms>
         </Form.Field>
         <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
-        <Message color='red' hidden={!this.state.usernameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
+        <Message color='red' hidden={!this.state.organizationNameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
+        <Message color='red' hidden={!this.state.addressHaveOrg}>You already created an organization with this account</Message>
       </Form>
 
     )
