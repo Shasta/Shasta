@@ -44,7 +44,7 @@ class MintSha extends Component {
 
   async componentDidMount() {
     const { drizzleState, drizzle, openAtStart} = this.props;
-    if (drizzleState && drizzleState.accounts) {
+    if (drizzleState && drizzleState.accounts && drizzleState.accounts[0]) {
       const { accounts } = drizzleState; 
       const currentAddress = accounts[0];
   

@@ -82,7 +82,8 @@ class RegistryForm extends Component {
     use: false,
     privacy: false,
     toDashboard: false,
-    usernameTaken: false
+    usernameTaken: false,
+    tx: -1
   }
 
   constructor(props) {
@@ -146,22 +147,14 @@ class RegistryForm extends Component {
 
       //Check username is taken
       const usernameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
-      console.log(usernameTaken)
       if (!usernameTaken) {
         //Create the user
         const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
-        const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
-
-        if (!userCreationResponse) {
-          console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
-        }
-
-        if (userCreationResponse) {
-          this.action.login(organizationName)
-          this.setState({
-            toDashboard: true
-          })
-        }
+        const tx = contractInstance.methods.createUser.cacheSend(rawOrgName, ipfsHash, { gas: estimatedGas, from: mainAccount });
+        this.setState({
+          tx
+        })
+        
       } else {
         this.setState({
           usernameTaken: true
@@ -170,8 +163,10 @@ class RegistryForm extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(nextProps, nextState) {
     const { drizzle, drizzleState, initialized } = nextProps;
+    const { tx, organizationName } = nextState;
+
     if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length === 0) {
       return;
     }
@@ -187,6 +182,17 @@ class RegistryForm extends Component {
         tokenBalancePointer,
         currentAddress: newAddress
       });
+    }
+
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx] && !!drizzleState.transactionStack[tx].length ) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status && transaction.status == "success") {
+        this.action.login(organizationName);
+        this.setState({
+          toDashboard: true
+        })
+      }
     }
   }
 
@@ -210,12 +216,22 @@ class RegistryForm extends Component {
     }));
   }
   render() {
-    const { organizationName, firstName, lastName, country, toDashboard, use, privacy } = this.state;
+    const { drizzleState } = this.props;
+    const { organizationName, firstName, lastName, country, toDashboard, use, privacy, tx } = this.state;
+    let transactionStatus = "";
+
+    const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
 
     if (toDashboard === true) {
       return <Redirect to="/home" />
     }
-    const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx]) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        transactionStatus = _.upperFirst(transaction.status);
+      }
+    }
 
     return (
       <Form as={RegistryBox}>
@@ -241,6 +257,7 @@ class RegistryForm extends Component {
         </Form.Field>
         <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
         <Message color='red' hidden={!this.state.usernameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
+        <Message warning={!(transactionStatus.length > 0)}>Tx status: {transactionStatus}</Message>
       </Form>
 
     )
