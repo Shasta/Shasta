@@ -82,8 +82,9 @@ class RegistryForm extends Component {
     use: false,
     privacy: false,
     toDashboard: false,
-    usernameTaken: false,
-    tx: -1
+    tx: -1,
+    organizationNameTaken: false,
+    addressHaveOrg: false
   }
 
   constructor(props) {
@@ -145,19 +146,27 @@ class RegistryForm extends Component {
       const rawOrgName = drizzle.web3.utils.utf8ToHex(organizationName);
       const ipfsHash = drizzle.web3.utils.utf8ToHex(ipfsResponse[0].hash);
 
-      //Check username is taken
-      const usernameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
-      if (!usernameTaken) {
-        //Create the user
-        const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
-        const tx = contractInstance.methods.createUser.cacheSend(rawOrgName, ipfsHash, { gas: estimatedGas, from: mainAccount });
-        this.setState({
-          tx
-        })
-        
+      //Check this address already has an organization
+      const addressHaveOrg = await contractInstance.methods.hasUser(mainAccount).call();
+      console.log("hasOrg: ", addressHaveOrg)
+      if (!addressHaveOrg) {
+        //Check username is taken
+        const organizationNameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
+        if (!organizationNameTaken) {
+          //Create the user
+          const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
+          const tx = contractInstance.methods.createUser.cacheSend(rawOrgName, ipfsHash, { gas: estimatedGas, from: mainAccount });
+          this.setState({
+            tx
+          })
+        } else {
+          this.setState({
+            organizationNameTaken: true
+          })
+        }
       } else {
         this.setState({
-          usernameTaken: true
+          addressHaveOrg: true
         })
       }
     }
@@ -197,7 +206,10 @@ class RegistryForm extends Component {
   }
 
   handleInputChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.setState({
+      [event.target.name]: event.target.value,
+      organizationNameTaken: false
+    })
   }
 
   selectCountry = (value) => {
@@ -256,7 +268,8 @@ class RegistryForm extends Component {
           </Terms>
         </Form.Field>
         <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
-        <Message color='red' hidden={!this.state.usernameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
+        <Message color='red' hidden={!this.state.organizationNameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
+        <Message color='red' hidden={!this.state.addressHaveOrg}>You already created an organization with this account</Message>
         <Message warning={!(transactionStatus.length > 0)}>Tx status: {transactionStatus}</Message>
       </Form>
 
