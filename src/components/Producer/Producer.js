@@ -144,7 +144,7 @@ class Producer extends Component {
         .cancelOffer(index, rawIpfsHash)
         .estimateGas({ from: currentAddress });
 
-      const tx =  drizzleUser.methods.cancelOffer.cacheSend(
+      const tx = drizzleUser.methods.cancelOffer.cacheSend(
         index,
         rawIpfsHash,
         { gas: estimatedGas, from: currentAddress }
@@ -225,9 +225,12 @@ class Producer extends Component {
       const estimatedGas = await drizzleUser.methods
         .createOffer(rawEnergyPrice, rawIpfsHash)
         .estimateGas({ from: currentAddress });
-      await drizzleUser.methods
-        .createOffer(rawEnergyPrice, rawIpfsHash)
-        .send({ gas: estimatedGas, from: currentAddress });
+
+      const tx = drizzleUser.methods.createOffer.cacheSend(
+        rawEnergyPrice,
+        rawIpfsHash,
+        { gas: estimatedGas, from: currentAddress }
+      );
 
       this.setState({
         chargers: userJson.producerOffers,
