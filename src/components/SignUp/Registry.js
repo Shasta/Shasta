@@ -82,6 +82,7 @@ class RegistryForm extends Component {
     use: false,
     privacy: false,
     toDashboard: false,
+    tx: -1,
     organizationNameTaken: false,
     addressHaveOrg: false
   }
@@ -149,25 +150,15 @@ class RegistryForm extends Component {
       const addressHaveOrg = await contractInstance.methods.hasUser(mainAccount).call();
       console.log("hasOrg: ", addressHaveOrg)
       if (!addressHaveOrg) {
-
         //Check username is taken
         const organizationNameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();
-        console.log(organizationNameTaken)
         if (!organizationNameTaken) {
           //Create the user
           const estimatedGas = await contractInstance.methods.createUser(rawOrgName, ipfsHash).estimateGas({ from: mainAccount })
-          const userCreationResponse = await contractInstance.methods.createUser(rawOrgName, ipfsHash).send({ gas: estimatedGas, from: mainAccount });
-
-          if (!userCreationResponse) {
-            console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
-          }
-
-          if (userCreationResponse) {
-            this.action.login(organizationName)
-            this.setState({
-              toDashboard: true
-            })
-          }
+          const tx = contractInstance.methods.createUser.cacheSend(rawOrgName, ipfsHash, { gas: estimatedGas, from: mainAccount });
+          this.setState({
+            tx
+          })
         } else {
           this.setState({
             organizationNameTaken: true
@@ -181,8 +172,10 @@ class RegistryForm extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(nextProps, nextState) {
     const { drizzle, drizzleState, initialized } = nextProps;
+    const { tx, organizationName } = nextState;
+
     if (!initialized || !drizzleState || Object.keys(drizzleState.accounts).length === 0) {
       return;
     }
@@ -198,6 +191,17 @@ class RegistryForm extends Component {
         tokenBalancePointer,
         currentAddress: newAddress
       });
+    }
+
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx] && !!drizzleState.transactionStack[tx].length ) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status && transaction.status == "success") {
+        this.action.login(organizationName);
+        this.setState({
+          toDashboard: true
+        })
+      }
     }
   }
 
@@ -224,12 +228,22 @@ class RegistryForm extends Component {
     }));
   }
   render() {
-    const { organizationName, firstName, lastName, country, toDashboard, use, privacy } = this.state;
+    const { drizzleState } = this.props;
+    const { organizationName, firstName, lastName, country, toDashboard, use, privacy, tx } = this.state;
+    let transactionStatus = "";
+
+    const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
 
     if (toDashboard === true) {
       return <Redirect to="/home" />
     }
-    const notValid = !use || !privacy || !organizationName || !firstName || !lastName || !country;
+    if (drizzleState && drizzleState.transactionStack && drizzleState.transactionStack[tx]) {
+      const txHash = drizzleState.transactionStack[tx];
+      const transaction = drizzleState.transactions[txHash];
+      if (transaction && transaction.status) {
+        transactionStatus = _.upperFirst(transaction.status);
+      }
+    }
 
     return (
       <Form as={RegistryBox}>
@@ -256,6 +270,7 @@ class RegistryForm extends Component {
         <SubmitButton disabled={notValid} type='submit' id="createOrgBtn" onClick={this.createUser}>Create a new organization</SubmitButton>
         <Message color='red' hidden={!this.state.organizationNameTaken}>The organization name {this.state.organizationName} is already in use. Choose a diferent one please.</Message>
         <Message color='red' hidden={!this.state.addressHaveOrg}>You already created an organization with this account</Message>
+        <Message warning={!(transactionStatus.length > 0)}>Tx status: {transactionStatus}</Message>
       </Form>
 
     )
