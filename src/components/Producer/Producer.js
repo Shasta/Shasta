@@ -468,36 +468,36 @@ class Producer extends Component {
             </Form>
           </Menu.Item>
         </Sidebar>
-        <span style={{ fontSize: "1.71428571rem", marginRight: 40 }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <img src={img.iconHeader} style={{ width: "40px", height: "40px" }} />
-          Current providers
-        </span>
-        <ShastaSellButton onClick={this.openForm}>
-          Sell your energy
-        </ShastaSellButton>
+          <div style={{fontSize: "1.71428571rem", margin:"0px 20px 0px 5px"}}>Current providers</div>
+          <ShastaSellButton onClick={this.openForm}>
+            Sell your energy
+          </ShastaSellButton>
+        </div>
+
         <SharedMap
           newLocation={{ chargerLatitude, chargerLongitude }}
           chargers={chargers}
           emitLocation={this.locationSelected}
         />
-        <div style={{ padding: 15 }}>
-          {" "}
-          <h3>
-            {" "}
-            <img
-              src={img.iconEnergyOffer}
-              style={{ width: "40px", height: "40px" }}
-            />{" "}
-            Your sell offers:{" "}
+        <div style={{ padding: 15, display: "flex", alignItems: "center" }}>
+          <img
+            src={img.iconEnergyOffer}
+            style={{ width: "40px", height: "40px" }}
+          />
+          <h3 style={{ margin: "8px 0px 0px 0px", }}>
+
+            Your sell offers:
           </h3>
         </div>
         <div style={{ width: "65%" }}>
-          <Table singleLine>
-            <Table.Body>{producerOffers}</Table.Body>
-          </Table>
           <Message warning={!(transactionStatus.length > 0)}>
             Tx status: {transactionStatus}
           </Message>
+          <Table singleLine>
+            <Table.Body>{producerOffers}</Table.Body>
+          </Table>
         </div>
       </div>
     );
