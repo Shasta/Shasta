@@ -14,7 +14,7 @@ If you would like to test Shasta on your own computer, please before check the n
 
 Clone the repository
 ```
-git clone https://github.com/alexsicart/Shasta
+git clone https://github.com/ShastaProject/Shasta.git
 ```
 
 Go into the folder and download modules:
