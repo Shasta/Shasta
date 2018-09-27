@@ -20,7 +20,7 @@ import styled from "styled-components";
 import * as img from "./images";
 
 //Styled components
-const ShastaButton = styled.Button`
+const ShastaButton = styled.button`
   background-color: #402d41;
   text-align: center;
   color: white;
@@ -31,7 +31,7 @@ const ShastaButton = styled.Button`
   cursor: pointer;
 `;
 
-const ShastaSellButton = styled.Button`
+const ShastaSellButton = styled.button`
   background-color: #402d41;
   text-align: center;
   color: white;
