@@ -1,17 +1,26 @@
-import User from '../build/contracts/User.json';
-import ShastaMarket from '../build/contracts/ShastaMarket.json';
-import ShaLedger from '../build/contracts/ShaLedger.json';
-import ContractRegistry from '../build/contracts/ContractRegistry.json';
-import BillSystem from '../build/contracts/BillSystem.json';
+const targetNetwork = process.env.TARGET_NETWORK;
+let contracts = [];
+
+if (targetNetwork == "rinkeby") {
+  const User = require('shasta-os/build/contracts/User.json');
+  const ShastaMarket = require('shasta-os/build/contracts/ShastaMarket.json');
+  const ShaLedger = require('shasta-os/build/contracts/ShaLedger.json');
+  const ContractRegistry = require('shasta-os/build/contracts/ContractRegistry.json');
+  const BillSystem = require('shasta-os/build/contracts/BillSystem.json');
+
+  contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem];
+} else if (targetNetwork == "private") {
+  const User = require('../build/contracts/User.json');
+  const ShastaMarket = require('../build/contracts/ShastaMarket.json');
+  const ShaLedger = require('../build/contracts/ShaLedger.json');
+  const ContractRegistry = require('../build/contracts/ContractRegistry.json');
+  const BillSystem = require('../build/contracts/BillSystem.json');
+  
+  contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem];
+}
 
 const options = {
-  contracts: [
-    User,
-    ShastaMarket,
-    ShaLedger,
-    ContractRegistry,
-    BillSystem
-  ],
+  contracts,
   polls: {
     accounts: 4000
   },
