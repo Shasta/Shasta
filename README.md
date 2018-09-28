@@ -33,6 +33,16 @@ Migrate contracts and run the web app in local at http://localhost:3000
 npm run dev
 ```
 
+Run the front-end pointing to Rinkeby network ShastaOS contracts
+```
+NODE_ENV=production npm run start
+```
+
+Make production build pointing to Rinkeby
+```
+NODE_ENV=production npm run build
+```
+
 ## Contributors
 
 We love pull requests from everyone. By participating in this project, you agree to abide by the thoughtbot
