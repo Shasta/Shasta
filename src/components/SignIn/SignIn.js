@@ -8,7 +8,7 @@ import { connect} from 'react-redux';
 import { UserActions } from '../../redux/UserActions';
 import { LoadingActions } from '../../redux/LoadingActions';
 
-import ShastaLogo from '../../static/logo-shasta-02.png';
+import ShastaLogo from '../../static/logo-shasta.png';
 
 const Title = styled.h4`
   margin: 20px 0px;

@@ -4,7 +4,7 @@ import { Image, Menu, Sidebar, MenuItem } from "semantic-ui-react";
 import { NavLink } from "react-router-dom";
 import _ from "lodash";
 import Tab from "../components/Tab/Tab";
-import logo from "../static/logo-shasta-02.png";
+import logo from "../static/logo-shasta.png";
 import withDrizzleContext from "../utils/withDrizzleContext";
 import { connect } from "react-redux";
 import "./PrivateLayout.less";

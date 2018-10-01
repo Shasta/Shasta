@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Logo from '../../../static/logo-shasta-02.png';
+import Logo from '../../../static/logo-shasta.png';
 
 const FlexDiv = styled.div`
   display: flex;

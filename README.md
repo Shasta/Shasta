@@ -1,6 +1,6 @@
 [![Follow](https://img.shields.io/twitter/follow/Filenation_io.svg?style=social&label=Follow)](https://twitter.com/ethshasta)
 
-# Shasta Platform <img align="right" src="/static/logo.png" height="80px" />
+# Shasta Platform <img align="right" src="/logo.png" height="80px" />
 
 _Decentralized Energy Network_
 
