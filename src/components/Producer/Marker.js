@@ -54,7 +54,7 @@ class ChargerMark extends Component {
           </MarkerInfo>
         )}
 
-        <img src={pointer} style={{ height: "58px", width: "48px" }} />
+        <img src={pointer} />
         {/* <Marker icon="bolt" size="3x" color={markColor} /> */}
       </MarkerWrapper>
     );
