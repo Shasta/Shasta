@@ -79,6 +79,7 @@
     "chart.js": "^2.7.2",
     "drizzle": "^1.2.3",
     "drizzle-react": "^1.2.0",
+    "faker": "^4.1.0",
     "google-map-react": "^1.0.6",
     "ipfs-api": "^24.0.1",
     "lodash": "^4.17.10",
@@ -108,10 +109,11 @@
   },
   "scripts": {
     "dev": "truffle migrate --reset && concurrently \"npm run start\" ",
+    "dev:demo": "truffle migrate --reset && npm run demo && concurrently \"npm run start\" ",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "demo": "node scripts/start.js demo",
+    "demo": "truffle exec demo/demo.js",
     "server": "node server/index.js"
   },
   "jest": {

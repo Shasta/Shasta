@@ -209,14 +209,14 @@ class Home extends Component {
           <Grid.Column width={16}>
             <h2>
               <ShastaIcon src={iconWelcomeUser} />
-              Welcome{" "}
+              Welcome,{" "}
               <a
                 style={{ color: "#f6a6d1" }}
                 href={`https://rinkeby.etherscan.io/address/${currentAccount}`}
               >
                 {organization.firstName}
               </a>
-              ,
+              
             </h2>
           </Grid.Column>
         </Grid.Row>
