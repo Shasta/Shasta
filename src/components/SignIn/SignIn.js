@@ -38,6 +38,13 @@ const LoginBox = styled.div`
   .ui.warning.message + ${LoginButton} {
     margin-top: 0px !important;
   }
+  & a {
+    color: #ea78bc;
+    -webkit-text-decoration: underline;
+    text-decoration: underline;
+    -webkit-text-decoration-color: #ea78bc;
+    text-decoration-color: #ea78bc;
+  }
 `
 const MessageHeader = styled(Message.Header)`
   &&&&&&& {
@@ -123,7 +130,7 @@ class SignIn extends Component {
       WarningMessage = (
         <Message warning>
           <MessageHeader>Organization not found</MessageHeader>
-          <span>Do you want to create a<Link to="/"> new organization?</Link></span>
+          <span>Forgot your organization? <Link to="/organization-reminder">Click here to recover it.</Link> </span>
         </Message>
       )
     }
@@ -137,6 +144,9 @@ class SignIn extends Component {
           <LoginButton onClick={this.loginIn}>
             Sign in
           </LoginButton>
+          <div style={{marginTop: 10, textAlign: 'right'}}>
+            <Link to="/">Create your organization</Link>
+          </div>
         </LoginBox>
       </div>
     )

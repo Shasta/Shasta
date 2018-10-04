@@ -118,7 +118,6 @@ class SignUp extends Component {
         // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
         const rawBalance = drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value;
         const tokenBalance = web3.utils.toBN(rawBalance);
-        console.log(tokenBalance)
         haveSha = tokenBalance.gt(zeroBN);
       }
     }

@@ -1,6 +1,7 @@
 import SignIn from "./components/SignIn/SignIn";
 import SignUp from "./components/SignUp/SignUp";
 import Logout from "./components/Logout";
+import Forgot from "./components/SignIn/Forgot";
 import DashboardHome from "./components/Home/Home";
 import Consumer from "./components/Consumer/Consumer";
 import Settings from "./components/Settings/Settings";
@@ -31,6 +32,11 @@ export const publicRoutes = {
     path: "/sign-in",
     component: SignIn,
     title: "Sign In"
+  },
+  Forgot: {
+    path: '/organization-reminder',
+    component: Forgot,
+    title: "Recover Organization"
   }
 };
 
