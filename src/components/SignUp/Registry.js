@@ -259,11 +259,11 @@ class RegistryForm extends Component {
             value={country}
             onChange={(val) => this.selectCountry(val)} />
           <Terms style={{ marginTop: 30 }}>
-            <span>I agree to Shasta <a href="#">Terms of Use</a>.</span>
+            <span>I agree to Shasta <a href="https://shasta.world/terms.pdf">Terms of Use</a>.</span>
             <Checkbox checked={this.state.user} onChange={this.toggleUseTerms} />
           </Terms>
           <Terms>
-            <span>I agree to Shasta <a href="#">Politic Privacy</a>.</span>
+            <span>I agree to Shasta <a href="https://shasta.world/privacy.pdf">Politic Privacy</a>.</span>
             <Checkbox checked={this.state.privacy} onChange={this.togglePrivacyTerms} />
           </Terms>
         </Form.Field>
