@@ -8,6 +8,8 @@ import Settings from "./components/Settings/Settings";
 import Producer from "./components/Producer/Producer";
 import Hardware from "./components/Hardware/Hardware";
 import Finance from "./components/Finance/Finance";
+import OrgManager from "./components/OrgManager/OrgManager";
+
 import homeIconOff from "./static/home_icon_off.png";
 import consumerIconOff from "./static/consumer_icon_off.png";
 import hardwareIconOff from "./static/hardware_icon_off.png";
@@ -21,6 +23,7 @@ import hardwareIconOn from "./static/hardware_icon_on.png";
 import settingsIconOn from "./static/settings_icon_on.png";
 import producerIconOn from "./static/finance_icon_on.png";
 import financeIconOn from "./static/marketer_icon_on.png";
+import aragonLogo from "./static/aragon-logo.png";
 
 export const publicRoutes = {
   SignUp: {
@@ -82,6 +85,13 @@ export const privateRoutes = {
     title: "Settings",
     iconOff: settingsIconOff,
     iconOn: settingsIconOn
+  },
+  Aragon: {
+    path: "/aragon",
+    component: OrgManager,
+    title: "Manage organization",
+    iconOff: aragonLogo,
+    iconOn: aragonLogo
   },
   Logout: {
     path: "/logout",

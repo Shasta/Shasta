@@ -20,7 +20,6 @@ class Dashboard extends React.Component {
 
   componentDidUpdate(newProps, newState) {
     const { drizzleState } = newProps;
-    console.log("priv", drizzleState)
     if (drizzleState && drizzleState.transactionStack) {
       const latestTx = drizzleState.transactionStack.length -1;
       const txHash = drizzleState.transactionStack[latestTx];
