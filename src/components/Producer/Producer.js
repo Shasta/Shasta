@@ -77,7 +77,6 @@ class Producer extends Component {
       .getIpfsHashByUsername(rawOrgName)
       .call({ from: currentAccount });
     const ipfsHash = web3.utils.hexToUtf8(rawHash);
-    console.log("ipfsHash: ", ipfsHash);
     const rawJson = await ipfs.cat(ipfsHash);
     const userJson = JSON.parse(rawJson);
 
@@ -130,15 +129,10 @@ class Producer extends Component {
       ]);
 
       const offers = shastaMarketInstance.methods.getOffersLength().call();
-      console.log("offers: ", offers);
 
       const ipfsHash = ipfsResponse[0].hash;
-      console.log("ipfsHash: ", ipfsHash);
-      console.log(currentAddress);
 
       const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash);
-      console.log("raw", rawIpfsHash);
-      console.log(drizzleUser.methods);
       const estimatedGas = await drizzleUser.methods
         .cancelOffer(index, rawIpfsHash)
         .estimateGas({ from: currentAddress });
@@ -206,16 +200,12 @@ class Producer extends Component {
         Buffer.from(JSON.stringify(userJson))
       ]);
       const ipfsHash = ipfsResponse[0].hash;
-      console.log("ipfsHash: ", ipfsHash);
 
       const rawEnergyPrice = web3.utils.toWei(
         newProducerOffer.energyPrice.toString(),
         "ether"
       );
       const rawIpfsHash = web3.utils.utf8ToHex(ipfsHash);
-      console.log("price", rawEnergyPrice);
-      console.log("raw", rawIpfsHash);
-      console.log("account", currentAddress);
       const estimatedGas = await drizzleUser.methods
         .createOffer(rawEnergyPrice, rawIpfsHash)
         .estimateGas({ from: currentAddress });

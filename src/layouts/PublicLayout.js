@@ -84,7 +84,6 @@ class PublicHome extends PureComponent {
     const Component = this.props.component;
     const isAppLoading = this.props.isAppLoading;
     const {visible} = this.state;
-    //console.log("is loading", isAppLoading);
     return (
       <div>
         {/* The top menu */}

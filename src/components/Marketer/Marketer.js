@@ -25,7 +25,6 @@ class Marketer extends Component {
     async checkMarket() {
 
         var self = this;
-        console.log("address", self.props.address)
 
         try {
             const shastaMarketInstance = await this.props.shastaMarketContract.deployed();
@@ -36,7 +35,6 @@ class Marketer extends Component {
             let bidsJsonData = [];
             //const bidIndexes = await shastaMarketInstance.getBidsIndexesFromAddress.call({ from: self.props.address });
             const bidsLength = await shastaMarketInstance.getBidsLength.call({ from: self.props.address });
-            console.log("len :", bidsLength.toNumber());
 
             let auxArray = Array.from({length: bidsLength.toNumber()}, (x, item)=> item);
     
@@ -44,14 +42,12 @@ class Marketer extends Component {
                 
                 let userContract = await shastaMarketInstance.getBidFromIndex.call(i, { from: self.props.address });
                 let userAddress = userContract[1];
-                console.log("bid from index: ", userContract);
 
                 if (!checkedAddresses.includes(userAddress)) {
 
                     checkedAddresses.push(userAddress);
                     let ipfsHashRaw = await userContractInstance.getIpfsHashByAddress.call(userAddress, { from: self.props.address });
                     let ipfsHash = this.props.web3.toAscii(ipfsHashRaw);
-                    console.log("ipfs rec: ", ipfsHash);
                     
                     let rawContent = await this.props.ipfs.cat(ipfsHash);
                     let userData = JSON.parse(rawContent.toString("utf8"));

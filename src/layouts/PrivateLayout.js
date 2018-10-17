@@ -27,11 +27,9 @@ class Dashboard extends React.Component {
       if (transaction && transaction.status) {
         const transactionStatus = transaction.status;
         if (transactionStatus === "pending" && newProps.isAppLoading == false) {
-          console.log("show");
           this.loaderAction.show(); 
         } 
         if (transactionStatus !== "pending" && newProps.isAppLoading == true) {
-          console.log("hide");
           this.loaderAction.hide();
         }
       }

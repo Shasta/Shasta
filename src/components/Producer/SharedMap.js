@@ -16,7 +16,6 @@ class SharedMap extends Component {
   };
 
   changeCurrentPlace = coordenates => {
-    console.log("new place", coordenates);
   };
 
   render() {

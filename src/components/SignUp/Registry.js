@@ -148,7 +148,6 @@ class RegistryForm extends Component {
 
       //Check this address already has an organization
       const addressHaveOrg = await contractInstance.methods.hasUser(mainAccount).call();
-      console.log("hasOrg: ", addressHaveOrg)
       if (!addressHaveOrg) {
         //Check username is taken
         const organizationNameTaken = await contractInstance.methods.usernameTaken(rawOrgName).call();

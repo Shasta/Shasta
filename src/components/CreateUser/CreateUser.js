@@ -28,8 +28,6 @@ class CreateUser extends Component {
   //It should save a json file to ipfs and save the hash to the smart contract
   async createUser() {
 
-    console.log("Creating user " + this.state.organization.name);
-
     var userJson = {
       organization: this.state.organization,
       consumerOffers: [],
@@ -45,14 +43,11 @@ class CreateUser extends Component {
     const res = await this.props.ipfs.add([Buffer.from(JSON.stringify(userJson))]);
 
     ipfsHash = res[0].hash;
-    console.log("ipfs hash: ", ipfsHash);
     const contractInstance = await this.props.userContract.deployed();
 
 
     const success = await contractInstance.createUser(organizationName, ipfsHash, { gas: 400000, from: this.props.account });
     if (success) {
-      console.log("self:", self)
-      console.log('created user ' + organizationName + ' on ethereum!');
       //this.setState({ isLoged: true })
     } else {
       console.log('error creating user on ethereum. Maybe the user name already exists or you already have a user.');
@@ -74,7 +69,6 @@ class CreateUser extends Component {
     this.setState({ organization: organizationData })
   }
   selectCountry(val) {
-    console.log("val: ", val);
     organizationData.country = val;
     this.setState({ country: val });
   }

@@ -316,10 +316,6 @@ class Consumer extends Component {
       billInstance.abi,
       billInstance.address
     );
-    console.log("con: ", con);
-    console.log("avg: ", avg);
-    console.log("price: ", price);
-    console.log("total: ", total);
     const confirmContractAbi = billInstanceWeb3.methods
       .newPrepaidContract(
         tokenInstance.address,
@@ -452,7 +448,6 @@ class Consumer extends Component {
         const avgRaw = web3.utils.toBN(averageConsumerEnergy);
         const totalRaw = priceRaw.mul(avgRaw);
         const totalPrice = web3.utils.fromWei(totalRaw, "ether");
-        console.log("TP: ", averageConsumerEnergy);
 
         let txStatus = "";
         if (drizzleState.transactionStack[tx]) {

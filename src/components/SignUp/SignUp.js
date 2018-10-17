@@ -65,7 +65,6 @@ class SignUp extends Component {
     const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();
     if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
       const shaLedgerInstance = drizzle.contracts.ShaLedger;
-      console.log("cachecall")
       const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress, {from: newAddress});
 
       this.setState({
@@ -81,7 +80,6 @@ class SignUp extends Component {
     const newAddress = _.get(drizzleState, ['accounts', 0], "").toLowerCase();
     if (initialized && drizzleState && drizzleState.accounts && newAddress !== currentAddress && newAddress && newAddress.length > 0) {
       const shaLedgerInstance = drizzle.contracts.ShaLedger;
-      console.log("cachecall")
       const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(newAddress, {from: newAddress});
 
       this.setState({
