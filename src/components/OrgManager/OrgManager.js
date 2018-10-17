@@ -15,7 +15,7 @@ class OrgManager extends Component {
     console.log(this.props)
     const { organization } = this.props.user;
     console.log(organization)
-    window.location.href = "http://aragon.aragonpm.com/#/" + organization + "-shasta.aragonid.eth"
+    window.location.href = "http://localhost:3000/#/" + organization + "shasta.aragonid.eth"
   }
 
   render() {
