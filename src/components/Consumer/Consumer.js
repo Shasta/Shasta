@@ -405,7 +405,7 @@ class Consumer extends Component {
         });
 
         return (
-          <Grid>
+          <Grid className="filtersGrid">
             <Grid.Column style={{ width: "30%" }}>
               <div style={{ paddingBottom: 20 }}>
                 <ShastaGridRow>

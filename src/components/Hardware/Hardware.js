@@ -23,34 +23,53 @@ const ShastaValue = styled.span`
   width: 300px;
 `;
 
+const ShastaButton = styled.button`
+  background-color: #402d41;
+  text-align: center;
+  color: white;
+  border-radius: 8px;
+  width: 110px;
+  height: 35px;
+  border: 0;
+  cursor: pointer;
+`;
+
 class Hardware extends Component {
   constructor(props) {
     super(props);
     this.state = {
       accountInfo: {},
-      hasHardware: false,
+      hasHardware: true,
       inputHardwareId: '',
+      hardwareId: '',
       historyConsumedEnergy: [],
-      historySurplusEnergy: []
+      historySurplusEnergy: [],
+      tx: null
     };
     this.getAccountInfo = this.getAccountInfo.bind(this);
     this.getHistoryConsumedEnergy = this.getHistoryConsumedEnergy.bind(this);
     this.getHistorySurplusEnergy = this.getHistorySurplusEnergy.bind(this);
+    this.handleHardwareInput = this.handleHardwareInput.bind(this);
+    this.addHardwareId = this.addHardwareId.bind(this);
   }
 
   async componentDidMount() {
 
     const { drizzle, drizzleState } = this.props;
-    console.log("PROOOPS: ", this.props)
-    //const hardwareId = await drizzle.HardwareContract.methods.getHardwareIdFromSender().call({ from: user });
+    const hardwareId = await drizzle.contracts.HardwareData.methods.getHardwareIdFromSender().call({ from: drizzleState.accounts[0] });
+    console.log("hw: ", hardwareId);
+    const utfHardwareId = drizzle.web3.utils.hexToUtf8(hardwareId);
+    if (hardwareId) {
+      this.setState({
+        hasHardware: true,
+        hardwareId: utfHardwareId
+      });
 
-    if (this.state.hasHardware) {
       this.getAccountInfo();
       this.getHistoryConsumedEnergy();
       this.getHistorySurplusEnergy();
-    } else {
-
     }
+
   }
 
   async getAccountInfo() {
@@ -75,7 +94,16 @@ class Hardware extends Component {
 
   async addHardwareId() {
 
+    const { drizzle, drizzleState } = this.props;
+    
+    const hexHardwareId = drizzle.web3.utils.utf8ToHex(this.state.inputHardwareId)
+    const hardwareGas = await drizzle.contracts.HardwareData.methods
+    .addNewHardwareId(hexHardwareId)
+    .estimateGas({ from: drizzleState.accounts[0] });
 
+    const tx = await drizzle.contracts.HardwareData.methods
+    .addNewHardwareId
+    .cacheSend(hexHardwareId, { from: drizzleState.accounts[0], gas: hardwareGas });
 
   }
 
@@ -95,7 +123,7 @@ class Hardware extends Component {
       <div>
         <div>
           <Transition visible={!this.state.hasHardware} animation='scale' duration={500}>
-            <div>
+            <div >
               <h2>
                 <ShastaIcon src={img.iconHardware} />
                 Hardware:
@@ -104,8 +132,10 @@ class Hardware extends Component {
                 <li>
                   You don't have any registered hardware for this organization. Add a new hardware writing its id:
                 </li>
-                <Input placeholder='Hardware identifier' onChange={this.handleHardwareInput} />
-                <Button type='submit' id="addHardwareId" onClick={this.addHardwareId}>Add Hardware</Button>         
+                <div className="inputDiv">
+                  <Input placeholder='Hardware identifier' className="hardwareIdInput" onChange={this.handleHardwareInput} />
+                  <ShastaButton type='submit' className="addHardwareIdBtn" onClick={this.addHardwareId}>Add Hardware</ShastaButton>
+                </div>
               </div>
             </div>
           </Transition>
@@ -122,7 +152,7 @@ class Hardware extends Component {
                     <li>
                       ID:
                     <ShastaValue style={{ display: "inline", padding: "8px" }}>
-                        {this.state.accountInfo.hardware_id}
+                        {this.state.hardwareId}
                       </ShastaValue>
                     </li>
                     <li>
