@@ -55,7 +55,7 @@ class Settings extends Component {
     const estimateGas = await drizzle.contracts.User.methods
       .updateUser(rawIpfsHash)
       .estimateGas({ from: currentAccount });
-    const tx = drizzle.contracts.User.methods     .updateUser.cacheSend(rawIpfsHash, { gas: estimateGas, from: currentAccount });
+    const tx = drizzle.contracts.User.methods.updateUser.cacheSend(rawIpfsHash, { gas: estimateGas, from: currentAccount });
     this.setState({
       tx
     })

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import HardwareCharts from "./HardwareCharts";
-import { Grid } from "semantic-ui-react";
+import { Grid, Transition, Button, Input } from "semantic-ui-react";
 import "./Hardware.less";
 
 import styled from "styled-components";
@@ -28,6 +28,8 @@ class Hardware extends Component {
     super(props);
     this.state = {
       accountInfo: {},
+      hasHardware: false,
+      inputHardwareId: '',
       historyConsumedEnergy: [],
       historySurplusEnergy: []
     };
@@ -37,9 +39,18 @@ class Hardware extends Component {
   }
 
   async componentDidMount() {
-    this.getAccountInfo();
-    this.getHistoryConsumedEnergy();
-    this.getHistorySurplusEnergy();
+
+    const { drizzle, drizzleState } = this.props;
+    console.log("PROOOPS: ", this.props)
+    //const hardwareId = await drizzle.HardwareContract.methods.getHardwareIdFromSender().call({ from: user });
+
+    if (this.state.hasHardware) {
+      this.getAccountInfo();
+      this.getHistoryConsumedEnergy();
+      this.getHistorySurplusEnergy();
+    } else {
+
+    }
   }
 
   async getAccountInfo() {
@@ -50,10 +61,22 @@ class Hardware extends Component {
   }
 
   async getHistoryConsumedEnergy() {
-    let result = await axios.get("/api/historyConsumedEnergy.json");
+    let result = await axios.get("/api/metrics/getConsumption", {
+      params: {
+        hardware_id: this.props.hardware_id
+      }
+    });
     this.setState({
       historyConsumedEnergy: result.data.data
     });
+
+
+  }
+
+  async addHardwareId() {
+
+
+
   }
 
   async getHistorySurplusEnergy() {
@@ -63,91 +86,112 @@ class Hardware extends Component {
     });
   }
 
+  handleHardwareInput(event) {
+    this.setState({ inputHardwareId: event.target.value })
+  }
+
   render() {
     return (
       <div>
         <div>
-          <Grid style={{ width: "90%" }}>
-            <Grid.Row>
-              <Grid.Column style={{ width: "50%" }}>
-                <h2>
-                  <ShastaIcon src={img.iconHardware} />
-                  Hardware:
+          <Transition visible={!this.state.hasHardware} animation='scale' duration={500}>
+            <div>
+              <h2>
+                <ShastaIcon src={img.iconHardware} />
+                Hardware:
+                </h2>
+              <div className="pinkBorder">
+                <li>
+                  You don't have any registered hardware for this organization. Add a new hardware writing its id:
+                </li>
+                <Input placeholder='Hardware identifier' onChange={this.handleHardwareInput} />
+                <Button type='submit' id="addHardwareId" onClick={this.addHardwareId}>Add Hardware</Button>         
+              </div>
+            </div>
+          </Transition>
+          <Transition visible={this.state.hasHardware} animation='scale' duration={500}>
+            <Grid style={{ width: "90%" }}>
+              <Grid.Row>
+                <Grid.Column style={{ width: "50%" }}>
+                  <h2>
+                    <ShastaIcon src={img.iconHardware} />
+                    Hardware:
                 </h2>
 
-                <div className="pinkBorder">
-                  <li>
-                    ID:
+                  <div className="pinkBorder">
+                    <li>
+                      ID:
                     <ShastaValue style={{ display: "inline", padding: "8px" }}>
-                      {this.state.accountInfo.hardware_id}
-                    </ShastaValue>
-                  </li>
-                  <li>
-                    Status:
+                        {this.state.accountInfo.hardware_id}
+                      </ShastaValue>
+                    </li>
+                    <li>
+                      Status:
                     <span style={{ backgroundColor: "green", padding: "6px" }}>
-                      {this.state.accountInfo.status}
-                    </span>
-                  </li>
-                </div>
-              </Grid.Column>
-              <Grid.Column style={{ width: "50%" }}>
-                <h2>
-                  <ShastaIcon src={img.iconConsumition} />
-                  your consumption: (KwH)
+                        {this.state.accountInfo.status}
+                      </span>
+                    </li>
+                  </div>
+                </Grid.Column>
+                <Grid.Column style={{ width: "50%" }}>
+                  <h2>
+                    <ShastaIcon src={img.iconConsumition} />
+                    your consumption: (KwH)
                 </h2>
-                <p>
-                  <HardwareCharts
-                    color={"rgba(243,166,210,1)"}
-                    color2={"rgba(243,166,210,0.4)"}
-                    data={this.state.historyConsumedEnergy}
-                  />
-                </p>
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column style={{ width: "50%" }}>
-                <h2>
-                  <ShastaIcon src={img.iconEnergy} />
-                  Energy:
+                  <p>
+                    <HardwareCharts
+                      color={"rgba(243,166,210,1)"}
+                      color2={"rgba(243,166,210,0.4)"}
+                      data={this.state.historyConsumedEnergy}
+                    />
+                  </p>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column style={{ width: "50%" }}>
+                  <h2>
+                    <ShastaIcon src={img.iconEnergy} />
+                    Energy:
                 </h2>
-                <div className="pinkBorder">
-                  <li>
-                    Consumed this month:
+                  <div className="pinkBorder">
+                    <li>
+                      Consumed this month:
                     <ShastaValue>
-                      {this.state.accountInfo.consumedEnergy}
-                      KwH
+                        {this.state.accountInfo.consumedEnergy}
+                        KwH
                     </ShastaValue>
-                  </li>
-                  <li>
-                    Total surplus energy month:{" "}
-                    <ShastaValue>
-                      {this.state.accountInfo.surplusEnergy} KwH
+                    </li>
+                    <li>
+                      Total surplus energy month:{" "}
+                      <ShastaValue>
+                        {this.state.accountInfo.surplusEnergy} KwH
                     </ShastaValue>
-                  </li>
-                  <li>
-                    Remaining surplus to sell:{" "}
-                    <ShastaValue>
-                      {this.state.accountInfo.remainingSurplusEnergy} KwH
+                    </li>
+                    <li>
+                      Remaining surplus to sell:{" "}
+                      <ShastaValue>
+                        {this.state.accountInfo.remainingSurplusEnergy} KwH
                     </ShastaValue>
-                  </li>
-                </div>
-              </Grid.Column>
+                    </li>
+                  </div>
+                </Grid.Column>
 
-              <Grid.Column style={{ width: "50%" }}>
-                <h2>
-                  <ShastaIcon src={img.iconSurplus} />
-                  Your surplus: (KwH)
+                <Grid.Column style={{ width: "50%" }}>
+                  <h2>
+                    <ShastaIcon src={img.iconSurplus} />
+                    Your surplus: (KwH)
                 </h2>
-                <p>
-                  <HardwareCharts
-                    color={"rgba(129,117,130,1)"}
-                    color2={"rgba(129,117,130,0.4)"}
-                    data={this.state.historySurplusEnergy}
-                  />
-                </p>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
+                  <p>
+                    <HardwareCharts
+                      color={"rgba(129,117,130,1)"}
+                      color2={"rgba(129,117,130,0.4)"}
+                      data={this.state.historySurplusEnergy}
+                    />
+                  </p>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Transition>
         </div>
       </div>
     );

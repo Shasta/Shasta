@@ -7,16 +7,18 @@ if (targetNetwork == "rinkeby") {
   const ShaLedger = require('shasta-os/build/contracts/ShaLedger.json');
   const ContractRegistry = require('shasta-os/build/contracts/ContractRegistry.json');
   const BillSystem = require('shasta-os/build/contracts/BillSystem.json');
+  const HardwareContract = require('shasta-os/build/contracts/HardwareData.json');
 
-  contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem];
+  contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem, HardwareContract];
 } else if (targetNetwork == "private") {
   const User = require('../build/contracts/User.json');
   const ShastaMarket = require('../build/contracts/ShastaMarket.json');
   const ShaLedger = require('../build/contracts/ShaLedger.json');
   const ContractRegistry = require('../build/contracts/ContractRegistry.json');
   const BillSystem = require('../build/contracts/BillSystem.json');
-  
-  contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem];
+  const HardwareContract = require('shasta-os/build/contracts/HardwareData.json');
+
+  contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem, HardwareContract];
 }
 
 const options = {
