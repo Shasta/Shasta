@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import withDrizzleContext from "../../utils/withDrizzleContext";
+import withRawDrizzle from "../../utils/withRawDrizzle";
 import ipfs from "../../ipfs";
 import { Feed, Grid } from "semantic-ui-react";
 import _ from "lodash";
@@ -246,4 +246,4 @@ function mapStateToProps(state, props) {
   return { user: state.userReducer };
 }
 
-export default withDrizzleContext(connect(mapStateToProps)(Home));
+export default withRawDrizzle(connect(mapStateToProps)(Home));

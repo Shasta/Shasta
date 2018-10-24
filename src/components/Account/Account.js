@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
-import withDrizzleContext from "../../utils/withDrizzleContext.js";
+import withRawDrizzle from "../../utils/withRawDrizzle.js";
 import MintSha from "./MintSha";
 import styled from "styled-components";
 import { connect } from "react-redux";
@@ -8,7 +8,7 @@ import { UserActions } from "../../redux/UserActions";
 import { Redirect } from "react-router-dom";
 import "./Account.less";
 
-const MintShaModal = withDrizzleContext(MintSha);
+const MintShaModal = withRawDrizzle(MintSha);
 
 const EthAccount = styled.div`
   display: flex;
@@ -33,7 +33,8 @@ class AccountData extends Component {
       menu: null,
       asked: false,
       tokenBalancePointer: "",
-      currentAddress: null
+      currentAddress: null,
+      accountsLoaded: false
     };
 
     this.action = new UserActions(this.props.dispatch);
@@ -45,34 +46,48 @@ class AccountData extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { drizzleState } = nextProps;
-    const { accounts } = drizzleState;
-    const { currentAddress } = this.state;
-    const newAddress = accounts[0];
-    if (newAddress !== currentAddress && !!currentAddress) {
-      this.action.logout();
+    const { drizzleState, initialized } = nextProps;
+    if (initialized && drizzleState) {
+      const { accounts } = drizzleState;
+      const { currentAddress } = this.state;
+      const newAddress = accounts[0];
+      if (newAddress !== currentAddress && !!currentAddress) {
+        this.action.logout();
+      }
     }
   }
 
-  async componentDidMount() {
-    const { drizzleState, drizzle, accountIndex } = this.props;
-    const { accounts } = drizzleState;
-    const currentAddress = accounts[accountIndex];
+  async componentDidUpdate() {
+    const { drizzleState, drizzle, initialized } = this.props;
+    const { accountsLoaded } = this.state;
 
-    const shaLedgerInstance = drizzle.contracts.ShaLedger;
-    const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(
-      currentAddress
-    );
+    if (initialized && drizzleState && !accountsLoaded) {
+      const { accounts } = drizzleState;
+      if (!!Object.keys(accounts).length) {
+        const currentAddress = accounts[0];
 
-    this.setState({
-      tokenBalancePointer,
-      currentAddress
-    });
+        const shaLedgerInstance = drizzle.contracts.ShaLedger;
+        const tokenBalancePointer = shaLedgerInstance.methods.balanceOf.cacheCall(
+          currentAddress
+        );
+
+        this.setState({
+          tokenBalancePointer,
+          currentAddress,
+          accountsLoaded: true
+        });
+      }
+    }
   }
 
   render() {
-    const { drizzleState, drizzle } = this.props;
+    const { drizzleState, drizzle, initialized } = this.props;
     const { tokenBalancePointer } = this.state;
+    if (!initialized) {
+      return (
+        <div></div>
+      )
+    }
     const { accounts, accountBalances } = drizzleState;
     const { web3 } = drizzle;
 
@@ -133,7 +148,7 @@ function mapDispatchToProps(dispatch) {
   return { dispatch };
 }
 
-export default withDrizzleContext(
+export default withRawDrizzle(
   connect(
     mapStateToProps,
     mapDispatchToProps

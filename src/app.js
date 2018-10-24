@@ -6,6 +6,7 @@ import { publicRoutes, privateRoutes } from "./routes";
 import { connect } from "react-redux";
 import { UserActions } from "./redux/UserActions";
 
+import Logout from "./components/Logout";
 import PublicLayout from "./layouts/PublicLayout";
 import PrivateLayout from "./layouts/PrivateLayout";
 
@@ -65,6 +66,7 @@ class App extends Component {
             />
           );
         })}
+        <Route path="/logout" component={Logout} />
         <Route component={Error404} />
       </Switch>
     );

@@ -25,7 +25,7 @@ import nuclearOnIcon from "../../static//nuclear-energy-60x60-on.png";
 
 import "./Consumer.css";
 import ipfs from "../../ipfs";
-import withDrizzleContext from "../../utils/withDrizzleContext";
+import withRawDrizzle from "../../utils/withRawDrizzle";
 import { connect } from "react-redux";
 import { countryOptions } from "./common";
 import MyStep from "./stepper/MyStep";
@@ -601,4 +601,4 @@ function mapStateToProps(state, props) {
   return { user: state.userReducer };
 }
 
-export default withDrizzleContext(connect(mapStateToProps)(Consumer));
+export default withRawDrizzle(connect(mapStateToProps)(Consumer));

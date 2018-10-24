@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { Feed, Sidebar, Responsive, Segment, Grid } from "semantic-ui-react";
 import MainChart from "./MainChart";
-import withDrizzleContext from "../../utils/withDrizzleContext.js";
+import withRawDrizzle from "../../utils/withRawDrizzle.js";
 import { Line, Pie } from "react-chartjs-2";
 import "./Finance.less";
 import styled from "styled-components";
@@ -237,4 +237,4 @@ class Finance extends Component {
   }
 }
 
-export default withDrizzleContext(Finance);
+export default withRawDrizzle(Finance);
