@@ -10,7 +10,7 @@ import {
   Message
 } from "semantic-ui-react";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
-
+import blockies from 'ethereum-blockies-png';
 //import icons
 import solarOffIcon from "../../static/solar-energy-60x60-off.png";
 import solarOnIcon from "../../static/solar-energy-60x60-on.png";
@@ -30,9 +30,9 @@ import { connect } from "react-redux";
 import { countryOptions } from "./common";
 import MyStep from "./stepper/MyStep";
 import styled from "styled-components";
+import _ from 'lodash';
 
-var _ = require("lodash");
-//Styled components
+// Styled components
 const ShastaButton = styled(Button)`
   background-color: #423142 !important;
   border-radius: 8px !important;
@@ -40,6 +40,28 @@ const ShastaButton = styled(Button)`
   border: 0 !important;
 `;
 
+const Paragraphs = styled.div`
+margin-top: 10px;
+& > p {
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+`
+const Address = styled.div`
+  color: light-grey;
+`
+
+const AddressBlockie = styled.div`
+  display: flex;
+  align-items: center;
+  & > ${Address} {
+    margin-left: 5px;
+  }
+`
+
+const Blockie = styled.img`
+  border-radius: 4px;
+`
 const ShastaBuyButton = styled(Button)`
   background-color: white !important;
   border-radius: 8px !important;
@@ -50,10 +72,17 @@ const ShastaBuyButton = styled(Button)`
 `;
 
 const ShastaCard = styled(Card)`
-  width: 80% !important;
   margin: 10px !important;
   border-radius: 0px 20px 20px 0px !important;
   border-left: 10px solid #f076b6 !important;
+  box-shadow: 0px 1px 1px 1px #d4d4d5 !important;
+`;
+
+const FinalCard = styled(Card)`
+  margin: 10px !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+  border-left: 5px solid #f076b6 !important;
   box-shadow: 0px 1px 1px 1px #d4d4d5 !important;
 `;
 
@@ -114,6 +143,18 @@ const sourcesIcons = selectedName => {
       />
     );
   });
+};
+
+const sourceIcon = selectedName => {
+  const energySource = sources.find((source) => {
+    return source.value === selectedName;
+  });
+  return (
+    <Image
+      style={{ width: "60px", height: "60px", padding: "10px 10px" }}
+      src={energySource.imgSrc2}
+    />
+  );
 };
 
 const pricesRanges = [
@@ -316,10 +357,7 @@ class Consumer extends Component {
       billInstance.abi,
       billInstance.address
     );
-    console.log("con: ", con);
-    console.log("avg: ", avg);
-    console.log("price: ", price);
-    console.log("total: ", total);
+
     const confirmContractAbi = billInstanceWeb3.methods
       .newPrepaidContract(
         tokenInstance.address,
@@ -444,6 +482,7 @@ class Consumer extends Component {
       case 2:
         const { tx } = this.state;
         const { drizzle, drizzleState } = this.props;
+        const consumerAccount = drizzleState.accounts[0];
         const web3 = drizzle.web3;
         const energyPrice = contract.energyPrice;
         const priceRaw = web3.utils.toBN(
@@ -452,8 +491,15 @@ class Consumer extends Component {
         const avgRaw = web3.utils.toBN(averageConsumerEnergy);
         const totalRaw = priceRaw.mul(avgRaw);
         const totalPrice = web3.utils.fromWei(totalRaw, "ether");
-        console.log("TP: ", averageConsumerEnergy);
-
+        
+        const ProviderBlockie = () => {
+          const icon = blockies.createDataURL({ seed: contract.ethAddress });
+          return (<Blockie src={icon} />);
+        }
+        const ConsumerBlockie = () => {
+          const icon = blockies.createDataURL({ seed: consumerAccount });
+          return (<Blockie src={icon} />);
+        }
         let txStatus = "";
         if (drizzleState.transactionStack[tx]) {
           const txHash = drizzleState.transactionStack[tx];
@@ -468,16 +514,29 @@ class Consumer extends Component {
         return (
           <div>
             <h3>Confirm contract</h3>
-            <div>
-              <p>
-                Can provide up to {contract.amountkWh} kWh at{" "}
-                {contract.energyPrice} Sha per kWh.
-              </p>
-              <p>Energy source: {contract.providerSource}</p>
-              <p>
-                Total monthly cost with your average energy usage: {totalPrice}{" "}
-                Sha for {averageConsumerEnergy} kWh
-              </p>
+            <FinalCard fluid color="purple" style={{maxWidth: '550px', 'position': 'relative'}}>
+              <h3>Provider</h3>
+              <AddressBlockie>
+                <ProviderBlockie />
+                <Address>{contract.ethAddress}</Address>
+              </AddressBlockie>
+              <Paragraphs>
+                <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} Sha per kWh.</p>
+                <p style={{marginTop: 10}}>Average monthly cost: {totalPrice} Sha for {averageConsumerEnergy} kWh</p>
+                <p>Energy source: {contract.providerSource}</p>
+              </Paragraphs>
+              <div style={{position: 'absolute', top: 10, right: 10}}>
+                {sourceIcon(contract.providerSource)}
+              </div>
+            </FinalCard>
+            <FinalCard fluid color="purple" style={{maxWidth: '550px'}}>
+              <h3>Consumer (You)</h3>
+              <AddressBlockie>
+                <ConsumerBlockie />
+                <Address>{consumerAccount}</Address>
+               </AddressBlockie>
+            </FinalCard>
+            <div style={{marginTop: 20}}>
               <p>
                 Confirm below to accept the energy contract with Shasta, paying
                 the first month beforehand in Sha token.
@@ -555,7 +614,7 @@ class Consumer extends Component {
         }
       }
       return (
-        <ShastaCard fluid color="purple">
+        <ShastaCard fluid color="purple" style={{width: '80%'}}>
           <Card.Content>
             <Card.Header>
               {contract.amountkWh} kWh at {contract.energyPrice} Shas/kWh
