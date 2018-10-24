@@ -10,7 +10,7 @@ import {
   Table
 } from "semantic-ui-react";
 import SharedMap from "./SharedMap";
-import withDrizzleContext from "../../utils/withDrizzleContext";
+import withRawDrizzle from "../../utils/withRawDrizzle";
 import { connect } from "react-redux";
 import _ from "lodash";
 import "./Producer.less";
@@ -508,4 +508,4 @@ function mapStateToProps(state, props) {
   return { user: state.userReducer };
 }
 
-export default withDrizzleContext(connect(mapStateToProps)(Producer));
+export default withRawDrizzle(connect(mapStateToProps)(Producer));

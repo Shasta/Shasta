@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button, Form, Message } from "semantic-ui-react";
 import { CountryDropdown, RegionDropdown } from "react-country-region-selector";
-import withDrizzleContext from "../../utils/withDrizzleContext";
+import withRawDrizzle from "../../utils/withRawDrizzle";
 import { connect } from "react-redux";
 import ipfs from "../../ipfs";
 import _ from "lodash";
@@ -181,4 +181,4 @@ function mapStateToProps(state, props) {
   return { user: state.userReducer };
 }
 
-export default withDrizzleContext(connect(mapStateToProps)(Settings));
+export default withRawDrizzle(connect(mapStateToProps)(Settings));

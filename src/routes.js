@@ -1,6 +1,5 @@
 import SignIn from "./components/SignIn/SignIn";
 import SignUp from "./components/SignUp/SignUp";
-import Logout from "./components/Logout";
 import Forgot from "./components/SignIn/Forgot";
 import DashboardHome from "./components/Home/Home";
 import Consumer from "./components/Consumer/Consumer";
@@ -83,10 +82,5 @@ export const privateRoutes = {
     iconOff: settingsIconOff,
     iconOn: settingsIconOn
   },
-  Logout: {
-    path: "/logout",
-    component: Logout,
-    title: "Logout",
-    hiddenOnSideBar: true
-  }
+  
 };

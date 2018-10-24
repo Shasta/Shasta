@@ -1,26 +1,29 @@
 import React from "react";
 import { privateRoutes } from "../routes";
 import { Image, Menu, Sidebar, MenuItem } from "semantic-ui-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import _ from "lodash";
 import Tab from "../components/Tab/Tab";
 import logo from "../static/logo-shasta.png";
-import withDrizzleContext from "../utils/withDrizzleContext";
+import withRawDrizzle from "../utils/withRawDrizzle";
 import { connect } from "react-redux";
 import "./PrivateLayout.less";
 import LoadingTop from '../components/LoadingTop';
+import LoadingCenter from '../components/LoadingCenter';
 import { LoadingActions }  from '../redux/LoadingActions';
+import { UserActions }  from '../redux/UserActions';
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
     this.loaderAction = new LoadingActions(this.props.dispatch);
+    this.userActions = new UserActions(this.props.dispatch);
   }
 
   componentDidUpdate(newProps, newState) {
-    const { drizzleState } = newProps;
-    console.log("priv", drizzleState)
+    const { drizzleState, initialized, isAppLoading } = newProps;
+
     if (drizzleState && drizzleState.transactionStack) {
       const latestTx = drizzleState.transactionStack.length -1;
       const txHash = drizzleState.transactionStack[latestTx];
@@ -42,11 +45,15 @@ class Dashboard extends React.Component {
   componentWillUnmount() {
     this.loaderAction.hide();
   }
-
+  
   render() {
-    const { web3, account, balance, isAppLoading } = this.props;
+    const { web3, account, balance, isAppLoading, initialized, drizzleState, user } = this.props;
     const Component = this.props.component;
-
+    const drizzleInit = initialized && drizzleState;
+    const drizzleUnlocked = initialized && drizzleState && !!Object.keys(drizzleState.accounts).length;
+    if (drizzleInit && !drizzleUnlocked) {
+      return <Redirect to="/logout" />
+    }
     const Links = _.map(privateRoutes, (privRoute, key) => {
       if (!privRoute.hiddenOnSideBar) {
         return (
@@ -112,9 +119,11 @@ class Dashboard extends React.Component {
             padding: "60px"
           }}
         >
-          <Component {...this.props} />
+          { drizzleInit && !drizzleUnlocked && <div>You Ethereum account should be unlocked. </div>}
+          { drizzleUnlocked && <Component {...this.props} /> }
         </div>
         {isAppLoading == true && <LoadingTop />}
+        {!drizzleInit && <LoadingCenter />}
       </div>
     );
   }
@@ -129,7 +138,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) { return { dispatch }; }
 
-export default withDrizzleContext(
+export default withRawDrizzle(
   connect(
     mapStateToProps,
     mapDispatchToProps
