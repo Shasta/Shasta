@@ -58,8 +58,8 @@ class Hardware extends Component {
     const { drizzle, drizzleState } = this.props;
     const hardwareId = await drizzle.contracts.HardwareData.methods.getHardwareIdFromSender().call({ from: drizzleState.accounts[0] });
     console.log("hw: ", hardwareId);
-    const utfHardwareId = drizzle.web3.utils.hexToUtf8(hardwareId);
-    if (hardwareId) {
+    if (!!hardwareId) {
+      const utfHardwareId = drizzle.web3.utils.hexToUtf8(hardwareId);
       this.setState({
         hasHardware: true,
         hardwareId: utfHardwareId
@@ -68,6 +68,10 @@ class Hardware extends Component {
       this.getAccountInfo();
       this.getHistoryConsumedEnergy();
       this.getHistorySurplusEnergy();
+    } else {
+      this.setState({
+        hasHardware: false
+      });
     }
 
   }
@@ -97,6 +101,9 @@ class Hardware extends Component {
     const { drizzle, drizzleState } = this.props;
     
     const hexHardwareId = drizzle.web3.utils.utf8ToHex(this.state.inputHardwareId)
+    console.log(drizzle.contracts)
+    const addressHaveOrg = await drizzle.contracts.User.methods.hasUser(drizzleState.accounts[0]).call();
+    console.log(addressHaveOrg)
     const hardwareGas = await drizzle.contracts.HardwareData.methods
     .addNewHardwareId(hexHardwareId)
     .estimateGas({ from: drizzleState.accounts[0] });

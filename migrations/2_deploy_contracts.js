@@ -12,7 +12,7 @@ module.exports = function(deployer) {
   deployer.deploy(ShastaMarket).then(function() {
     
     return deployer.deploy(User, ShastaMarket.address).then(function() {
-      
+      console.log("HOLAAAAAAAAAAAAAAAAA:", User.address)
       return deployer.deploy(HardwareData, User.address);
       
     })
