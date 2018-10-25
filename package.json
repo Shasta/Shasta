@@ -97,7 +97,7 @@
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-less": "^2.4.0",
     "semantic-ui-react": "^0.82.5",
-    "shasta-os": "git+ssh://git@github.com/Shasta/ShastaOS.git#5f21a524ac70aeedd44466f51e94ad271ab40293",
+    "shasta-os": "git+ssh://git@github.com/Shasta/ShastaOS.git#ef0370afd9fb93c9cc201213a1b29134e616dbb8",
     "solc": "^0.4.24",
     "styled-components": "^3.4.9",
     "sw-precache-webpack-plugin": "0.11.4",

@@ -11,7 +11,7 @@ module.exports = function(deployer) {
   deployer.deploy(ContractRegistry);
   deployer.deploy(ShastaMarket).then(function() {
     
-    deployer.deploy(User, ShastaMarket.address).then(function() {
+    return deployer.deploy(User, ShastaMarket.address).then(function() {
       
       return deployer.deploy(HardwareData, User.address);
       
