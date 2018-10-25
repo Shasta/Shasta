@@ -1,0 +1,1 @@
+export const toKwH = (watts) => +(watts / 1000).toFixed(2);
