@@ -3,7 +3,7 @@ import axios from "axios";
 import HardwareCharts from "./HardwareCharts";
 import { Grid, Transition, Button, Input } from "semantic-ui-react";
 import ConsumptionChart from "./ConsumptionChart";
-import ProductionChart from "./ConsumptionChart";
+import ProductionChart from "./ProductionChart";
 import { toKwH } from '../../utils/energyUnits';
 import "./Hardware.less";
 
@@ -38,17 +38,6 @@ const ShastaButton = styled(Button)`
 `;
 
 class Hardware extends Component {
-  state = {
-    consumptionMetrics: [],
-    accountInfo: {},
-    historyConsumedEnergy: [],
-    historySurplusEnergy: [],
-    currentMetrics: {
-      watts_consumed: 0,
-      watts_produced: 0,
-      watts_surplus: 0
-    }
-  };
 
   constructor(props) {
     super(props);
@@ -59,6 +48,12 @@ class Hardware extends Component {
       hardwareId: '',
       historyConsumedEnergy: [],
       historySurplusEnergy: [],
+      consumptionMetrics: [],
+      currentMetrics: {
+        kwh_consumed: 0,
+        kwh_produced: 0,
+        kwh_surplus: 0
+      },
       txAdd: null,
       txDel: null
     };
@@ -123,16 +118,16 @@ class Hardware extends Component {
     const txAdd = await drizzle.contracts.HardwareData.methods
       .addNewHardwareId
       .cacheSend(hexHardwareId, { from: drizzleState.accounts[0], gas: hardwareGas });
-      this.setState({
-        txAdd
-      });
+    this.setState({
+      txAdd
+    });
   }
 
   async removeHardwareId() {
 
     const { drizzle, drizzleState } = this.props;
 
-    console.log( drizzle.contracts.HardwareData.methods)
+    console.log(drizzle.contracts.HardwareData.methods)
     const hardwareGas = await drizzle.contracts.HardwareData.methods
       .removeHadwareId()
       .estimateGas({ from: drizzleState.accounts[0] });
@@ -140,9 +135,9 @@ class Hardware extends Component {
     const txDel = await drizzle.contracts.HardwareData.methods
       .removeHadwareId
       .cacheSend({ from: drizzleState.accounts[0], gas: hardwareGas });
-      this.setState({
-        txDel
-      });
+    this.setState({
+      txDel
+    });
   }
 
   async getHistorySurplusEnergy() {
@@ -157,7 +152,7 @@ class Hardware extends Component {
   }
 
   getMetricsHistory = async (unitOfTime) => {
-    const result = await axios.get('http://localhost:5050/api/metrics/by-unit-time', { params: { hardware_id: '1b1b44ab-67f8-4820-b344-5f333fc2f5a8', by: unitOfTime } })
+    const result = await axios.get('http://localhost:5050/api/metrics/by-unit-time', { params: { hardware_id: this.state.hardwareId, by: unitOfTime } })
     this.setState({
       consumptionMetrics: result.data.history_by_unit.map(metric => ({
         date: metric.timestamp,
@@ -167,19 +162,20 @@ class Hardware extends Component {
   }
 
   getCurrentMetrics = async () => {
-    const result = await axios.get('http://localhost:5050/api/metrics/current-month', { params: { hardware_id: '1b1b44ab-67f8-4820-b344-5f333fc2f5a8' } })
+    const result = await axios.get('http://localhost:5050/api/metrics/current-month', { params: { hardware_id: this.state.hardwareId } })
     console.log('current', result)
-    this.setState({
-      currentMetrics: {
-        kwh_consumed: toKwH(result.data.metrics.watts_consumed),
-        kwh_produced: toKwH(result.data.metrics.watts_produced),
-        kwh_surplus: toKwH(result.data.metrics.watts_surplus),
-      }
-    });
+    if (result) {
+      this.setState({
+        currentMetrics: {
+          kwh_consumed: toKwH(result.data.metrics.watts_consumed),
+          kwh_produced: toKwH(result.data.metrics.watts_produced),
+          kwh_surplus: toKwH(result.data.metrics.watts_surplus),
+        }
+      });
+    }
   }
 
   render() {
-    
     return (
       <div>
         <div>
@@ -229,48 +225,48 @@ class Hardware extends Component {
                     <ShastaIcon src={img.iconConsumition} />
                     your consumption: (KwH)
                 </h2>
-                <div>
-                  <ConsumptionChart
-                    color={"rgba(243,166,210,1)"}
-                    color2={"rgba(243,166,210,0.4)"}
-                    data={this.state.consumptionMetrics}
-                  />
-                </div>
-                <div>
-                  <ProductionChart
-                    color={"rgba(243,166,210,1)"}
-                    color2={"rgba(243,166,210,0.4)"}
-                    data={this.state.consumptionMetrics}
-                  />
-                </div>
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column style={{ width: "50%" }}>
-                <h2>
-                  <ShastaIcon src={img.iconEnergy} />
-                  Energy:
+                  <div>
+                    <ConsumptionChart
+                      color={"rgba(243,166,210,1)"}
+                      color2={"rgba(243,166,210,0.4)"}
+                      data={this.state.consumptionMetrics}
+                    />
+                  </div>
+                  <div>
+                    <ProductionChart
+                      color={"rgba(243,166,210,1)"}
+                      color2={"rgba(243,166,210,0.4)"}
+                      data={this.state.consumptionMetrics}
+                    />
+                  </div>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column style={{ width: "50%", top:"-200px" }}>
+                  <h2>
+                    <ShastaIcon src={img.iconEnergy} />
+                    Energy:
                 </h2>
                   <div className="pinkBorder">
                     <li>
                       Consumed this month:
                     <ShastaValue>
-                      {this.state.currentMetrics.kwh_consumed} KwH
+                        {this.state.currentMetrics.kwh_consumed} KwH
                     </ShastaValue>
-                  </li>
-                  <li>
-                    Produced this month:
+                    </li>
+                    <li>
+                      Produced this month:
                     <ShastaValue>
-                      {this.state.currentMetrics.kwh_produced} KwH
+                        {this.state.currentMetrics.kwh_produced} KwH
                     </ShastaValue>
-                  </li>
-                  <li>
-                    Total surplus energy month:{" "}
-                    <ShastaValue>
-                      {this.state.currentMetrics.kwh_surplus} KwH
+                    </li>
+                    <li>
+                      Total surplus energy month:{" "}
+                      <ShastaValue>
+                        {this.state.currentMetrics.kwh_surplus} KwH
                     </ShastaValue>
-                  </li>
-                  {/*
+                    </li>
+                    {/*
                   <li>
                     Remaining surplus to sell:{" "}
                     <ShastaValue>
@@ -278,8 +274,9 @@ class Hardware extends Component {
                     </ShastaValue>
                   </li>
                   */}
-                </div>
-              </Grid.Column>
+                  </div>
+                  <ShastaButton type='submit' className="removeHardwareIdBtn" onClick={this.removeHardwareId}>Remove Hardware</ShastaButton>
+                </Grid.Column>
 
                 <Grid.Column style={{ width: "50%" }}>
                   <h2>
