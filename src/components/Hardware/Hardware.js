@@ -23,15 +23,15 @@ const ShastaValue = styled.span`
   width: 300px;
 `;
 
-const ShastaButton = styled.button`
-  background-color: #402d41;
-  text-align: center;
-  color: white;
-  border-radius: 8px;
-  width: 110px;
-  height: 35px;
-  border: 0;
-  cursor: pointer;
+const ShastaButton = styled(Button)`
+  background-color: #402d41 !important;
+  text-align: center !important;
+  color: white !important;
+  border-radius: 8px !important;
+  width: 110px !important;
+  height: 35px !important;
+  border: 0 !important;
+  cursor: pointer !important;
 `;
 
 class Hardware extends Component {
@@ -44,13 +44,15 @@ class Hardware extends Component {
       hardwareId: '',
       historyConsumedEnergy: [],
       historySurplusEnergy: [],
-      tx: null
+      txAdd: null,
+      txDel: null
     };
     this.getAccountInfo = this.getAccountInfo.bind(this);
     this.getHistoryConsumedEnergy = this.getHistoryConsumedEnergy.bind(this);
     this.getHistorySurplusEnergy = this.getHistorySurplusEnergy.bind(this);
     this.handleHardwareInput = this.handleHardwareInput.bind(this);
     this.addHardwareId = this.addHardwareId.bind(this);
+    this.removeHardwareId = this.removeHardwareId.bind(this);
   }
 
   async componentDidMount() {
@@ -99,19 +101,35 @@ class Hardware extends Component {
   async addHardwareId() {
 
     const { drizzle, drizzleState } = this.props;
-    
+
     const hexHardwareId = drizzle.web3.utils.utf8ToHex(this.state.inputHardwareId)
-    console.log(drizzle.contracts)
-    const addressHaveOrg = await drizzle.contracts.User.methods.hasUser(drizzleState.accounts[0]).call();
-    console.log(addressHaveOrg)
     const hardwareGas = await drizzle.contracts.HardwareData.methods
-    .addNewHardwareId(hexHardwareId)
-    .estimateGas({ from: drizzleState.accounts[0] });
+      .addNewHardwareId(hexHardwareId)
+      .estimateGas({ from: drizzleState.accounts[0] });
 
-    const tx = await drizzle.contracts.HardwareData.methods
-    .addNewHardwareId
-    .cacheSend(hexHardwareId, { from: drizzleState.accounts[0], gas: hardwareGas });
+    const txAdd = await drizzle.contracts.HardwareData.methods
+      .addNewHardwareId
+      .cacheSend(hexHardwareId, { from: drizzleState.accounts[0], gas: hardwareGas });
+      this.setState({
+        txAdd
+      });
+  }
 
+  async removeHardwareId() {
+
+    const { drizzle, drizzleState } = this.props;
+
+    console.log( drizzle.contracts.HardwareData.methods)
+    const hardwareGas = await drizzle.contracts.HardwareData.methods
+      .removeHadwareId()
+      .estimateGas({ from: drizzleState.accounts[0] });
+
+    const txDel = await drizzle.contracts.HardwareData.methods
+      .removeHadwareId
+      .cacheSend({ from: drizzleState.accounts[0], gas: hardwareGas });
+      this.setState({
+        txDel
+      });
   }
 
   async getHistorySurplusEnergy() {
@@ -126,6 +144,7 @@ class Hardware extends Component {
   }
 
   render() {
+    
     return (
       <div>
         <div>
@@ -211,6 +230,7 @@ class Hardware extends Component {
                     </ShastaValue>
                     </li>
                   </div>
+                  <ShastaButton type='submit' className="removeHardwareIdBtn" onClick={this.removeHardwareId}>Remove Hardware</ShastaButton>
                 </Grid.Column>
 
                 <Grid.Column style={{ width: "50%" }}>
