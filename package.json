@@ -84,6 +84,7 @@
     "google-map-react": "^1.0.6",
     "ipfs-api": "^24.0.1",
     "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "object-assign": "4.1.1",
     "react": "^16.5.2",
     "react-chartjs-2": "^2.7.4",
