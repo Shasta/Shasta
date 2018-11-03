@@ -11,6 +11,7 @@ import PublicLayout from "./layouts/PublicLayout";
 import PrivateLayout from "./layouts/PrivateLayout";
 
 import Error404 from "./components/404/Error404";
+var Web3 = require('web3');
 
 class App extends Component {
   constructor(props) {
@@ -26,6 +27,28 @@ class App extends Component {
   componentWillMount() {
     this.userActions.verify();
   }
+
+  componentDidMount() {
+    window.addEventListener('load', async () => {
+      // Modern dapp browsers...
+      if (window.ethereum) {
+          window.web3 = new Web3(window.ethereum);
+          try {
+              // Request account access if needed
+              await window.ethereum.enable();
+              // Acccounts now exposed
+             // web3.eth.sendTransaction({/* ... */});
+          } catch (error) {
+              // User denied account access...
+          }
+      }
+      
+      else {
+          console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+      }
+    });
+  }
+
 
   render() {
     const user = this.props.user ? this.props.user : { logged: false };
