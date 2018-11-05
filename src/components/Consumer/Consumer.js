@@ -27,7 +27,6 @@ import "./Consumer.css";
 import ipfs from "../../ipfs";
 import withRawDrizzle from "../../utils/withRawDrizzle";
 import { connect } from "react-redux";
-import { countryOptions } from "./common";
 import MyStep from "./stepper/MyStep";
 import styled from "styled-components";
 import _ from 'lodash';
@@ -203,7 +202,6 @@ class Consumer extends Component {
       producersOffersList: [],
       totalToPay: 0,
       filterSources: [],
-      filterCountry: "",
       filterAmount: "",
       currentStep: 0,
       tx: null,
@@ -279,10 +277,6 @@ class Consumer extends Component {
       }
     });
   }
-
-  selectCountry = (e, val) => {
-    this.setState({ filterCountry: val.value });
-  };
 
   handleChangefilterAmount = (e, data) => {
     this.setState({
@@ -421,19 +415,6 @@ class Consumer extends Component {
                   </div>
                 </ShastaGridRow>
               </div>
-              <ShastaGridRow>
-                <div style={{ paddingLeft: 20 }}>
-                  <h3>Country:</h3>
-                  <Dropdown
-                    placeholder="Select Country"
-                    fluid
-                    search
-                    selection
-                    onChange={this.selectCountry}
-                    options={countryOptions}
-                  />
-                </div>
-              </ShastaGridRow>
               <Message color="red" hidden={!this.state.messageVisibility}>
                 Select an amount of energy to buy please.
               </Message>
