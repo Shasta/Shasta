@@ -53,7 +53,7 @@ class MainChart extends Component {
         <h2>
           {" "}
           <ShastaIcon src={iconSHA} />
-          Sha historic
+          SHA historic
         </h2>
         <Line data={data} options={options} height={100} />
       </Fragment>

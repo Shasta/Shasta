@@ -521,8 +521,8 @@ class Consumer extends Component {
                 <Address>{contract.ethAddress}</Address>
               </AddressBlockie>
               <Paragraphs>
-                <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} Sha per kWh.</p>
-                <p style={{marginTop: 10}}>Average monthly cost: {totalPrice} Sha for {averageConsumerEnergy} kWh</p>
+                <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} SHA per kWh.</p>
+                <p style={{marginTop: 10}}>Average monthly cost: {totalPrice} SHA for {averageConsumerEnergy} kWh</p>
                 <p>Energy source: {contract.providerSource}</p>
               </Paragraphs>
               <div style={{position: 'absolute', top: 10, right: 10}}>
@@ -539,7 +539,7 @@ class Consumer extends Component {
             <div style={{marginTop: 20}}>
               <p>
                 Confirm below to accept the energy contract with Shasta, paying
-                the first month beforehand in Sha token.
+                the first month beforehand in SHA token.
               </p>
             </div>
             <div style={{ paddingTop: 20, display: "flex" }}>
@@ -628,7 +628,7 @@ class Consumer extends Component {
             <Grid stackable columns={2}>
               <Grid.Column>
                 <p>Source: {contract.providerSource}</p>
-                <p>Total Price: {contract.fiatAmount} Sha</p>
+                <p>Total Price: {contract.fiatAmount} SHA</p>
                 <ShastaBuyButton
                   onClick={() => this.handleOfferSelection(contract)}
                 >
