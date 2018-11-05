@@ -28,28 +28,6 @@ class App extends Component {
     this.userActions.verify();
   }
 
-  componentDidMount() {
-    window.addEventListener('load', async () => {
-      // Modern dapp browsers...
-      if (window.ethereum) {
-          window.web3 = new Web3(window.ethereum);
-          try {
-              // Request account access if needed
-              await window.ethereum.enable();
-              // Acccounts now exposed
-             // web3.eth.sendTransaction({/* ... */});
-          } catch (error) {
-              // User denied account access...
-          }
-      }
-      
-      else {
-          console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      }
-    });
-  }
-
-
   render() {
     const user = this.props.user ? this.props.user : { logged: false };
     return (
