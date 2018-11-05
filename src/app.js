@@ -11,6 +11,7 @@ import PublicLayout from "./layouts/PublicLayout";
 import PrivateLayout from "./layouts/PrivateLayout";
 
 import Error404 from "./components/404/Error404";
+var Web3 = require('web3');
 
 class App extends Component {
   constructor(props) {
