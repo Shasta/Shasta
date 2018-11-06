@@ -16,7 +16,7 @@ if (targetNetwork == "rinkeby") {
   const ShaLedger = require('../build/contracts/ShaLedger.json');
   const ContractRegistry = require('../build/contracts/ContractRegistry.json');
   const BillSystem = require('../build/contracts/BillSystem.json');
-  const HardwareData = require('shasta-os/build/contracts/HardwareData.json');
+  const HardwareData = require('../build/contracts/HardwareData.json');
 
   contracts = [User, ShastaMarket, ShaLedger, ContractRegistry, BillSystem, HardwareData];
 }

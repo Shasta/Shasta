@@ -43,7 +43,7 @@ class Hardware extends Component {
     super(props);
     this.state = {
       accountInfo: {},
-      hasHardware: true,
+      hasHardware: false,
       inputHardwareId: '',
       hardwareId: '',
       historyConsumedEnergy: [],
@@ -55,7 +55,9 @@ class Hardware extends Component {
         kwh_surplus: 0
       },
       txAdd: null,
-      txDel: null
+      txDel: null,
+      txi: null,
+      lock: false
     };
     this.getAccountInfo = this.getAccountInfo.bind(this);
     this.getHistoryConsumedEnergy = this.getHistoryConsumedEnergy.bind(this);
@@ -68,26 +70,67 @@ class Hardware extends Component {
   async componentDidMount() {
 
     const { drizzle, drizzleState } = this.props;
-    const hardwareId = await drizzle.contracts.HardwareData.methods.getHardwareIdFromSender().call({ from: drizzleState.accounts[0] });
-    console.log("hw: ", hardwareId);
-    if (!!hardwareId) {
-      const utfHardwareId = drizzle.web3.utils.hexToUtf8(hardwareId);
-      this.setState({
-        hasHardware: true,
-        hardwareId: utfHardwareId
-      });
+    const txi = drizzle.contracts.HardwareData.methods.getHardwareIdFromSender.cacheCall({ from: drizzleState.accounts[0] });
+    this.setState({
+      txi
+    });
+  }
 
-      this.getAccountInfo();
-      this.getHistoryConsumedEnergy();
-      this.getHistorySurplusEnergy();
-    } else {
-      this.setState({
-        hasHardware: false
-      });
+  async componentDidUpdate() {
+
+    const { drizzle, drizzleState } = this.props;
+    const { txi, txDel, txAdd, lock } = this.state;
+
+    if (drizzleState && !lock && drizzleState.contracts.HardwareData && txi in drizzleState.contracts.HardwareData.getHardwareIdFromSender) {
+      const hardwareId = drizzleState.contracts.HardwareData.getHardwareIdFromSender[txi].value;
+      if (hardwareId) {
+        const utfHardwareId = drizzle.web3.utils.hexToUtf8(hardwareId);
+        this.setState({
+          hasHardware: true,
+          hardwareId: utfHardwareId,
+          lock: true
+        });
+
+        this.getAccountInfo();
+        this.getHistoryConsumedEnergy();
+        this.getHistorySurplusEnergy();
+        return Promise.all([this.getMetricsHistory('month'), this.getCurrentMetrics()])
+      }
     }
 
-    return Promise.all([this.getMetricsHistory('month'), this.getCurrentMetrics()])
+    if (txDel >= 0) {
+      const txHash = drizzleState.transactionStack[txDel];
+      if (drizzleState.transactions[txHash]) {
+        const transactionStatus = drizzleState.transactions[txHash].status;        
+        if (transactionStatus == "success") {
+          this.setState({
+            hasHardware: false,
+            txDel: null,
+            lock: false,
+            txi: null,
+            utfHardwareId: null
+          });
+        }
+      }
+    }
+
+    if (txAdd >= 0) {
+      const txHash = drizzleState.transactionStack[txAdd];
+      if (drizzleState.transactions[txHash]) {
+        const transactionStatus = drizzleState.transactions[txHash].status;
+        console.log(transactionStatus)   
+        if (transactionStatus == "success") {
+          const tx = drizzle.contracts.HardwareData.methods.getHardwareIdFromSender.cacheCall({ from: drizzleState.accounts[0] });
+          this.setState({
+            txAdd: null,
+            lock: false,
+            txi: tx
+          });
+        }
+      }
+    }
   }
+
 
   async getAccountInfo() {
     let result = await axios.get("/api/accountInfo.json");
@@ -102,8 +145,6 @@ class Hardware extends Component {
     this.setState({
       historyConsumedEnergy: result.data.data
     });
-
-
   }
 
   async addHardwareId() {
@@ -127,12 +168,11 @@ class Hardware extends Component {
 
     const { drizzle, drizzleState } = this.props;
 
-    console.log(drizzle.contracts.HardwareData.methods)
     const hardwareGas = await drizzle.contracts.HardwareData.methods
       .removeHadwareId()
       .estimateGas({ from: drizzleState.accounts[0] });
 
-    const txDel = await drizzle.contracts.HardwareData.methods
+    const txDel = drizzle.contracts.HardwareData.methods
       .removeHadwareId
       .cacheSend({ from: drizzleState.accounts[0], gas: hardwareGas });
     this.setState({
@@ -242,7 +282,7 @@ class Hardware extends Component {
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
-                <Grid.Column style={{ width: "50%", top:"-200px" }}>
+                <Grid.Column style={{ width: "50%", top: "-200px" }}>
                   <h2>
                     <ShastaIcon src={img.iconEnergy} />
                     Energy:
