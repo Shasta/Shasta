@@ -49,6 +49,7 @@ class Hardware extends Component {
       historyConsumedEnergy: [],
       historySurplusEnergy: [],
       consumptionMetrics: [],
+      productionMetrics: [],
       currentMetrics: {
         kwh_consumed: 0,
         kwh_produced: 0,
@@ -94,7 +95,7 @@ class Hardware extends Component {
         this.getAccountInfo();
         this.getHistoryConsumedEnergy();
         this.getHistorySurplusEnergy();
-        return Promise.all([this.getMetricsHistory('month'), this.getCurrentMetrics()])
+        return Promise.all([this.getMetricsHistory('month', utfHardwareId), this.getCurrentMetrics(utfHardwareId)])
       }
     }
 
@@ -191,18 +192,23 @@ class Hardware extends Component {
     this.setState({ inputHardwareId: event.target.value })
   }
 
-  getMetricsHistory = async (unitOfTime) => {
-    const result = await axios.get('http://localhost:5050/api/metrics/by-unit-time', { params: { hardware_id: this.state.hardwareId, by: unitOfTime } })
+  getMetricsHistory = async (unitOfTime, hardwareId) => {
+    const result = await axios.get('http://localhost:5050/api/metrics/by-unit-time', { params: { hardware_id: hardwareId, by: unitOfTime } })
+    console.log("res: ", result)
     this.setState({
       consumptionMetrics: result.data.history_by_unit.map(metric => ({
         date: metric.timestamp,
         value: toKwH(metric.watts_consumed),
+      })),
+      productionMetrics: result.data.history_by_unit.map(metric => ({
+        date: metric.timestamp,
+        value: toKwH(metric.watts_produced),
       }))
     });
   }
 
-  getCurrentMetrics = async () => {
-    const result = await axios.get('http://localhost:5050/api/metrics/current-month', { params: { hardware_id: this.state.hardwareId } })
+  getCurrentMetrics = async (hardwareId) => {
+    const result = await axios.get('http://localhost:5050/api/metrics/current-month', { params: { hardware_id: hardwareId } })
     console.log('current', result)
     if (result) {
       this.setState({
@@ -214,8 +220,9 @@ class Hardware extends Component {
       });
     }
   }
-
+  
   render() {
+    console.log("render: ", this.state.consumptionMetrics)
     return (
       <div>
         <div>
@@ -276,7 +283,7 @@ class Hardware extends Component {
                     <ProductionChart
                       color={"rgba(243,166,210,1)"}
                       color2={"rgba(243,166,210,0.4)"}
-                      data={this.state.consumptionMetrics}
+                      data={this.state.productionMetrics}
                     />
                   </div>
                 </Grid.Column>
