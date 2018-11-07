@@ -110,13 +110,15 @@
     "yaeti": "^1.0.2"
   },
   "scripts": {
-    "dev": "truffle migrate --reset && concurrently \"npm run start\" ",
+    "dev": "concurrently \"npm run ganache:dev \" \"npm run migrate:dev\" \"npm run start\" ",
     "dev:demo": "truffle migrate --reset && npm run demo && concurrently \"npm run start\" ",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
     "demo": "truffle exec demo/demo.js",
-    "server": "node server/index.js"
+    "server": "node server/index.js",
+    "ganache:dev": "ganache-cli -i 5777 -m 'alley begin crumble design dress snap scorpion gym search rural bitter empower'",
+    "migrate:dev": "truffle migrate --reset --network development"
   },
   "jest": {
     "collectCoverageFrom": [

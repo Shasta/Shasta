@@ -7,7 +7,7 @@ export default class ProductionChart extends Component {
       labels: [],
       datasets: [
         {
-          label: "KwH production over time",
+          label: "KwH surplus over time",
           backgroundColor: this.props.color,
 					borderColor: this.props.color2,
 					fill: true,

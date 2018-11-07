@@ -10,7 +10,7 @@ export default class ConsumptionChart extends Component {
           label: "KwH consumption over time",
           backgroundColor: this.props.color,
 					borderColor: this.props.color2,
-					fill: false,
+					fill: true,
           data: []
         }
       ]

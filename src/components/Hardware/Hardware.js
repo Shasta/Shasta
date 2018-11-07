@@ -4,6 +4,7 @@ import HardwareCharts from "./HardwareCharts";
 import { Grid, Transition, Button, Input } from "semantic-ui-react";
 import ConsumptionChart from "./ConsumptionChart";
 import ProductionChart from "./ProductionChart";
+import SurplusChart from "./SurplusChart";
 import { toKwH } from '../../utils/energyUnits';
 import "./Hardware.less";
 
@@ -50,6 +51,7 @@ class Hardware extends Component {
       historySurplusEnergy: [],
       consumptionMetrics: [],
       productionMetrics: [],
+      surplusMetrics: [],
       currentMetrics: {
         kwh_consumed: 0,
         kwh_produced: 0,
@@ -197,12 +199,16 @@ class Hardware extends Component {
     console.log("res: ", result)
     this.setState({
       consumptionMetrics: result.data.history_by_unit.map(metric => ({
-        date: metric.timestamp,
+        date: metric.timestamp_iso,
         value: toKwH(metric.watts_consumed),
       })),
       productionMetrics: result.data.history_by_unit.map(metric => ({
-        date: metric.timestamp,
+        date: metric.timestamp_iso,
         value: toKwH(metric.watts_produced),
+      })),
+      surplusMetrics: result.data.history_by_unit.map(metric => ({
+        date: metric.timestamp_iso,
+        value: toKwH(metric.watts_surplus),
       }))
     });
   }
@@ -250,7 +256,7 @@ class Hardware extends Component {
                   <h2>
                     <ShastaIcon src={img.iconHardware} />
                     Hardware:
-                </h2>
+                  </h2>
 
                   <div className="pinkBorder">
                     <li>
@@ -266,34 +272,10 @@ class Hardware extends Component {
                       </span>
                     </li>
                   </div>
-                </Grid.Column>
-                <Grid.Column style={{ width: "50%" }}>
-                  <h2>
-                    <ShastaIcon src={img.iconConsumition} />
-                    your consumption: (KwH)
-                </h2>
-                  <div>
-                    <ConsumptionChart
-                      color={"rgba(243,166,210,1)"}
-                      color2={"rgba(243,166,210,0.4)"}
-                      data={this.state.consumptionMetrics}
-                    />
-                  </div>
-                  <div>
-                    <ProductionChart
-                      color={"rgba(243,166,210,1)"}
-                      color2={"rgba(243,166,210,0.4)"}
-                      data={this.state.productionMetrics}
-                    />
-                  </div>
-                </Grid.Column>
-              </Grid.Row>
-              <Grid.Row>
-                <Grid.Column style={{ width: "50%", top: "-200px" }}>
                   <h2>
                     <ShastaIcon src={img.iconEnergy} />
                     Energy:
-                </h2>
+                  </h2>
                   <div className="pinkBorder">
                     <li>
                       Consumed this month:
@@ -324,17 +306,34 @@ class Hardware extends Component {
                   </div>
                   <ShastaButton type='submit' className="removeHardwareIdBtn" onClick={this.removeHardwareId}>Remove Hardware</ShastaButton>
                 </Grid.Column>
-
                 <Grid.Column style={{ width: "50%" }}>
+                  <h2>
+                    <ShastaIcon src={img.iconConsumition} />
+                    Your consumption: (KwH)
+                  </h2>
+                  <div>
+                    <ConsumptionChart
+                      color2={"rgba(243,166,210,1)"}
+                      color={"rgba(243,166,210,0.4)"}
+                      data={this.state.consumptionMetrics}
+                    />
+                  </div>
+                  <div>
+                    <ProductionChart
+                      color2={"rgba(243,166,210,1)"}
+                      color={"rgba(243,166,210,0.4)"}
+                      data={this.state.productionMetrics}
+                    />
+                  </div>
                   <h2>
                     <ShastaIcon src={img.iconSurplus} />
                     Your surplus: (KwH)
-                </h2>
+                  </h2>
                   <p>
-                    <HardwareCharts
-                      color={"rgba(129,117,130,1)"}
-                      color2={"rgba(129,117,130,0.4)"}
-                      data={this.state.historySurplusEnergy}
+                    <SurplusChart
+                      color2={"rgba(129,117,130,1)"}
+                      color={"rgba(129,117,130,0.4)"}
+                      data={this.state.surplusMetrics}
                     />
                   </p>
                 </Grid.Column>
