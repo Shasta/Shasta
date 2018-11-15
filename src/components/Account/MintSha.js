@@ -85,7 +85,7 @@ class MintSha extends Component {
         <Modal.Content>
           <p>
             Get your <u>100 Shasta</u> tokens to try the platform. Click in 'Claim your SHA' to initiate the transaction.
-            Remember you need Test Ether to retrieve your Sha Token. If you dont have any test Ether, you can retrieve from this <a href="https://faucet.rinkeby.io/" target="blank">Rinkeby testnet faucet.</a>
+            Remember you need Test Ether to retrieve your SHA Token. If you dont have any test Ether, you can retrieve from this <a href="https://faucet.rinkeby.io/" target="blank">Rinkeby testnet faucet.</a>
           </p>
           {transactionMsg.length > 0 && (<p>Transaction status: {transactionMsg}</p>)}
         </Modal.Content>

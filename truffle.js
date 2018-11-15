@@ -54,17 +54,17 @@ const mocha = process.env.GAS_REPORTER ? mochaGasSettings : {}
 
 module.exports = {
   networks: {
-    rinkeby: {
-      network_id: 4,
-      provider: providerForNetwork('rinkeby'),
-      gas: 6.9e6,
-      gasPrice: 15000000001
-    },
     development: {
       host: "localhost",
       network_id: "5777",
       port: 8545,
       gas: 4000000
+    },
+    rinkeby: {
+      network_id: 4,
+      provider: providerForNetwork('rinkeby'),
+      gas: 6.9e6,
+      gasPrice: 15000000001
     },
     coverage: {
       host: "localhost",

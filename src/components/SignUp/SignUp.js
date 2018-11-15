@@ -117,8 +117,11 @@ class SignUp extends Component {
         const zeroBN = web3.utils.toBN("0");
         // ShaLedger have 18 decimals, like Ether, so we can reuse `fromWei` util function.
         const rawBalance = drizzleState.contracts.ShaLedger.balanceOf[tokenBalancePointer].value;
-        const tokenBalance = web3.utils.toBN(rawBalance);
-        haveSha = tokenBalance.gt(zeroBN);
+        if (!!rawBalance) {
+          const tokenBalance = web3.utils.toBN(rawBalance);
+          haveSha = tokenBalance.gt(zeroBN);
+        }
+        
       }
     }
 

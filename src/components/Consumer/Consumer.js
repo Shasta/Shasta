@@ -27,7 +27,6 @@ import "./Consumer.css";
 import ipfs from "../../ipfs";
 import withRawDrizzle from "../../utils/withRawDrizzle";
 import { connect } from "react-redux";
-import { countryOptions } from "./common";
 import MyStep from "./stepper/MyStep";
 import styled from "styled-components";
 import _ from 'lodash';
@@ -203,7 +202,6 @@ class Consumer extends Component {
       producersOffersList: [],
       totalToPay: 0,
       filterSources: [],
-      filterCountry: "",
       filterAmount: "",
       currentStep: 0,
       tx: null,
@@ -279,10 +277,6 @@ class Consumer extends Component {
       }
     });
   }
-
-  selectCountry = (e, val) => {
-    this.setState({ filterCountry: val.value });
-  };
 
   handleChangefilterAmount = (e, data) => {
     this.setState({
@@ -405,7 +399,7 @@ class Consumer extends Component {
         });
 
         return (
-          <Grid>
+          <Grid className="filtersGrid">
             <Grid.Column style={{ width: "30%" }}>
               <div style={{ paddingBottom: 20 }}>
                 <ShastaGridRow>
@@ -421,19 +415,6 @@ class Consumer extends Component {
                   </div>
                 </ShastaGridRow>
               </div>
-              <ShastaGridRow>
-                <div style={{ paddingLeft: 20 }}>
-                  <h3>Country:</h3>
-                  <Dropdown
-                    placeholder="Select Country"
-                    fluid
-                    search
-                    selection
-                    onChange={this.selectCountry}
-                    options={countryOptions}
-                  />
-                </div>
-              </ShastaGridRow>
               <Message color="red" hidden={!this.state.messageVisibility}>
                 Select an amount of energy to buy please.
               </Message>
@@ -521,8 +502,8 @@ class Consumer extends Component {
                 <Address>{contract.ethAddress}</Address>
               </AddressBlockie>
               <Paragraphs>
-                <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} Sha per kWh.</p>
-                <p style={{marginTop: 10}}>Average monthly cost: {totalPrice} Sha for {averageConsumerEnergy} kWh</p>
+                <p>Can provide up to {contract.amountkWh} kWh at {contract.energyPrice} SHA per kWh.</p>
+                <p style={{marginTop: 10}}>Average monthly cost: {totalPrice} SHA for {averageConsumerEnergy} kWh</p>
                 <p>Energy source: {contract.providerSource}</p>
               </Paragraphs>
               <div style={{position: 'absolute', top: 10, right: 10}}>
@@ -539,7 +520,7 @@ class Consumer extends Component {
             <div style={{marginTop: 20}}>
               <p>
                 Confirm below to accept the energy contract with Shasta, paying
-                the first month beforehand in Sha token.
+                the first month beforehand in SHA token.
               </p>
             </div>
             <div style={{ paddingTop: 20, display: "flex" }}>
@@ -628,7 +609,7 @@ class Consumer extends Component {
             <Grid stackable columns={2}>
               <Grid.Column>
                 <p>Source: {contract.providerSource}</p>
-                <p>Total Price: {contract.fiatAmount} Sha</p>
+                <p>Total Price: {contract.fiatAmount} SHA</p>
                 <ShastaBuyButton
                   onClick={() => this.handleOfferSelection(contract)}
                 >

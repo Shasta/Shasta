@@ -132,9 +132,9 @@ class AccountData extends Component {
         <div className="indicatorEth">
           {balance} {units}
         </div>
-        <div className="indicatorSha">{tokenBalance} Sha</div>
+        <div className="indicatorSha">{tokenBalance} SHA</div>
         <MintShaModal>
-          <ShastaButton color="purple">Get Sha</ShastaButton>
+          <ShastaButton color="purple">Get SHA</ShastaButton>
         </MintShaModal>
       </EthAccount>
     );
