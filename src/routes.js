@@ -7,6 +7,8 @@ import Settings from "./components/Settings/Settings";
 import Producer from "./components/Producer/Producer";
 import Hardware from "./components/Hardware/Hardware";
 import Finance from "./components/Finance/Finance";
+import Billing from "./components/Billing/Billing"
+
 import homeIconOff from "./static/home_icon_off.png";
 import consumerIconOff from "./static/consumer_icon_off.png";
 import hardwareIconOff from "./static/hardware_icon_off.png";
@@ -46,6 +48,13 @@ export const privateRoutes = {
     title: "Home",
     iconOff: homeIconOff,
     iconOn: homeIconOn
+  },
+  Billing: {
+    path: "/billing",
+    component: Billing,
+    title: "Billing",
+    iconOff: financeIconOff,
+    iconOn: financeIconOn
   },
   Finances: {
     path: "/finances",

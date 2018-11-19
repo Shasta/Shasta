@@ -29,6 +29,7 @@ class Finance extends Component {
       totalEth: "",
       tokenBalancePointer: ""
     };
+    
   }
 
   async componentDidMount() {

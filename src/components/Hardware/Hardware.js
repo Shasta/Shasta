@@ -228,7 +228,6 @@ class Hardware extends Component {
   }
   
   render() {
-    console.log("render: ", this.state.consumptionMetrics)
     return (
       <div>
         <div>

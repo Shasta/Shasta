@@ -1,0 +1,11 @@
+.accordionTitles {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.accordionTitleItem {
+    width: 30%;
+    text-align: center;
+
+}
